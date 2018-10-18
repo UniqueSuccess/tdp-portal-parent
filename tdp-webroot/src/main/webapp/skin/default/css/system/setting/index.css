@@ -1,0 +1,479 @@
+.titleTab {
+  height: 40px;
+  width: 100%;
+  border-bottom: 1px solid #dedede;
+  background-color: #fff;
+}
+.titleTab li {
+  float: left;
+  height: 40px;
+  line-height: 40px;
+  width: 110px;
+  text-align: center;
+  cursor: pointer;
+}
+.titleTabactive {
+  color: #38D1BF;
+  border-bottom: 3px solid #38D1BF;
+  box-sizing: border-box;
+}
+.main-contentall {
+  background-color: white;
+  position: absolute;
+  top: 40px;
+  left: 0px;
+  right: 0px;
+  bottom: 0;
+  font-size: 14px;
+  clear: both;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.main-contentall .accountcon {
+  padding: 5px 20px 10px 20px;
+}
+.main-contentall .accountcon .accounttop {
+  height: 44px;
+  line-height: 44px;
+  width: 100%;
+  text-align: right;
+}
+.main-contentall .accountcon .accounttop a {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background-color: #ededed;
+  color: #10C7BE;
+}
+.main-contentall .accountcon .accountshow {
+  position: absolute;
+  width: 98%;
+  height: calc(100% - 49px);
+}
+.main-contentall .clearcon {
+  padding: 30px 0px 0px 40px;
+}
+.main-contentall .decodecon {
+  padding: 30px 0px 0px 40px;
+  overflow-x: auto;
+  position: relative;
+  height: 690px;
+}
+.main-contentall .decodecon .decodecon-common {
+  display: inline-block;
+  vertical-align: top;
+}
+.main-contentall .decodecon .decodecon-common .decodecon-content {
+  height: 400px;
+  border: 1px solid #eeeeee;
+}
+.main-contentall .decodecon .decodecon-left {
+  position: absolute;
+  left: 40px;
+  top: 120px;
+}
+.main-contentall .decodecon .decodecon-left .decodecon-content {
+  width: 370px;
+  padding: 40px 34px;
+}
+.main-contentall .decodecon .decodecon-center {
+  position: absolute;
+  top: 120px;
+  left: 410px;
+  width: 190px;
+  height: 420px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+}
+.main-contentall .decodecon .decodecon-center .center-content {
+  width: 90px;
+  height: 100px;
+  margin-top: 170px;
+  display: inline-block;
+}
+.main-contentall .decodecon .decodecon-right {
+  position: absolute;
+  top: 120px;
+  left: 600px;
+}
+.main-contentall .decodecon .decodecon-right .decodecon-content {
+  width: 370px;
+  padding: 16px;
+  background-color: #f7f7f7;
+}
+.main-contentall .decodecon .decodecon-right .decodecon-content .wind-label {
+  width: 100px;
+  text-align: left;
+}
+.dot-box {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  display: table;
+  float: left;
+}
+.dot-box .dot-start {
+  background-color: #0AD0C6;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 16px;
+  cursor: pointer;
+  transform: translateY(2px);
+}
+.dot-box .dot-check {
+  background-color: #0AD0C6 !important;
+}
+.dot-box .dot {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+.dot-box .dot:hover {
+  background-color: #e5e5e5;
+}
+.layui-layer-setwin {
+  top: 11px;
+}
+#openWind {
+  padding-left: 0px;
+}
+#openWind .wind-cell {
+  width: 50%;
+  float: left;
+}
+#openWind .j-add-account-form .wind-normal-input {
+  width: 220px;
+}
+#openWind .dept {
+  margin-right: 107px;
+}
+#openWind .navcation,
+#openWind .dept {
+  display: inline-block;
+}
+#openWind form {
+  padding-left: 10px;
+}
+#openWind form .info > label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+}
+#openWind form .info .infocon {
+  margin-left: 40px;
+  /*input,select{
+          width: 380px;
+        }*/
+}
+#openWind form .authset > label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+}
+#openWind form .authset .authcon {
+  margin-left: 40px;
+}
+#openWind form .authset .authcon #depttree,
+#openWind form .authset .authcon #navtree {
+  display: inline-block;
+  width: 220px;
+  height: 180px;
+  border: 1px solid #ededed;
+  overflow: auto;
+  vertical-align: top;
+}
+#openWind form .authset .authcon select {
+  width: 380px;
+}
+.netset {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.netset .netsetleft {
+  height: 230px;
+  background-color: #F5F5F5;
+  margin-left: 50px;
+  margin-top: 50px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.ethsa {
+  height: 40px;
+  text-align: left;
+  line-height: 40px;
+  background: #E5E6E8;
+}
+.netset .netsetright {
+  height: 230px;
+  background-color: #F5F5F5;
+  margin-left: 50px;
+  margin-top: 50px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.netset span {
+  text-align: center;
+  font-size: 14px;
+  height: 30px;
+  display: inline-block;
+  line-height: 30px;
+  color: #A2A2A2;
+}
+.netsetlast {
+  margin-left: 200px;
+}
+.netsetlast .preserve-1 {
+  height: 32px;
+  width: 70px;
+  background: #5CAEDE;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  line-height: 32px;
+}
+@media screen and (max-width: 1366px) {
+  .boxnet {
+    height: 600px;
+    overflow-y: auto;
+  }
+}
+.left-netconfig {
+  float: right;
+  margin-right: 48px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 99999;
+}
+.neter-icon {
+  color: #5BAFDE;
+  padding-right: 5px;
+}
+.ethsa {
+  font-weight: bold;
+  color: #666666;
+  font-size: 16px;
+  font-family: arial;
+}
+.viewbtn {
+  color: #333 !important;
+}
+.boxnet {
+  overflow: auto;
+}
+.btn-save {
+  width: 90px;
+  height: 32px;
+  line-height: 32px;
+  cursor: pointer;
+  padding: 0 20px;
+  color: white;
+  background: #38CFC0;
+  border-radius: 2px;
+  outline: none;
+  border: none;
+  margin-left: 50px;
+}
+.left {
+  float: left;
+}
+#accountTableth {
+  width: 100% !important;
+}
+.main-contentall .servercon {
+  padding: 20px 0px 0px 20px;
+}
+.main-contentall .servercon .wind-label {
+  width: 100px;
+  text-align: left;
+}
+.main-contentall .servercon form {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+}
+.main-contentall .servercon form input {
+  display: inline-block;
+  float: left;
+}
+.main-contentall .servercon form .uploadFile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 260px;
+  height: 30px;
+  overflow: hidden;
+}
+.main-contentall .cascadecon {
+  padding: 20px 0px 0px 20px;
+}
+.main-contentall .cascadecon .wind-label {
+  width: 80px;
+  text-align: left;
+}
+.main-contentall .cascadecon #bar_lower_add {
+  display: inline-block;
+  margin-left: 10px;
+  width: 26px;
+  height: 26px;
+  text-align: center;
+  line-height: 26px;
+  background-color: #ededed;
+  color: #38D1BF;
+  float: none;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList {
+  height: 31px;
+  min-width: 390px;
+  max-width: 733px;
+  line-height: 30px;
+  margin-top: 4px;
+  margin-right: 10px;
+  background: #fff;
+  cursor: pointer;
+  border: 1px solid #ededed;
+  box-sizing: content-box;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList > span {
+  width: 300px;
+  background-color: #fff;
+  padding-left: 5px;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList .con {
+  background-color: #ededed;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList .con span {
+  width: 200px;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList .con i:first-child {
+  color: #38D1BF;
+  margin: 0px 5px;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList .con i:last-child {
+  font-size: 12px;
+  margin: 0px 5px;
+  color: #ededed;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList-hover {
+  border: 1px solid #38D1BF;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList-hover .con {
+  background-color: #38D1BF;
+  color: #fff;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList-hover .con i:first-child,
+.main-contentall .cascadecon .lowerShow .lowerShowList-hover .con span {
+  color: #fff;
+}
+.main-contentall .cascadecon .lowerShow .lowerShowList-hover .con i:last-child {
+  display: inline-block;
+}
+.main-contentall .cascadecon #lowername-error {
+  position: absolute;
+  width: 200px;
+  margin-left: 10px;
+  margin-top: 5px;
+  display: inline-block !important;
+}
+.main-contentall .cascadecon #lowerip-error {
+  position: absolute;
+  width: 200px;
+  margin-left: 50px;
+  margin-top: 5px;
+  display: inline-block !important;
+}
+.none {
+  display: none;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+.wind-bulk {
+  margin-bottom: 20px;
+}
+.wind-bulk .wind-title {
+  display: inline-block;
+  height: 35px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+}
+.wind-bulk .wind-content {
+  margin-left: 40px;
+}
+.wind-bulk .wind-content form a {
+  display: inline-block;
+  float: left;
+  height: 30px;
+  width: 40px;
+  background-color: #eaeaea;
+  line-height: 30px;
+  text-align: center;
+}
+.wind-bulk .wind-content form a i {
+  color: #38D1BF;
+}
+.sureButton {
+  background-color: #eaeaea;
+  color: #333333;
+  width: 72px;
+}
+.from-style {
+  width: 500px;
+  position: relative;
+}
+.from-style input[type=text] {
+  height: 32px;
+  width: 371px;
+}
+.from-style .sureButton {
+  vertical-align: top;
+}
+.from-style input[type=file] {
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  height: 32px;
+  width: 413px;
+  overflow: hidden;
+  display: inline-block;
+  cursor: pointer;
+}
+.from-style > a {
+  display: inline-block;
+  height: 32px;
+  width: 42px;
+  text-align: center;
+  margin-left: -4px;
+  color: #38D1BF;
+  background-color: #E9E9E9;
+  vertical-align: top;
+  border-radius: unset;
+  padding: 0px !important;
+}
+.from-style > a:hover {
+  color: #38D1BF;
+}
+.ztree li a {
+  cursor: default;
+}
+.ztree li span.button.chk {
+  cursor: pointer;
+}

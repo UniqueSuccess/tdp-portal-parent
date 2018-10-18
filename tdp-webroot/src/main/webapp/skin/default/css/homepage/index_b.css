@@ -1,0 +1,73 @@
+.main_right {
+  width: 100%;
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
+  padding: 10px;
+  overflow: auto;
+  background-color: #EBECED;
+}
+.main_right .row-top {
+  height: 55%;
+  min-height: 400px;
+  min-width: 1100px;
+}
+.main_right .row-top .cell {
+  float: left;
+  height: 100%;
+  background-color: #fff;
+}
+.main_right .row-top .cell .echarts-content {
+  height: 100%;
+}
+.main_right .row-top .cell:nth-child(1) {
+  min-width: 350px;
+}
+.main_right .row-top .cell:nth-child(2) {
+  width: calc(100% - 700px);
+  margin: 0 10px;
+}
+.main_right .row-top .cell:nth-child(3) {
+  width: 330px;
+}
+.main_right .row-top .cell:nth-child(3) .serverinfo-chart-box {
+  height: calc(33% - 13px);
+  background-color: #fff;
+}
+.main_right .row-top .cell:nth-child(3) .serverinfo-chart-box .serverinfo-chart-title {
+  display: inline-block;
+  height: 100%;
+  width: 140px;
+  padding-left: 58px;
+  padding-top: 60px;
+  color: #333333;
+  font-weight: 600;
+  font-size: 14px;
+}
+.main_right .row-top .cell:nth-child(3) .serverinfo-chart-box .serverinfo-content {
+  float: right;
+  display: inline-block;
+  height: 100%;
+  width: calc(100% - 140px);
+}
+.main_right .row-bottom {
+  height: 45%;
+  min-height: 280px;
+  padding-top: 10px;
+  min-width: 1100px;
+}
+.main_right .row-bottom .cell {
+  height: 100%;
+  background-color: #fff;
+}
+.main_right .row-bottom .cell .echarts-content {
+  height: 100%;
+}
+.cell .section-title {
+  line-height: 40px;
+  text-indent: 10px;
+}
+#vedio_export,
+#potent_risk {
+  height: calc(100% - 40px) !important;
+}

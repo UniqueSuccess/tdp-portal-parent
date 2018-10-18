@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.core.dao.CUserNavigationDOMapper">
+  <insert id="batchInsertByOneUserAndNavigationList">
+    insert into t_user_navigation (user_id, navigation_id)
+    values
+    <foreach collection="navigationIdList" item="navigationId" separator=",">
+      (#{userId},#{navigationId})
+    </foreach>
+  </insert>
+
+  <delete id="batchDeleteUserNavigationByUserId" parameterType="java.lang.String">
+    DELETE FROM t_user_navigation
+    WHERE user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+
+  <select id="getNavigationListByUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT t.navigation_id
+    FROM t_user_navigation t
+    WHERE t.user_id = #{userGuid}
+  </select>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.report.dao.CVideoTransferLogDOMapper">
+    <resultMap id="BaseResultMap" type="cn.goldencis.tdp.report.entity.VideoTransferLogDO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="truename" jdbcType="VARCHAR" property="truename" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="userguid" jdbcType="VARCHAR" property="userguid" />
+        <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+        <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+        <result column="devunique" jdbcType="VARCHAR" property="devunique" />
+        <result column="extradata" jdbcType="VARCHAR" property="extradata" />
+        <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+        <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+        <result column="receiver" jdbcType="VARCHAR" property="receiver" />
+        <result column="transfer_time" jdbcType="TIMESTAMP" property="transferTime" />
+        <result column="tranunique" jdbcType="VARCHAR" property="tranunique" />
+        <result column="fftype" jdbcType="INTEGER" property="fftype" />
+    </resultMap>
+
+    <select id="countVideoTransferTop5" resultType="java.util.Map">
+        SELECT l.truename, count(1) countTransfer
+        FROM t_video_transfer_log l
+        GROUP BY l.userguid
+        ORDER BY countTransfer DESC
+        LIMIT 0,5
+    </select>
+</mapper>

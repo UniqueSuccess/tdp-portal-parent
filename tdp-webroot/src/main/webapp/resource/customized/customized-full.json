@@ -1,0 +1,15 @@
+{
+  "modules": [
+    "clientLog",
+    "fingerprintEntry",
+    "userMode",
+    "legalTime"
+  ],
+  "navigations": [
+
+  ],
+  "replace": [
+    "pySrcanPic",
+    "fingerprint"
+  ]
+}

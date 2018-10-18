@@ -1,0 +1,74 @@
+.content-box {
+  top: 90px;
+}
+.content-box .cell-bottom {
+  height: calc(100% - 90px);
+  width: 100%;
+}
+.bar-item-box .bar-item {
+  vertical-align: top;
+}
+.wind-content .wind-content-input-date {
+  background-image: url(../../images/calendarbai.png);
+  background-repeat: no-repeat;
+  background-position: 99% center;
+  cursor: pointer;
+}
+.dataTables_wrapper {
+  width: calc(100% - 40px) !important;
+  left: 20px;
+  right: 20px;
+}
+i.iconfont.icon-btn-photos {
+  color: #C9C9C9;
+}
+i.iconfont.icon-btn-photos:hover {
+  color: #38D1BF;
+}
+.bar-item-box .bar-item-search input[type="text"] {
+  width: 260px;
+}
+.datatimechoose ul.datachange {
+  background-color: #fff;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  z-index: 100;
+  width: 260px;
+  border: 1px solid #ccc;
+  border-top: 0;
+  text-indent: 6px;
+}
+.datatimechoose ul.datachange li {
+  padding: 6px 0;
+  line-height: 26px;
+  cursor: pointer;
+}
+.datatimechoose ul.datachange li:hover {
+  background-color: #38D1BF;
+  color: #fff;
+}
+.daterangepicker.opensright:after {
+  left: 295px;
+}
+.wind-content .wind-content-input-date {
+  background-image: url(../../images/calendar.png);
+  background-repeat: no-repeat;
+  background-position: 98% center;
+  cursor: pointer;
+}
+.daterangepicker.opensright:before {
+  border: none;
+}
+label {
+  margin-bottom: 0px;
+}
+.magnify-button {
+  height: 38px;
+}
+.magnify-header .magnify-toolbar {
+  width: 40px;
+}
+.magnify-stage {
+  border: none;
+}

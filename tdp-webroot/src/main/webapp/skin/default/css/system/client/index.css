@@ -1,0 +1,133 @@
+.content-box {
+  position: absolute;
+  top: 46px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  background: white;
+  padding: 0px 15px 0px 15px;
+  overflow-x: hidden;
+}
+.content-box .top-bar {
+  background: #fff;
+  border-bottom: 1px solid #ededed;
+}
+.content-box .videoNetCon {
+  height: 340px;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+}
+.content-box .videoLogoCon {
+  min-height: 400px;
+  width: 100%;
+  position: absolute;
+  top: 300px;
+}
+.content-box .netContent {
+  padding: 0px 30px 0px 50px;
+}
+.netAdd a,
+.logoAdd a {
+  display: inline-block;
+  margin-left: 10px;
+  width: 26px;
+  height: 26px;
+  text-align: center;
+  line-height: 26px;
+  background-color: #ededed;
+  color: #38D1BF;
+}
+.netShow .netShowList {
+  height: 30px;
+  min-width: 260px;
+  max-width: 300px;
+  line-height: 30px;
+  padding-left: 5px;
+  margin-top: 4px;
+  margin-right: 10px;
+  background: #ededed;
+  cursor: pointer;
+}
+.netShow .netShowList i {
+  font-size: 12px;
+  margin-left: 10px;
+  color: #fff;
+  float: right;
+  margin-right: 10px;
+}
+.logoShow .logoShowList {
+  height: 31px;
+  min-width: 390px;
+  max-width: 733px;
+  line-height: 30px;
+  margin-top: 4px;
+  margin-right: 10px;
+  background: #fff;
+  cursor: pointer;
+  border: 1px solid #ededed;
+  box-sizing: content-box;
+}
+.logoShow .logoShowList > span {
+  width: 130px;
+  background-color: #fff;
+  padding-left: 5px;
+}
+.logoShow .logoShowList .con {
+  background-color: #ededed;
+}
+.logoShow .logoShowList .con span {
+  width: 300px;
+}
+.logoShow .logoShowList .con i:first-child {
+  color: #38D1BF;
+  margin: 0px 5px;
+}
+.logoShow .logoShowList .con i:last-child {
+  font-size: 12px;
+  margin: 0px 5px;
+  color: #ededed;
+}
+.logoShow .logoShowList-hover {
+  border: 1px solid #38D1BF;
+}
+.logoShow .logoShowList-hover .con {
+  background-color: #38D1BF;
+  color: #fff;
+}
+.logoShow .logoShowList-hover .con i:first-child,
+.logoShow .logoShowList-hover .con span {
+  color: #fff;
+}
+.logoShow .logoShowList-hover .con i:last-child {
+  display: inline-block;
+}
+#netip-error {
+  position: absolute;
+  width: 200px;
+  vertical-align: middle;
+  margin-left: 45px;
+  margin-top: 5px;
+  display: inline-block !important;
+}
+#logoname-error {
+  position: absolute;
+  width: 200px;
+  margin-left: 10px;
+  margin-top: 5px;
+  display: inline-block !important;
+}
+#logoip-error {
+  position: absolute;
+  width: 200px;
+  margin-left: 50px;
+  margin-top: 5px;
+  display: inline-block !important;
+}
+.logoAdd {
+  margin-top: 4px;
+}
+.netAdd {
+  margin-top: 4px;
+}

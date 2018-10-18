@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.approve.dao.CApproveMapper">
+    <resultMap id="DetailResultMap" type="cn.goldencis.tdp.approve.entity.ApproveDetail">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="flow_id" jdbcType="INTEGER" property="flowId" />
+        <result column="point_id" jdbcType="INTEGER" property="pointId" />
+        <result column="senior_id" jdbcType="INTEGER" property="seniorId" />
+        <result column="approver" jdbcType="VARCHAR" property="approver" />
+        <result column="result" jdbcType="INTEGER" property="result" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="standard" jdbcType="INTEGER" property="standard" />
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    </resultMap>
+
+    <resultMap id="FlowResultMap" type="cn.goldencis.tdp.approve.entity.ApproveFlow">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="flow_id" jdbcType="INTEGER" property="flowId" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="point_id" jdbcType="INTEGER" property="pointId" />
+        <result column="point_name" jdbcType="INTEGER" property="pointName" />
+        <result column="approvers" jdbcType="INTEGER" property="approvers" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="tran_unique" jdbcType="VARCHAR" property="tranUnique" />
+        <result column="applicant_id" jdbcType="VARCHAR" property="applicantId" />
+        <result column="applicant_name" jdbcType="VARCHAR" property="applicantName" />
+        <result column="reason" jdbcType="VARCHAR" property="reason" />
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+    </resultMap>
+
+    <sql id="ApproveDetail_Column_List">
+        id, name, flow_id, point_id, senior_id, approver, result, remark, standard, modify_time
+    </sql>
+
+    <insert id="batchInsertApproveDetailList">
+        insert into t_approve_detail ( name, flow_id, point_id, senior_id, approver, standard, modify_time )
+        values
+        <foreach collection="detailList" item="detail" separator=",">
+            (#{detail.name}, #{detail.flowId}, #{detail.pointId}, #{detail.seniorId}, #{detail.approver},
+            #{detail.standard}, #{detail.modifyTime})
+        </foreach>
+    </insert>
+
+    <select id="getApproveFlowPage" resultMap="FlowResultMap">
+        SELECT DISTINCT
+          f.id,
+          f.name,
+          f.flow_id,
+          f.status,
+          f.point_id,
+          d.name point_Name,
+          group_concat(d.approver) approvers,
+          type,
+          tran_unique,
+          applicant_id,
+          applicant_name,
+          reason,
+          apply_time,
+          finish_time
+        FROM t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id AND f.point_id = d.point_id
+        WHERE 1 = 1
+        <if test="userGuid != null">
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+        </if>
+        <if test="startDate != null">
+            AND apply_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="applicantOrType != null">
+            AND INSTR(applicant_name, #{applicantOrType})
+        </if>
+        <if test="status == 0">
+            AND f.status = 0 AND d.result IS NULL
+        </if>
+        <if test="status == -1">
+            AND f.status = -1
+        </if>
+        <if test="status == 1">
+            AND f.status = 1
+        </if>
+        <if test="status == 2">
+            AND f.status != 0
+        </if>
+
+        GROUP BY f.id
+
+        <if test="status == 0">
+            ORDER BY f.apply_time DESC
+        </if>
+        <if test="status == -1">
+            ORDER BY f.apply_time DESC
+        </if>
+        <if test="status == 1">
+            ORDER BY f.apply_time DESC
+        </if>
+        <if test="status == 2">
+            ORDER BY f.finish_time DESC
+        </if>
+        <if test="start != null">
+            limit #{start} , #{length}
+        </if>
+    </select>
+
+    <select id="countApproveFlowPage" resultType="java.lang.Long">
+        SELECT
+        count(DISTINCT f.id)
+        FROM t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id AND f.point_id = d.point_id
+        WHERE 1 = 1
+        <if test="userGuid != null">
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+        </if>
+        <if test="status == 0">
+            AND f.status = 0 AND d.result IS NULL
+        </if>
+        <if test="status == 1">
+            AND f.status != 0
+        </if>
+        <if test="startDate != null">
+            AND apply_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="applicantOrType != null">
+            AND INSTR(applicant_name, #{applicantOrType})
+        </if>
+    </select>
+
+    <select id="countNeedToApprove" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM
+          t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id
+            AND f.point_id = d.point_id
+        WHERE
+            f.status = 0
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countApproveByState" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM
+        t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id
+        AND f.point_id = d.point_id
+        WHERE
+            1 = 1
+            <if test="userGuid != null">
+                AND d.approver = #{userGuid,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null and status != 2">
+                AND f.status = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="status != null and status == 2">
+                AND f.status != 0
+            </if>
+    </select>
+</mapper>

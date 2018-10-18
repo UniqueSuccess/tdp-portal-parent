@@ -1,0 +1,38 @@
+#download_page {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+  background-image: url(../../images/download.jpg);
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+#download_page .content {
+  width: 400px;
+  height: 600px;
+  margin: 200px auto;
+  text-align: center;
+}
+#download_page .content .logo {
+  width: 400px;
+  height: 180px;
+  background-image: url('../../images/downloadlogo.png');
+  background-position: center center;
+}
+#download_page .content .down {
+  margin-top: 150px;
+}
+#download_page .content .down a {
+  width: 260px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  color: #fff;
+  background-color: #38CEC0;
+  display: inline-block;
+}
+#download_page .content .down a:focus,
+#download_page .content .down a:hover {
+  text-decoration: none;
+}

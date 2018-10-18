@@ -1,0 +1,49 @@
+#download_page {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+  background-color: #fff;
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+#download_page .content {
+  width: 600px;
+  height: 600px;
+  margin: 200px auto;
+  text-align: center;
+}
+#download_page .content .logo {
+  width: 600px;
+  height: 120px;
+  background-image: url('../../images/downloadlogo.png');
+  background-position: center center;
+}
+#download_page .content .down {
+  width: 600px;
+}
+#download_page .content .down label {
+  font-size: 16px;
+  font-weight: 200;
+  display: inline-block;
+  text-align: center;
+}
+#download_page .content .down div {
+  float: left;
+  width: 200px;
+  text-align: center;
+  padding-top: 90px;
+}
+#download_page .content .down div a {
+  display: block;
+  width: 100px;
+  height: 45px;
+  margin: 0 auto;
+}
+#download_page .content .down div span {
+  display: block;
+}
+#download_page .content .down div span.title {
+  color: #999999;
+}

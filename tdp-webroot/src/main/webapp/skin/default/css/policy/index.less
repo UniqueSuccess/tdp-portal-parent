@@ -1,0 +1,305 @@
+@maincolor: #38CFC0;
+@baise: #fff;
+@buttonW: 90px;
+@buttonH: 30px;
+.policy-content {
+  padding: 20px 0px 30px 35px;
+  .beauty-switch{
+    margin-bottom: 4px;
+  }
+  label{
+    vertical-align: middle;
+  }
+  & > form > div:last-child {
+    //padding-bottom: 60px;
+  }
+  & form > div .policy-title {
+    height: 50px;
+    position: relative;
+    line-height: 50px;
+    border-bottom: 1px solid #F6F6F6;
+    padding-left: 26px;
+    &:after {
+      content: '';
+      height: 14px;
+      width: 2px;
+      background-color: #10c7be;
+      display: inline-block;
+      position: absolute;
+      top: calc(~ "50% - 7px");
+      left: 10px;
+    }
+  }
+  & form > div .policy-con.export-c{
+    padding-bottom: 0px;
+  }
+  & form > div .policy-con {
+    padding: 10px 45px 18px 60px;
+    width: 90%;
+    & > .policy-content-con{
+      padding-left: 30px;
+    }
+    & > .policy-content-con>label {
+      //display: inline-block;
+      height: 42px;
+      line-height: 38px;
+      margin-right: 45px;
+      width: 110px;
+    }
+    & > .policy-content-con>div>label {
+      height: 42px;
+      //margin-right: 20px;
+    }
+    & > label {
+      display: inline-block;
+      height: 42px;
+      line-height: 38px;
+      margin-right: 45px;
+
+
+    }
+    & > label span {
+      vertical-align: middle;
+    }
+    & > label.out {
+      display: block;
+      height: 38px;
+      line-height: 38px;
+      .smallinput {
+        width: 50px;
+        margin-right: 5px;
+      }
+      .autoDelete {
+        display: inline-block;
+      }
+    }
+    & > label.export {
+      display: block;
+    }
+    .waterShowContent {
+      padding-left: 40px;
+      & > label {
+        display: inline-block;
+        height: 38px;
+        line-height: 38px;
+        margin-right: 45px;
+        width: 110px;
+      }
+
+    }
+
+  }
+  & form > div .outC {
+    padding-bottom: 0px;
+  }
+
+}
+.screenWater{
+  .policy-con{
+    & > .policy-content-con{
+      padding-left: 40px !important;
+    }
+  }
+
+}
+.save {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  width: 100%;
+  height: 68px;
+  border-top: 1px solid #ededed;
+  z-index: 100000;
+  background-color: #fff;
+  overflow: hidden;
+  .policy-save {
+    margin: 18px 0px 0px 85px;
+    width: 90px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background-color: @maincolor;
+    color: @baise;
+    cursor: pointer;
+  }
+}
+select{
+  height: 32px;
+}
+.bar-item-box.policy-delete{
+  position: relative;
+  top: 25%;
+  border: none;
+  float: right;
+  right: 15px;
+
+}
+.bar-item-box {
+  color: #38CFC0;
+  cursor: pointer;
+  transform: none;
+  position: inherit;
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  input{
+    color: #333333;
+  }
+  .color-content{
+    min-width: 60px;
+    height: 32px;
+    border: 1px solid #E5E5E5;
+    border-radius: 3px;
+    display: inline-block;
+    padding:0 5px;
+    text-align: left;
+    line-height: 30px;
+    background-image: url(../../images/downselect.png);
+    background-repeat: no-repeat;
+    background-position: calc(100% - 5px) center;
+    .color-content-title{
+      height: 18px;
+      width: 30px;
+      margin-left: 15px;
+      //display: inline-block;
+      color: #333333;
+      vertical-align: top;
+    }
+    .color-content-show{
+      height: 14px;
+      width: 30px;
+      display: inline-block;
+      vertical-align: middle;
+      border: 1px solid #c5c5c5;
+      margin-bottom: 4px;
+    }
+  }
+  .bar-item:last-child{
+    margin-right: 0px;
+    height: 32px;
+    line-height: 32px;
+    input[type="text"]{
+      min-width: 165px;
+    }
+    ul{
+      width: 60px;
+      background-color: #fff;
+      position: absolute;
+      top: 30px;
+      left: 0;
+      z-index: 100;
+      border: 1px solid #ccc;
+      border-top: 0;
+      text-indent: 6px;
+      color: #333333;
+      li{
+        height: 30px;
+        width: 100%;
+        line-height: 30px;
+        border-bottom: 1px solid #cccccc;
+        span{
+          display: inline-block;
+          width: 48px;
+          margin-left: -6px;
+          height: 14px;
+          margin-top: 8px;
+          border: 1px solid #ccc;
+        }
+      }
+      li:last-child{
+        border: none;
+      }
+    }
+  }
+}
+
+.approveButton {
+  display: inline-block;
+  width: @buttonW;
+  height: @buttonH;
+  background-color: #38CFC0;
+  line-height: 30px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  color: #fff;
+
+}
+
+.approve-disabled {
+  background-color: #38CFC0;
+}
+
+#settingTimes-error {
+  position: absolute;
+  margin-left: 20px;
+  display: inline-block!important;
+}
+
+#passwordVerifications-error {
+  position: absolute;
+  margin-left: 20px;
+  display: inline-block!important;
+}
+
+#allowOpens-error {
+  position: absolute;
+  margin-left: 145px;
+  display: inline-block!important;
+}
+
+#outOpenWind {
+  .content {
+    margin-top: 30px;
+    margin-left: 30px;
+  }
+}
+
+#exportOpenWind {
+  .content {
+    margin-top: 30px;
+    margin-left: 30px;
+  }
+}
+
+.content-box {
+  bottom: 60px;
+}
+//
+////兼容ie11
+input[type=text]:-ms-input {
+  vertical-align: middle;
+}
+
+input[type="text"]:disabled {
+  background-color: #eeeeee;
+}
+//颜色选取
+.colpick_submit{
+  top: 144px !important;
+}
+.colpick:last-child{
+  //left: 1040.609px !important;
+  top: auto !important;
+  bottom: 70px !important;
+  right: auto !important;
+}
+.color-red{
+  background-color: red;
+}
+.color-green{
+  background-color: #00ff00;
+}
+.color-cyan{
+  background-color: #00ffff;
+}
+.color-white{
+  background-color: white;
+}
+.color-grey{
+  background-color: #EEEEEE !important;
+}
+.color-other{
+  background-image: url('../../images/caiye.png');
+}

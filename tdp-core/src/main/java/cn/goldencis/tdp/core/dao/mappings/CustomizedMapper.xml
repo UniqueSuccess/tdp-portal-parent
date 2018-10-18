@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.core.dao.CustomizedMapper">
+
+  <insert id="addUserDeparts" parameterType="cn.goldencis.tdp.core.entity.DepartmentDO">
+    INSERT INTO t_user_department (user_id, department_id) values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.userId},#{item.departmentId})
+    </foreach>
+  </insert>
+
+  <select id="countUserList" resultType="java.lang.Long">
+    SELECT count(*) FROM t_user d
+    <if test="type=='permission'">
+      LEFT JOIN t_permission p
+      ON d.role_type = p.id
+    </if>
+    <if test="type=='department'">
+      LEFT JOIN t_user_department td
+      ON td.user_id=d.ID_
+    </if>
+    <if test="type=='group'">
+      LEFT JOIN ACT_ID_MEMBERSHIP ug
+      ON ug.USER_ID_ = d.ID_
+    </if>
+    WHERE d.id_ &lt;&gt; '-1'
+    and d.status = '1'
+    <if test='searchstr != null'>
+      AND (
+      d.FIRST_ like CONCAT('%',#{searchstr},'%') escape
+      '*' or d.user_name
+      like
+      CONCAT('%',#{searchstr},'%') escape '*'
+      )
+    </if>
+    <if test="type=='department'">
+      and td.department_id=#{value}
+    </if>
+    <if test="type=='permission'">
+      and d.role_type=#{value}
+    </if>
+    <if test="type=='group'">
+      and ug.group_id_=#{value}
+    </if>
+    <if test='permissionId != null and permissionId != ""'>
+      AND d.role_type=#{permissionId}
+    </if>
+  </select>
+
+  <select id="getUserList" resultType="cn.goldencis.tdp.core.entity.UserDO">
+    SELECT
+    DISTINCT(d.ID_) id,
+    FIRST_ FIRST,
+    EMAIL_ email,
+    PWD_ pwd,
+    user_name username,
+    d.department,
+    (SELECT
+    GROUP_CONCAT(rp.`name`)
+    FROM
+    t_user_department ud
+    LEFT JOIN
+    t_department rp
+    ON ud.department_id = rp.id
+    WHERE ud.user_id
+    = d.ID_)
+    AS departmentNames,
+    (SELECT
+    GROUP_CONCAT(gp.NAME_)
+    FROM
+    ACT_ID_MEMBERSHIP gd
+    LEFT JOIN ACT_ID_GROUP gp
+    ON gd.GROUP_ID_ =
+    gp.id_
+    WHERE gd.USER_ID_ = d.ID_) AS groupNames,
+    role_type roleType,
+    p.name roleTypeName,
+    phone,
+    status
+    FROM
+    ACT_ID_USER d
+    LEFT JOIN
+    t_permission p
+    ON d.role_type = p.id
+    WHERE d.id_ &lt;&gt; '-1'
+    and d.status = '1'
+    <if test='searchstr != null'>
+      AND (d.FIRST_ like CONCAT('%',#{searchstr},'%') escape
+      '*' or d.user_name
+      like
+      CONCAT('%',#{searchstr},'%') escape '*')
+    </if>
+    <if test='permissionId != null and permissionId != ""'>
+      AND role_type=#{permissionId}
+    </if>
+    order by user_name
+    <if test='startNum != null and pageSize != null'>
+      limit ${startNum},${pageSize}
+    </if>
+  </select>
+
+  <select id="getUserIdListByApproveModelId" parameterType="java.lang.Integer" resultType="java.lang.String">
+    SELECT approvers
+    FROM t_approve_model
+    WHERE id = #{approveModelId}
+  </select>
+
+</mapper>

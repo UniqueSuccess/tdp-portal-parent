@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.policy.dao.CScrnwatermarkLogDoMapper">
+
+  <insert id="insert">
+    INSERT INTO t_scrnwatermark_log (auth_id, applicant_id, applicant_name, apply_info, apply_time)
+    VALUES ( #{authId}, #{userGuid}, #{truename}, #{applyInfo}, #{appliTime})
+  </insert>
+
+  <insert id="insertByParamMap" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO t_scrnwatermark_log (auth_id, applicant_id, applicant_name, apply_info, apply_time)
+    VALUES ( #{authId}, #{userGuid}, #{truename}, #{applyInfo}, #{appliTime})
+  </insert>
+
+  <update id="updateScrnwatermarkId">
+    UPDATE t_scrnwatermark_log
+    SET scrnwatermark_id = #{scrnwatermarkId}
+    WHERE id = #{id}
+  </update>
+
+  <select id="getScrnwatermarkIdByApplicantId" resultType="String">
+    SELECT scrnwatermark_id
+    FROM t_scrnwatermark_log
+    WHERE applicant_id = #{guid} AND apply_info = '{"type":"用户屏幕水印"}'
+  </select>
+</mapper>

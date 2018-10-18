@@ -1,0 +1,514 @@
+.titleTab{
+  height: 40px;
+  width: 100%;
+  border-bottom: 1px solid #dedede;
+  background-color: #fff;
+  li{
+    float: left;
+    height: 40px;
+    line-height: 40px;
+    width: 110px;
+    text-align: center;
+    cursor: pointer;
+  }
+}
+.titleTabactive {
+  color: #38D1BF;
+  border-bottom: 3px solid #38D1BF;
+  box-sizing: border-box;
+}
+.main-contentall{
+  background-color: white;
+  position: absolute;
+  top: 40px;
+  left: 0px;
+  right: 0px;
+  bottom: 0;
+  font-size: 14px;
+  clear: both;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .accountcon{
+    padding: 5px 20px 10px 20px;
+    .accounttop{
+      height: 44px;
+      line-height: 44px;
+      width: 100%;
+      text-align: right;
+      a{
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        background-color: #ededed;
+        color: #10C7BE;
+      }
+    }
+    .accountshow{
+      position: absolute;
+      width: 98%;
+      height: calc(~ '100% - 49px');
+    }
+  }
+  .clearcon{
+    padding: 30px 0px 0px 40px;
+  }
+  .decodecon{
+    padding: 30px 0px 0px 40px;
+    overflow-x: auto;
+    position: relative;
+    height: 690px;
+    .decodecon-common{
+      display: inline-block;
+      vertical-align: top;
+      .decodecon-content{
+        height: 400px;
+        border: 1px solid #eeeeee;
+      }
+    }
+    .decodecon-left{
+      position: absolute;
+      left: 40px;
+      top: 120px;
+      .decodecon-content{
+        width: 370px;
+        padding:40px 34px;
+      }
+    }
+    .decodecon-center{
+      position: absolute;
+      top: 120px;
+      left: 410px;
+      width: 190px;
+      height: 420px;
+      display: inline-block;
+      vertical-align: top;
+      text-align: center;
+      .center-content{
+        width: 90px;
+        height: 100px;
+        margin-top: 170px;
+        display: inline-block;
+
+      }
+    }
+    .decodecon-right{
+      position: absolute;
+      top: 120px;
+      left: 600px;
+      .decodecon-content{
+        //min-width: 300px;
+        //max-width: 500px;
+        width: 370px;
+        padding:16px;
+        background-color: #f7f7f7;
+        .wind-label{
+          width: 100px;
+          text-align: left;
+        }
+      }
+    }
+  }
+}
+//水印小点样式
+.dot-box{
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  display: table;
+  float: left;
+  .dot-start{
+    background-color: #0AD0C6;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transform: translateY(2px);
+  }
+  .dot-check{
+    background-color: #0AD0C6 !important;
+  }
+  .dot{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    &:hover{
+      background-color: #e5e5e5;
+    }
+  }
+}
+.layui-layer-setwin{
+  top: 11px;
+}
+//账户弹窗
+#openWind{
+  padding-left: 0px;
+  .wind-cell {
+    width: 50%;
+    float: left;
+  }
+  .j-add-account-form .wind-normal-input {
+    width: 220px;
+  }
+  .dept{
+    margin-right: 107px;
+  }
+  .navcation,.dept{
+    display: inline-block;
+  }
+  form{
+    padding-left: 10px;
+    .info{
+      &>label{
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        height: 40px;
+        line-height: 40px;
+        width: 100%;
+      }
+      .infocon{
+        margin-left: 40px;
+        /*input,select{
+          width: 380px;
+        }*/
+      }
+    }
+    .authset{
+      &>label{
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        height: 40px;
+        line-height: 40px;
+        width: 100%;
+      }
+      .authcon{
+        margin-left: 40px;
+        #depttree,#navtree{
+          display: inline-block;
+          width: 220px;
+          height: 180px;
+          border: 1px solid #ededed;
+          overflow: auto;
+          vertical-align: top;
+        }
+        select{
+          width: 380px;
+        }
+
+
+
+
+      }
+    }
+  }
+}
+//网络配置
+.netset {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.netset .netsetleft {
+  height: 230px;
+  background-color: #F5F5F5;
+  margin-left: 50px;
+  margin-top: 50px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.ethsa {
+  height: 40px;
+  text-align: left;
+  line-height: 40px;
+  background: #E5E6E8;
+}
+
+.netset .netsetright {
+  height: 230px;
+  background-color: #F5F5F5;
+  margin-left: 50px;
+  margin-top: 50px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.netset span {
+  text-align: center;
+  font-size: 14px;
+  height: 30px;
+  display: inline-block;
+  line-height: 30px;
+  color: #A2A2A2;
+}
+
+.netsetlast {
+  margin-left: 200px;
+}
+
+.netsetlast .preserve-1 {
+  height: 32px;
+  width: 70px;
+  background: #5CAEDE;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  line-height: 32px;
+}
+
+@media screen and (max-width:1366px) {
+  .boxnet {
+    height: 600px;
+    overflow-y: auto;
+  }
+}
+
+.left-netconfig {
+  float: right;
+  margin-right: 48px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 99999;
+}
+
+.neter-icon {
+  color: #5BAFDE;
+  padding-right: 5px;
+}
+
+.ethsa {
+  font-weight: bold;
+  color: #666666;
+  font-size: 16px;
+  font-family: arial;
+}
+
+.viewbtn {
+  color: #333 !important;
+}
+
+.boxnet {
+  overflow: auto;
+}
+
+.btn-save {
+  width: 90px;
+  height: 32px;
+  line-height: 32px;
+  cursor: pointer;
+  padding: 0 20px;
+  color: white;
+  background: #38CFC0;
+  border-radius: 2px;
+  outline: none;
+  border: none;
+  margin-left: 50px;
+}
+.left{
+  float: left;
+}
+#accountTableth{
+  width: 100% !important;
+}
+//服务器
+.main-contentall .servercon{
+  padding: 20px 0px 0px 20px;
+  & .wind-label{
+    width: 100px;
+    text-align: left;
+  }
+  form{
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    input{
+      display: inline-block;
+      float: left;
+    }
+    .uploadFile{
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 260px;
+      height: 30px;
+      overflow: hidden;
+
+    }
+  }
+
+}
+//日志采集
+.main-contentall .cascadecon{
+  padding: 20px 0px 0px 20px;
+  & .wind-label{
+    width: 80px;
+    text-align: left;
+  }
+  #bar_lower_add{
+    display: inline-block;
+    margin-left: 10px;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    line-height: 26px;
+    background-color: #ededed;
+    color: #38D1BF;
+    float: none;
+  }
+  .lowerShow{
+    .lowerShowList{
+      height: 31px;
+      min-width: 390px;
+      max-width: 733px;
+      line-height: 30px;
+      margin-top: 4px;
+      margin-right: 10px;
+      background: #fff;
+      cursor: pointer;
+      border: 1px solid #ededed;
+      box-sizing: content-box;
+      &>span{
+        width: 300px;
+        background-color: #fff;
+        padding-left: 5px;
+      }
+      .con{
+        background-color: #ededed;
+        span{
+          width: 200px;
+        }
+        i:first-child{
+          color: #38D1BF;
+          margin: 0px 5px;
+        }
+        i:last-child{
+          font-size: 12px;
+          margin: 0px 5px;
+          color: #ededed;
+        }
+      }
+    }
+    .lowerShowList-hover{
+      border: 1px solid #38D1BF;
+      .con{
+        background-color: #38D1BF;
+        color: #fff;
+        i:first-child,span{
+          color: #fff;
+        }
+        i:last-child{
+          display: inline-block;
+        }
+      }
+    }
+  }
+  #lowername-error {
+    position: absolute;
+    width: 200px;
+    margin-left: 10px;
+    margin-top: 5px;
+    display: inline-block !important;
+  }
+  #lowerip-error {
+    position: absolute;
+    width: 200px;
+    margin-left: 50px;
+    margin-top: 5px;
+    display: inline-block !important;
+  }
+
+}
+.none{
+  display: none;
+  vertical-align: middle;
+  margin-left: 10px;
+  //color: red;
+}
+.wind-bulk{
+  margin-bottom: 20px;
+  .wind-title{
+    display: inline-block;
+    height: 35px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .wind-content{
+    margin-left: 40px;
+    form{
+      a{
+        display: inline-block;
+        float: left;
+        height: 30px;
+        width: 40px;
+        background-color: #eaeaea;
+        line-height: 30px;
+        text-align: center;
+        i{
+          color: #38D1BF;
+        }
+      }
+    }
+  }
+}
+.sureButton{
+  background-color: #eaeaea;
+  color: #333333;
+  width: 72px;
+}
+.from-style{
+  width: 500px;
+  position: relative;
+  input[type=text]{
+    height: 32px;
+    width: 371px;
+  }
+  .sureButton{
+    vertical-align: top;
+  }
+  input[type = file]{
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    height: 32px;
+    width: 413px;
+    overflow: hidden;
+    display: inline-block;
+    cursor: pointer;
+  }
+  &>a{
+    display: inline-block;
+    height: 32px;
+    width: 42px;
+    text-align: center;
+    margin-left: -4px;
+    color: #38D1BF;
+    background-color: #E9E9E9;
+    vertical-align: top;
+    border-radius: unset;
+    padding: 0px !important;
+  }
+  &>a:hover{
+    color: #38D1BF;
+  }
+}
+.ztree li a{
+  cursor: default;
+}
+.ztree li span.button.chk{
+  cursor: pointer;
+}
+

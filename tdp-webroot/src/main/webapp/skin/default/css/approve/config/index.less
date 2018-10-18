@@ -1,0 +1,319 @@
+
+.gd-toolbar{
+  background-color: #fff;
+}
+
+.client-state {
+  display: inline-block;
+  width: 54px;
+  height: 22px;
+  line-height: 22px;
+  border-radius: 1px;
+  text-align: center;
+  color: #fff;
+}
+.client-state.backlog {
+  background-color: #F5A623;
+}
+.client-state.onway {
+  background-color: #58A5E3;
+}
+
+.main-contentall {
+  position: absolute;
+  top: 40px;
+  left: 0px;
+  right: 0px;
+  bottom: 0;
+  font-size: 14px;
+  clear: both;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .processcon {
+    margin: 5px -14px 10px 20px;
+    .processtop {
+      height: 44px;
+      line-height: 44px;
+      width: 100%;
+      .left {
+        float: left;
+        span {
+          vertical-align: middle;
+        }
+      }
+      .right {
+        float: right;
+      }
+    }
+    .processshow {
+      position: absolute;
+      width: 98%;
+      height: calc(~'100% - 49px');
+    }
+  }
+  .complatecon{
+     margin: 5px -14px 10px 20px;
+    .processtop{
+      height: 44px;
+      line-height: 44px;
+      width: 100%;
+      .left{
+        float: left;
+        a{
+          width: 30px;
+          height: 26px;
+          display: inline-block;
+          line-height: 26px;
+          text-align: center;
+          color: #10C7BE;
+          background: #eee;
+        }
+        a:hover{
+          color: #fff;
+          background: #38cec0;
+        }
+      }
+      .right{
+        float: right;
+      }
+    }
+    .processshow{
+      position: absolute;
+      width: 98%;
+      height: calc(~'100% - 49px');
+    }
+  }
+}
+
+.bar-item-box {
+  top: -4px;
+  transform: inherit;
+}
+.bar-item-box .bar-item{
+  height: 30px;
+  line-height: 30px;
+}
+.datatimechoose ul.datachange {
+  background-color: #fff;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  z-index: 100;
+  width: 260px;
+  border: 1px solid #ccc;
+  border-top: 0;
+  text-indent: 6px;
+}
+.datatimechoose ul.datachange li {
+  padding: 6px 0;
+  line-height: 26px;
+  cursor: pointer;
+}
+//.bar-item-box .bar-item-search input[type="text"] {
+//  background-color:#ededed;
+//}
+.datatimechoose ul.datachange li:hover {
+  background-color: #38D1BF;
+  color: #fff;
+}
+.opensright {
+  width: 608px !important;
+  right: 10px !important;
+  top: 45px !important;
+  left: auto !important;
+}
+.daterangepicker.opensright:before {
+  left: 312px;
+}
+.daterangepicker.opensright:after {
+  border: none;
+}
+.approve-opt-icon {
+  color: #c9c9c9;
+}
+
+.approve-opt-icon:hover {
+  color: #38D1BF;
+  cursor: pointer;
+}
+
+.table-opt-icon{
+  color: #E1E1E1;
+}
+.table-opt-icon:hover{
+  color: #38D1BF;
+  cursor: pointer;
+}
+.wind-label {
+  text-align: left !important;
+}
+
+textarea {
+  vertical-align: top;
+  width: 540px;
+  height: 100px;
+}
+.wind-content .wind-content-input-date{
+  background-image: url(../../../images/calendar.png);
+  background-repeat: no-repeat;
+  background-position: 99% center;
+  //padding-right: 25px;
+  cursor: pointer;
+}
+#openWind .dataTables_wrapper{
+  position: inherit;
+  top: 391px;
+  left: 70px;
+  height: 100%;
+}
+#openWind .dataTables_scrollBody{
+  position:inherit !important;
+}
+#openWind {
+  padding-top: 10px;
+  .top {
+    width: 860px;
+    height: 220px;
+    margin: 0 auto;
+    background-color: #F7F7F9;
+    color: #3B3B3B;
+    margin-top: 20px;
+    padding: 15px 0px 15px 15px;
+    .title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333333;
+      margin-bottom: 12px;
+    }
+    .content {
+      .left, .right {
+        width: 415px;
+        display: inline-block;
+        .dig {
+          display: inline-block;
+        }
+      }
+      label {
+        display: block;
+      }
+    }
+  }
+  .flow {
+    width: 860px;
+    //height: 90px;
+    margin: 20px auto;
+    color: #333333;
+    //overflow-y: auto;
+    .flowTitle {
+      margin-top: 30px;
+    }
+    .flowContent {
+      width: 86%;
+      display: inline-block;
+      vertical-align: middle;
+      & > label {
+        display: inline-block;
+        vertical-align: top;
+        width: 120px;
+        .begin_bar, .default_bar, .end_bar {
+          height: 50px;
+          text-align: center;
+          position: relative;
+          display: inline-block;
+
+          & > label {
+            display: block;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            background-color: #ededed;
+            background-image: url(../../../images/approve/app_start.png);
+            background-repeat: no-repeat;
+            background-position: center center;
+            border-radius: 50px;
+          }
+          span{
+            display: inline-block;
+            width: 50px;
+          }
+        }
+        .default_bar {
+          &>label {
+            background-image: url(../../../images/approve/step_show.png);
+          }
+        }
+        .end_bar {
+          &>label {
+            background-image: url(../../../images/approve/app_end.png);
+          }
+        }
+        .flow_line {
+          width: 65px;
+          height: 15px;
+          display: inline-block;
+          vertical-align: top;
+          text-align: center;
+          line-height: 28px;
+          border-bottom: 1px solid #eeeeee;
+          background-color: #f2f2f2;
+          margin-top: 17px;
+        }
+      }
+      &>label.default-hover .default_bar label{
+        background-image: url(../../../images/approve/step_gray.png);
+
+      }
+
+    }
+  }
+  .opinion {
+    width: 860px;
+    height: 150px;
+    margin: 0 auto;
+    color: #333333;
+  }
+  .table{
+    width: 860px;
+    height: 260px;
+    margin: 0 auto;
+    color: #333333;
+    .approveHistory{
+      width: 740px;
+      height:100%;
+      display: inline-block;
+      vertical-align: top;
+    }
+  }
+  i.icon-btn-review:focus{
+    color: #38D1BF;
+  }
+  a{
+    color: #38D1BF;
+  }
+  a:focus{
+    color: #38D1BF !important;
+  }
+}
+//通过和拒绝
+.refuse{
+  display: inline-block;
+  width: 40px;
+  text-align: center;
+  height: 20px;
+  line-height: 20px;
+  background-color: red;
+  color: #fff;
+}
+.pass{
+  display: inline-block;
+  width: 40px;
+  text-align: center;
+  height: 20px;
+  line-height: 20px;
+  background-color: #38D1BF;
+  color: #fff;
+}
+i:focus{
+  color: #38D1BF;
+}
