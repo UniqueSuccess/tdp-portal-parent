@@ -135,6 +135,7 @@ public class ApproveFlowController {
             approveFlowService.noticeApprover(approveFlow);
 
             resultMsg.put("state", ConstantsDto.APPROVE_SUBMIT_SUCCESS);
+            resultMsg.put("flowId", approveFlow.getFlowId());
             resultMsg.put("reason", "");
         } catch (Exception e) {
             resultMsg.put("state", ConstantsDto.APPROVE_SUBMIT_FAILED);

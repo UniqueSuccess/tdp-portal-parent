@@ -27,7 +27,7 @@ public interface IClientUserService extends BaseService<ClientUserDO, ClientUser
      * @param usbkeyid
      * @return
      */
-    int addClientUser(ClientUserDO clientUser, Integer usbkeyid);
+    Map<String, Object> addClientUser(ClientUserDO clientUser);
 
     /**
      * 通过用户id删除用户
@@ -110,7 +110,7 @@ public interface IClientUserService extends BaseService<ClientUserDO, ClientUser
      * @param maxCustomerCnt
      * @return
      */
-    boolean ckeckMaxCustomerCount(int maxCustomerCnt);
+    boolean ckeckMaxCustomerCount(int maxCustomerCnt, String computerguid);
 
     /**
      * 校验上传的Excel文件的表格标题项是否正确，并将标题从列表中移除。
@@ -173,4 +173,18 @@ public interface IClientUserService extends BaseService<ClientUserDO, ClientUser
      * @param params
      */
     void updateClientUser(Map<String, Object> params);
+    /**
+     * 心跳上报接口
+     * @param computerguid
+     */
+    void updateHeartbeat(String usrunique);
+    
+    void updateClientUserState(String taskguid);
+
+    /**
+     * 根据用户唯一值查询 用户信息
+     * @param usrunique
+     * @return
+     */
+    Map<String, Object> queryDepartmentByUnique(String usrunique);
 }

@@ -43,6 +43,7 @@ public class ApproveResultPublish4ClientRunnable implements Runnable {
         contentJson.put("state", status);
         contentJson.put("type", flow.getType());
         contentJson.put("content", flowInfo.getPolicyParam());
+
         String content = contentJson.toString();
 
         //使用消息缓存服务

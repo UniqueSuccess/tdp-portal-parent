@@ -2,12 +2,15 @@ package cn.goldencis.tdp.policy.service.impl;
 
 import cn.goldencis.tdp.common.dao.BaseDao;
 import cn.goldencis.tdp.common.service.impl.AbstractBaseServiceImpl;
+import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.common.utils.SysContext;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.dao.CClientUserDOMapper;
 import cn.goldencis.tdp.core.dao.DepartmentDOMapper;
 import cn.goldencis.tdp.core.entity.ResultMsg;
+import cn.goldencis.tdp.core.scheduledtask.DynamicScheduledTask;
+import cn.goldencis.tdp.core.scheduledtask.ExecutableTask;
 import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
 import cn.goldencis.tdp.policy.dao.*;
@@ -15,14 +18,16 @@ import cn.goldencis.tdp.policy.entity.*;
 import cn.goldencis.tdp.core.entity.DepartmentDO;
 import cn.goldencis.tdp.policy.service.IClientUserService;
 
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by limingchao on 2017/12/22.
@@ -51,12 +56,28 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
     @Autowired
     private CScrnwatermarkLogDoMapper cScrnwatermarkLogDoMapper;
 
+    @Autowired
+    private DynamicScheduledTask dynamicScheduledTask;
+
     @Value("${golbalcfg.path}")
     public String golbalcfgpath;
+
+    @Value("${updateClientUserState}")
+    private String updateClientUserState;
 
     @Override
     protected BaseDao<ClientUserDO, ClientUserDOCriteria> getDao() {
         return mapper;
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            ExecutableTask executableTask = new ExecutableTask("终端状态更新", this, this.getClass().getMethod("updateClientUserState", String.class), "cn.goldencis.tdp.policy.service.impl.ClientUserServiceImpl.updateClientUserState");
+            dynamicScheduledTask.addExecutableTask(executableTask);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -86,29 +107,94 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
      */
     @Transactional
     @Override
-    public int addClientUser(ClientUserDO clientUser, Integer usbkeyid) {
-        //设置用户guid
-        UUID uuid = UUID.randomUUID();
-        clientUser.setGuid(uuid.toString());
-
-        //设置用户策略，没有则设置默认策略
-        if (clientUser.getPolicyid() == null || clientUser.getPolicyid() == 0) {
-            clientUser.setPolicyid(ConstantsDto.DEFAULT_POLICY_ID);
-        }
-
-        //设置usbKey，没有则未绑定，有则绑定，并且在UsbKey表中更新记录，传入用户id
-        if (usbkeyid != null && usbkeyid != -1) {
-            UsbKeyDOCriteria example = new UsbKeyDOCriteria();
-            example.createCriteria().andIdEqualTo(usbkeyid);
-            UsbKeyDO usbKey = new UsbKeyDO();
-            usbKey.setUserguid(uuid.toString());
-            usbKeyDOMapper.updateByExampleSelective(usbKey, example);
-        }
-
+    public synchronized Map<String, Object> addClientUser(ClientUserDO clientUser) {
+        Map<String, Object> result = new HashMap<String, Object>();
         clientUser.setOnline("0");
-        clientUser.setRegtime(new Date());
+        Integer policyId = ConstantsDto.DEFAULT_POLICY_ID;
+        
+        if (clientUser.getGuid() != null) {
+            /**
+             * 这里对已经注册过 开机登录调用
+             */
+            //直接更新
+            ClientUserDO cu = mapper.queryClientUserByGuId(clientUser.getGuid());
+            if (cu == null) {
+                result.put("resultCode", ConstantsDto.RESULT_CODE_FALSE);
+                result.put("resultMsg", "用户不存在");
+                return result;
+            }
+            ClientUserDO updateCu = new ClientUserDO();
+            updateCu.setIp(clientUser.getIp());
+            updateCu.setMac(clientUser.getMac());
+            updateCu.setOnlineTime(new Date());
+            updateCu.setOnline("0");
+            mapper.updateByPrimaryKeySelective(updateCu);
+            result.put("usrunique", clientUser.getGuid());
+            policyId = cu.getPolicyid();
+        } else {
+            /**
+             * 未注册过
+             * 1 校验部门id是否准确
+             * 2 检查该终端是否在系统注册过
+             *      如果注册过
+             *              更新数据库
+             *              返回之前策略id
+             *      如果没有注册过
+             *              根据部门找策略
+             *                      如果找不到 使用默认策略
+             *                      如果找到则使用查找到的策略
+             */
+            if (clientUser.getDeptguid() != null) {
+              //根据部门查找对应策略
+                if(clientUser.getDeptguid() != null) {
+                    Integer departmnetPolicyId = departmentDOMapper.queryPolicyIdByDepartmentId(clientUser.getDeptguid());
+                    if (departmnetPolicyId != null) {
+                        policyId = departmnetPolicyId;
+                    }
+                }
+            } else {
+                clientUser.setDeptguid(ConstantsDto.DEPARTMENT_UNKOWN_GROUP);
+            }
 
-        return mapper.insertSelective(clientUser);
+            ClientUserDO cu = mapper.queryClientUserByComputerguid(clientUser.getComputerguid());
+            if (cu == null) {
+                if (!checkClientUserMax(clientUser)) {
+                    result.put("resultCode", ConstantsDto.RESULT_CODE_FALSE);
+                    result.put("resultMsg", "超过用户最大点数");
+                    return result;
+                }
+                //设置用户guid
+                UUID uuid = UUID.randomUUID();
+                clientUser.setGuid(uuid.toString());
+                clientUser.setPolicyid(policyId);
+                mapper.insertSelective(clientUser);
+                result.put("usrunique", uuid);
+            } else {
+                //更新数据
+                policyId = cu.getPolicyid();
+                clientUser.setPolicyid(null);
+                clientUser.setId(cu.getId());
+                clientUser.setOnlineTime(new Date());
+                mapper.updateByPrimaryKeySelective(clientUser);
+                result.put("usrunique", cu.getGuid());
+            }
+        }
+        
+        //根据策略id查询策略地址
+        PolicyDO policy = policyDOMapper.selectByPrimaryKey(policyId);
+        result.put("policy", policy.getPath());
+        return result;
+    }
+
+    public boolean checkClientUserMax(ClientUserDO clientUser) {
+      //检查是否超过用户购买的最大点数
+        Integer maxCustomerCnt = ConstantsDto.VALIDATE_FLAG == 1 ? Integer.parseInt((String) SysContext.getRequest().getServletContext().getAttribute("maxCustomerCnt")) : Integer.MAX_VALUE;
+        //排除重新安装的
+        boolean flag = ckeckMaxCustomerCount(maxCustomerCnt, clientUser.getComputerguid());
+        if (!flag) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -368,8 +454,9 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
      * @return
      */
     @Override
-    public boolean ckeckMaxCustomerCount(int maxCustomerCnt) {
-        int currentCustomerCnt = this.countAllClientUser();
+    public boolean ckeckMaxCustomerCount(int maxCustomerCnt, String computerguid) {
+        
+        int currentCustomerCnt = mapper.queryCurrentCustomerCntExclude(computerguid);
         if (currentCustomerCnt < maxCustomerCnt) {
             return true;
         }
@@ -534,5 +621,24 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
     public void updateClientUser(Map<String, Object> params) {
         mapper.updateClientUser(params);
         
+    }
+
+    @Override
+    public void updateHeartbeat(String usrunique) {
+        mapper.updateHeartbeat(usrunique, DateUtil.getCurrentDate(DateUtil.DateTimeFormat));
+    }
+
+    @Transactional
+    @Override
+    public void updateClientUserState(String taskguid) {
+        String date = DateUtil.getFormatDate(DateUtil.getCurrentDateAddMinute(Integer.valueOf(updateClientUserState)), DateUtil.DateTimeFormat);
+        mapper.updateClientUserOnline(date);
+        mapper.updateClientUserOffline(date);
+    }
+
+    @Override
+    @Cacheable(value = "heartInfo", key = "#usrunique")
+    public Map<String, Object> queryDepartmentByUnique(String usrunique) {
+        return mapper.queryDepartmentByUnique(usrunique);
     }
 }

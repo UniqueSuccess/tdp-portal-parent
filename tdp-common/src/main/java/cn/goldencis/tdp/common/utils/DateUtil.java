@@ -1048,6 +1048,18 @@ public class DateUtil {
     }
 
     /**
+     * 当前时间点、日期，设置0点 加减 几分钟
+     * @param n
+     * @return
+     */
+    public static Date getCurrentDateAddMinute(int n) {
+
+        Date date = new Date();
+        date.setTime(date.getTime() + n * 60 * 1000);// 减去4分钟以后的时间
+        return date;
+    }
+
+    /**
      * 通用的解析查询的开始时间和结束时间
      * @param submitDate
      * @param startDate
@@ -1151,5 +1163,10 @@ public class DateUtil {
     public static String formatCronTime(String corn) {
         String[] timeFields = corn.split(" ");
         return timeFields[2] + ":" + (timeFields[1].length() == 1 ? "0" + timeFields[1] : timeFields[1]) + ":" + (timeFields[0].length() == 1 ? "0" + timeFields[0] : timeFields[0]);
+    }
+    public static void main(String[] args) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DateTimeFormat);
+        Date date = getCurrentDateAddMinute(-10);
+        System.out.println(sdf.format(date));
     }
 }

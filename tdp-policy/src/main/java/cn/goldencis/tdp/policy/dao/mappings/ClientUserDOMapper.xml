@@ -395,6 +395,7 @@
   
   <resultMap id="ResultMap" type="cn.goldencis.tdp.policy.entity.ClientUserDO">
     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="guid" jdbcType="CHAR" property="guid" />
     <result column="deptguid" jdbcType="INTEGER" property="deptguid" />
     <result column="computerguid" jdbcType="CHAR" property="computerguid" />
     <result column="computername" jdbcType="VARCHAR" property="computername" />
@@ -409,7 +410,7 @@
   </resultMap>
 
   <sql id="Column_List">
-    t1.id, t1.deptguid, t1.computerguid, t1.computername, t1.ip,
+    t1.id,t1.guid, t1.deptguid, t1.computerguid, t1.computername, t1.ip,
     t1.mac, t1.policyid, t1.online, t1.online_time, td.name as department_name, tp.name as policy_name
   </sql>
   <sql id="clientUserPage">
@@ -471,4 +472,37 @@
         #{item}
       </foreach>
   </update>
+  <select id="queryClientUserByComputerguid" resultMap="ResultMap">
+  	select id, guid,computerguid, policyid from t_client_user
+  	where computerguid =  #{computerguid}
+  </select>
+  <select id="queryCurrentCustomerCntExclude" resultType="int">
+  	 select count(1) from t_client_user where computerguid &lt;&gt;  #{computerguid}
+  </select>
+  <update id="updateHeartbeat">
+  		update t_client_user
+  		 set online_time = #{onlineTime}
+  		where guid =  #{usrunique}
+  </update>
+  <update id="updateClientUserOnline">
+  	UPDATE t_client_user
+	   SET online = 0
+	WHERE online_time &gt;= #{date}
+	AND online = 1
+  </update>
+  <update id="updateClientUserOffline">
+  	UPDATE t_client_user
+	   SET online = 1
+	WHERE online_time &lt; #{date}
+	AND online = 0
+  </update>
+  <select id="queryDepartmentByUnique" resultType="map">
+  	SELECT tc.deptguid AS deptId, td.name AS deptName FROM t_client_user   tc 
+  		LEFT JOIN t_department td ON tc.deptguid = td.id
+	WHERE tc.guid =  #{usrunique}
+  </select>
+  <select id="queryClientUserByGuId" resultMap="ResultMap">
+  	select id, guid,computerguid, policyid from t_client_user
+  	where guid = #{guid}
+  </select>
 </mapper>

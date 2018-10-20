@@ -13,6 +13,7 @@
 					    http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd
 					    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
+	<context:property-placeholder location="classpath*:tdp-common.properties" />
 	<!-- websocket消息推送 -->
 	<websocket:handlers>
 		<!-- 配置消息处理bean和路径的映射关系 -->

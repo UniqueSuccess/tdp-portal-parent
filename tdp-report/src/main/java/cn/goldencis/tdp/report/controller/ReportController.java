@@ -77,7 +77,6 @@ public class ReportController {
             //解析参数，转化为视频流转日志对象
             VideoTransferLogDO videoTransferLog = new VideoTransferLogDO();
             JSONObject argvJson = JSONObject.fromObject(argv).getJSONObject("tGopLog");
-
             videoTransferLogService.encapsulationBean(videoTransferLog, argvJson);
 
             //保存上传文件，更新对象的文件地址

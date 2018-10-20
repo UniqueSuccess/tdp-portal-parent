@@ -43,4 +43,17 @@ public interface ClientUserDOMapper extends BaseDao {
     List<ClientUserDO> getClientUserListByDepartmentId(Map<String, Object> params);
 
     void updateClientUser(Map<String, Object> params);
+
+    ClientUserDO queryClientUserByComputerguid(@Param("computerguid")String computerguid);
+    ClientUserDO  queryClientUserByGuId(@Param("guid")String guid);
+
+    int queryCurrentCustomerCntExclude(String computerguid);
+
+    void updateHeartbeat(@Param("usrunique")String usrunique, @Param("onlineTime")String onlineTime);
+
+    void updateClientUserOnline(@Param("date")String date);
+
+    void updateClientUserOffline(@Param("date")String date);
+
+    Map<String, Object> queryDepartmentByUnique(@Param("usrunique")String usrunique);
 }

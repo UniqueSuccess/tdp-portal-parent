@@ -1,5 +1,6 @@
 package cn.goldencis.tdp.policy.controller;
 
+import cn.goldencis.tdp.common.cache.manager.GuavaCacheManager;
 import cn.goldencis.tdp.common.utils.*;
 import cn.goldencis.tdp.core.annotation.LogType;
 import cn.goldencis.tdp.core.annotation.PageLog;
@@ -9,6 +10,7 @@ import cn.goldencis.tdp.core.entity.OperationLogDO;
 import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.service.IDepartmentService;
 import cn.goldencis.tdp.core.service.IOperationLogService;
+import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
 import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.policy.entity.ClientUserDO;
@@ -68,12 +70,17 @@ public class ClientUserController implements ServletContextAware {
     @Autowired
     private IOperationLogService logService;
 
+    @Autowired
+    private GuavaCacheManager cacheManager;
+
     private static final String FILE_NAME = "用户信息";
 
     private ServletContext servletContext;
 
     @Override
     public void setServletContext(ServletContext servletContext) {
+        Map<String, Object> authInfo = AuthUtils.getAuthInfo(servletContext);
+        servletContext.setAttribute("maxCustomerCnt", authInfo.get("maxCustomerCnt") == null ? "0" : authInfo.get("maxCustomerCnt").toString());
         this.servletContext = servletContext;
     }
 
@@ -148,62 +155,34 @@ public class ClientUserController implements ServletContextAware {
      * @param clientUser
      * @return
      */
-    @PageLog(module = "新建用户", template = "用户名：%s", args = "0.username", type = LogType.INSERT)
+    @PageLog(module = "创建用户", template = "用户名ip：%s", args = "0.computerguid", type = LogType.INSERT)
     @ResponseBody
     @RequestMapping(value = "/addClientUser", method = RequestMethod.POST)
-    public ResultMsg addClientUser(ClientUserDO clientUser, Integer usbkeyid, String fingerprint, HttpServletRequest request) {
+    public ResultMsg addClientUser(ClientUserDO clientUser, HttpServletRequest request) {
 
         ResultMsg resultMsg = new ResultMsg();
         try {
-            resultMsg.setData(request.getSession().getAttribute("maxCustomerCnt"));
-            //检查是否超过用户购买的最大点数
-            int maxCustomerCnt = Integer.parseInt((String) request.getSession().getAttribute("maxCustomerCnt"));
-            boolean flag = clientUserService.ckeckMaxCustomerCount(maxCustomerCnt);
-            if (!flag) {
+            if (StringUtil.isEmpty(clientUser.getComputerguid())) {
+                resultMsg.setResultMsg("缺失字段computerguid");
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
-                resultMsg.setResultMsg("超过用户最大点数！");
                 return resultMsg;
             }
-
-            //判断用户名是否重复
-            flag = clientUserService.checkClientUserNameDuplicate(clientUser);
-            if (!flag) {
-                resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
-                resultMsg.setResultMsg("用户名重复！");
-                return resultMsg;
-            }
-
             //插入用户
-            clientUserService.addClientUser(clientUser, usbkeyid);
-
-            //为用户生成的屏幕隐式水印id和添加对应的水印日志
-            clientUserService.addScrnwatermarkLog(clientUser);
-
-            //判断定制化模板中替换选项内，是否包含指纹选项
-            JSONArray replace = (JSONArray) request.getServletContext().getAttribute("replace");
-            if (replace.contains("fingerprint")) {
-                //将指纹参数解析为指纹实体集合
-                List<FingerprintDO> fingerprintList = fingerprintService.parseFingerprintParam(fingerprint);
-
-                if (fingerprintList.size() > 3) {
-                    resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
-                    resultMsg.setResultMsg("指纹数量超过上限！");
-                    return resultMsg;
+            Map<String, Object> result = clientUserService.addClientUser(clientUser);
+            if (result.containsKey("resultCode")) {
+                resultMsg.setResultCode(Integer.valueOf(result.get("resultCode").toString()));
+                if (result.containsKey("resultMsg")) {
+                    resultMsg.setResultMsg(String.valueOf(result.get("resultMsg")));
                 }
-
-                //为用户添加关联指纹
-                fingerprintService.addFingerprintListForClientUser(clientUser.getGuid(), fingerprintList);
-
-                //跟新指纹模板集合
-                fingerprintService.refreshFingerprintRegCache();
+                return resultMsg;
             }
-
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
-            resultMsg.setResultMsg("插入成功！");
+            resultMsg.setData(result);
+            resultMsg.setResultMsg("注册成功！");
         } catch (Exception e) {
-            resultMsg.setData(e);
+            e.printStackTrace();
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
-            resultMsg.setResultMsg("插入错误");
+            resultMsg.setResultMsg("注册失败");
         }
         return resultMsg;
     }
@@ -223,6 +202,7 @@ public class ClientUserController implements ServletContextAware {
             Map<String, Object> params = HttpServletRequestUtils.getRequestParams(request);
             params = HttpServletRequestUtils.replaceStr2List(params, "ids");
             clientUserService.updateClientUser(params);
+            cacheManager.getCache("heartInfo").clear();
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         }catch (Exception e) {
             e.printStackTrace();
@@ -602,6 +582,25 @@ public class ClientUserController implements ServletContextAware {
             ClientUserDO clientUser = clientUserService.getClientUserById(id);
             map.put("clientUser", clientUser);
         }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/heartbeat", method = RequestMethod.POST)
+    public ResultMsg heartbeat(String usrunique, HttpServletRequest request) {
+        ResultMsg resultMsg = new ResultMsg();
+
+        try {
+            clientUserService.updateHeartbeat(usrunique);
+            Map<String, Object> into = clientUserService.queryDepartmentByUnique(usrunique);
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+            resultMsg.setData(into);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMsg.setResultMsg("心跳接口异常");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+        }
+
+        return resultMsg;
     }
 
 }

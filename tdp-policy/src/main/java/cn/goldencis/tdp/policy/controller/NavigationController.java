@@ -85,6 +85,8 @@ public class NavigationController implements ServletContextAware {
     @ResponseBody
     @RequestMapping(value = "/getUserNavigation", produces = "application/json", method = RequestMethod.GET)
     public ResultMsg getUserNavigation(HttpServletRequest request) {
+        System.out.println(request.getServletContext());
+        System.out.println(request.getSession().getServletContext());
         ResultMsg resultMsg = new ResultMsg();
         UserDO user = GetLoginUser.getLoginUser();
 

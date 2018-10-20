@@ -114,4 +114,8 @@ public class ConstantsDto {
     /*public static final String SEC_CODE = "SEC_CODE";
     public static final String SEC_CODE_FLAG = "SEC_CODE_FLAG";
     public static final String SEC_CODE_PARAMETER = "sec_code_parameter";*/
+    /**
+     * 日志提交类型
+     */
+    public static final String SUBMIT_REPORT_FILE_TRANSFER = "fileTransferLog";
 }

@@ -150,6 +150,7 @@ public class AboutController implements ServletContextAware {
         }
 
         request.getSession().setAttribute("maxCustomerCnt", authInfo.get("maxCustomerCnt") == null ? "0" : authInfo.get("maxCustomerCnt").toString());
+        request.getServletContext().setAttribute("maxCustomerCnt", authInfo.get("maxCustomerCnt") == null ? "0" : authInfo.get("maxCustomerCnt").toString());
 
         if (!"".equals(authInfo.get("authmsg"))) {
             request.getSession().setAttribute("unauthority", "1");

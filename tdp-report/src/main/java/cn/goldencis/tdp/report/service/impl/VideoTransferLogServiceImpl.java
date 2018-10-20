@@ -72,15 +72,15 @@ public class VideoTransferLogServiceImpl extends AbstractBaseServiceImpl<VideoTr
         return mapper;
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         try {
-            ExecutableTask executableTask = new ExecutableTask("日志采集", this, this.getClass().getMethod("collectVideoTransferLogsWithAttachment", String.class), "cn.goldencis.tdp.report.service.impl.VideoTransferLogServiceImpl.collectVideoTransferLogsWithAttachment");
+            ExecutableTask executableTask = new ExecutableTask("日志采集", this, this.getClass().getMethod("", String.class), "cn.goldencis.tdp.report.service.impl.VideoTransferLogServiceImpl.collectVideoTransferLogsWithAttachment");
             dynamicScheduledTask.addExecutableTask(executableTask);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * 添加视频流转日志

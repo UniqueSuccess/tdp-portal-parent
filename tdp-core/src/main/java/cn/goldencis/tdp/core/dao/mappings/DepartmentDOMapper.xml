@@ -345,4 +345,7 @@
         #{item}
     </foreach>
   </select>
+  <select id="queryPolicyIdByDepartmentId" resultType="int">
+  	select policy_id from t_department where id = #{deptguid}
+  </select>
 </mapper>

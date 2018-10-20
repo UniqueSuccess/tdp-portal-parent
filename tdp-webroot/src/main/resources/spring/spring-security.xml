@@ -52,12 +52,7 @@
 	<!-- 开放浏览器下载页面 -->
 	<http pattern="/downloadBrowserPage" security="none" />
 	<http pattern="/downloadBrowser/*" security="none" />
-	<!-- 开放验证密码接口 -->
-	<http pattern="/loginVal" security="none" />
-	<!-- 开发测试接口 -->
-	<!--<http pattern="/childNode/**" security="none" />-->
-	<!--<http pattern="/scheduledTask/**" security="none" />-->
-
+	
 	<!-- 动态IP http的接口 -->
 	<http pattern="/access/applyClientAccess" security="none" />
 	<http pattern="/access/checkClientAccessList" security="none" />
@@ -72,20 +67,15 @@
 	<http pattern="/report/countVideoTransferLogsForCollecting" security="none" />
 	<!-- 开放非法登录告警接口 -->
 	<http pattern="/warning/submitIllegalLoginAlarm" security="none" />
-
-	<!-- 开放指纹比对接口 -->
-	<http pattern="/fingerprint/verifyFingerprint" security="none" />
-
+	
+	<!-- 终端用户注册接口 -->
+	<http pattern="/clientUser/addClientUser" security="none" />
+	<!-- 心跳上报接口 -->
+	<http pattern="/clientUser/heartbeat" security="none" />
+	<!-- 外发日志上报接口 -->
+	<http pattern="/submit/submitReport" security="none" />
+	
 	<!--<http pattern="/vdpWebSocketServer" security="none" />-->
-
-	<!-- <http pattern="/system/import/import" security="none"></http> <http
-		pattern="/system/import/importdevice" security="none"></http> -->
-	<http pattern="/user/getPlatformAccount" security="none" />
-	<http pattern="/user/queryPlatformAccount" security="none" />
-	<http pattern="/user/validatOmsUser" security="none" />
-
-	<!-- 不过滤验证码 -->
-	<http pattern="/getCode" security="none" />
 
 
 <!--	<http pattern="/logout" create-session="never" auto-config="true">
