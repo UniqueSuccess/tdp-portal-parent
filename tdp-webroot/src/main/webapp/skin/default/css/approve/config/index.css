@@ -16,6 +16,15 @@
 .client-state.onway {
   background-color: #58A5E3;
 }
+.client-state.refuse {
+  background-color: red;
+}
+button[style*="visibility: hidden"] {
+  display: none;
+}
+.gd-toolbar {
+  padding: 0px;
+}
 .main-contentall {
   position: absolute;
   top: 40px;
@@ -272,16 +281,17 @@ textarea {
   display: inline-block;
   vertical-align: top;
 }
-#openWind i.icon-btn-review:focus {
-  color: #38D1BF;
+#openWind i.icon-download:focus {
+  color: #58A5E3;
 }
 #openWind a {
-  color: #38D1BF;
+  color: #58A5E3;
 }
 #openWind a:focus {
-  color: #38D1BF !important;
+  color: #58A5E3 !important;
 }
-.refuse {
+/*
+.refuse{
   display: inline-block;
   width: 40px;
   text-align: center;
@@ -290,7 +300,7 @@ textarea {
   background-color: red;
   color: #fff;
 }
-.pass {
+.pass{
   display: inline-block;
   width: 40px;
   text-align: center;
@@ -299,6 +309,6 @@ textarea {
   background-color: #38D1BF;
   color: #fff;
 }
-i:focus {
+i:focus{
   color: #38D1BF;
-}
+}*/

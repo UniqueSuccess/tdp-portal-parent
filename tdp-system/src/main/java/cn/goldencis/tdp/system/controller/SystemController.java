@@ -7,8 +7,10 @@ import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.entity.*;
 import cn.goldencis.tdp.core.service.IOperationLogService;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
+import cn.goldencis.tdp.core.utils.JsonUtil;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
 import cn.neiwang.vdpjni.IFConfig;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.*;
 
 /**
@@ -61,6 +64,7 @@ public class SystemController {
             e.printStackTrace();
         }
 
+        modelAndView.addObject("roleTypeList", JsonUtil.getObjectToString(ConstantsDto.ROLE_LIST));
         modelAndView.setViewName("system/setting/index");
         return modelAndView;
     }

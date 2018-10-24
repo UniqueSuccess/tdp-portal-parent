@@ -193,6 +193,9 @@ public class DepartmentController {
                 //传入部门和数据库中部门的名称一致，名称没有修改的情况，执行更新
                 if (dep.getName().equals(bean.getName())) {
                     departmentService.updatedept(bean);
+                    if (!dep.getPolicyId().equals(bean.getPolicyId())) {
+                        departmentService.changePolicy(dep.getId(), bean.getPolicyId(), dep.getPolicyId());
+                    }
                     resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
                 } else {
                     //跟数据库中其他id部门的名称一致。重复。
@@ -201,6 +204,9 @@ public class DepartmentController {
             } else {
                 //不存在该名称，不存在名称重复问题，直接修改。
                 departmentService.updatedept(bean);
+                if (!dep.getPolicyId().equals(bean.getPolicyId())) {
+                    departmentService.changePolicy(dep.getId(), bean.getPolicyId(), dep.getPolicyId());
+                }
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
             }
         } catch (Exception ex) {

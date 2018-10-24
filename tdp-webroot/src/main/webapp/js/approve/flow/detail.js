@@ -109,9 +109,8 @@ function initEvents() {
             });
         })
         //删除流程
-        .on('click', '.bar_delete_flow', function () {
+        .off("click", '.bar_delete_flow').on('click', '.bar_delete_flow', function () {
             var indexDom = $(this);
-
             if ($(".approve_start label.default").length == 1) {
                 gd.showWarning('必须保留一个节点');
                 return false;

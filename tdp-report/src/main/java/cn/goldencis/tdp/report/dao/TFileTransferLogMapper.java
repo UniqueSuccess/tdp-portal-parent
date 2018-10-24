@@ -3,7 +3,10 @@ package cn.goldencis.tdp.report.dao;
 import cn.goldencis.tdp.common.dao.BaseDao;
 import cn.goldencis.tdp.report.entity.TFileTransferLog;
 import cn.goldencis.tdp.report.entity.TFileTransferLogCriteria;
+
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
@@ -33,4 +36,8 @@ public interface TFileTransferLogMapper extends BaseDao {
     int updateByPrimaryKey(TFileTransferLog record);
 
     String queryApproveFlowAttachment(@Param("usrunique")String usrunique, @Param("tranunique")String tranunique);
+
+    List<TFileTransferLog> queryFileTransferLog(Map<String, Object> params);
+
+    Integer queryFileTransferLogCount(Map<String, Object> params);
 }

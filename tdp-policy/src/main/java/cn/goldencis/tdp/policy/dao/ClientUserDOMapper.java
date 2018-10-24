@@ -56,4 +56,6 @@ public interface ClientUserDOMapper extends BaseDao {
     void updateClientUserOffline(@Param("date")String date);
 
     Map<String, Object> queryDepartmentByUnique(@Param("usrunique")String usrunique);
+
+    List<String> queryChangeClient(Map<String, Object> params);
 }

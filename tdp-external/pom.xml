@@ -18,22 +18,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-
-    <dependency>
-    	<groupId>cn.goldencis</groupId>
-    	<artifactId>tdp-report</artifactId>
-    	<version>6.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>cn.goldencis</groupId>
-    	<artifactId>tdp-core</artifactId>
-    	<version>6.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>cn.goldencis</groupId>
-    	<artifactId>tdp-common</artifactId>
-    	<version>6.0.0-SNAPSHOT</version>
-    </dependency>
+        <dependency>
+            <groupId>cn.goldencis</groupId>
+            <artifactId>tdp-approve</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.goldencis</groupId>
+            <artifactId>tdp-report</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.goldencis</groupId>
+            <artifactId>tdp-core</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.goldencis</groupId>
+            <artifactId>tdp-common</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -29,6 +29,8 @@
         <result column="reason" jdbcType="VARCHAR" property="reason" />
         <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
         <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+        <result column="senior_id" jdbcType="INTEGER" property="seniorId" />
     </resultMap>
 
     <sql id="ApproveDetail_Column_List">
@@ -45,21 +47,84 @@
     </insert>
 
     <select id="getApproveFlowPage" resultMap="FlowResultMap">
+    SELECT DISTINCT
+    f.id,
+    f.name,
+    f.flow_id,
+    f.status,
+    f.point_id,
+    d.name point_Name,
+    group_concat(d.approver) approvers,
+    type,
+    tran_unique,
+    applicant_id,
+    applicant_name,
+    reason,
+    apply_time,
+    finish_time,
+    d.modify_time,
+    d.senior_id
+    FROM t_approve_flow f
+    LEFT JOIN t_approve_detail d
+    ON f.id = d.flow_id AND f.point_id = d.point_id
+    WHERE 1 = 1
+    <if test="userGuid != null">
+        AND d.approver = #{userGuid,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null">
+        AND apply_time BETWEEN #{startDate} AND #{endDate}
+    </if>
+    <if test="applicantOrType != null">
+        AND INSTR(applicant_name, #{applicantOrType})
+    </if>
+    <if test="status == 0">
+        AND f.status = 0 AND d.result IS NULL
+    </if>
+    <if test="status == -1">
+        AND f.status = -1
+    </if>
+    <if test="status == 1">
+        AND f.status = 1
+    </if>
+    <if test="status == 2">
+        AND f.status != 0
+    </if>
+
+    GROUP BY f.id
+
+    <if test="status == 0">
+        ORDER BY f.apply_time DESC
+    </if>
+    <if test="status == -1">
+        ORDER BY f.apply_time DESC
+    </if>
+    <if test="status == 1">
+        ORDER BY f.apply_time DESC
+    </if>
+    <if test="status == 2">
+        ORDER BY f.finish_time DESC
+    </if>
+    <if test="start != null">
+        limit #{start} , #{length}
+    </if>
+</select>
+
+    <select id="getApproveFlowPageClient" resultMap="FlowResultMap">
         SELECT DISTINCT
-          f.id,
-          f.name,
-          f.flow_id,
-          f.status,
-          f.point_id,
-          d.name point_Name,
-          group_concat(d.approver) approvers,
-          type,
-          tran_unique,
-          applicant_id,
-          applicant_name,
-          reason,
-          apply_time,
-          finish_time
+        f.id,
+        f.name,
+        f.flow_id,
+        f.status,
+        f.point_id,
+        d.name point_Name,
+        group_concat(d.approver) approvers,
+        type,
+        tran_unique,
+        applicant_id,
+        applicant_name,
+        reason,
+        apply_time,
+        finish_time
         FROM t_approve_flow f
         LEFT JOIN t_approve_detail d
         ON f.id = d.flow_id AND f.point_id = d.point_id
@@ -70,8 +135,8 @@
         <if test="startDate != null">
             AND apply_time BETWEEN #{startDate} AND #{endDate}
         </if>
-        <if test="applicantOrType != null">
-            AND INSTR(applicant_name, #{applicantOrType})
+        <if test="uuid != null">
+            AND f.applicant_id = #{uuid,jdbcType=VARCHAR}
         </if>
         <if test="status == 0">
             AND f.status = 0 AND d.result IS NULL
@@ -105,6 +170,8 @@
         </if>
     </select>
 
+
+
     <select id="countApproveFlowPage" resultType="java.lang.Long">
         SELECT
         count(DISTINCT f.id)
@@ -128,6 +195,31 @@
             AND INSTR(applicant_name, #{applicantOrType})
         </if>
     </select>
+
+    <select id="countApproveFlowPageClient" resultType="java.lang.Long">
+        SELECT
+        count(DISTINCT f.id)
+        FROM t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id AND f.point_id = d.point_id
+        WHERE 1 = 1
+        <if test="userGuid != null">
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+        </if>
+        <if test="status == 0">
+            AND f.status = 0 AND d.result IS NULL
+        </if>
+        <if test="status == 1">
+            AND f.status != 0
+        </if>
+        <if test="startDate != null">
+            AND apply_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="uuid != null">
+            AND f.applicant_id = #{uuid,jdbcType=VARCHAR}
+        </if>
+    </select>
+
 
     <select id="countNeedToApprove" resultType="java.lang.Long">
         SELECT count(1)

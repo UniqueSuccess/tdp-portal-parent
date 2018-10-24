@@ -1,10 +1,7 @@
 var homepage = new Vue({
     el: "#homepage",
-    data: {
-    }
+    data: {}
 });
-
-
 
 
 var potentRiskChart = ''//潜在风险图表
@@ -74,15 +71,15 @@ function initEvents() {
                 getRistInfo("month", "noall");
             }
         })
-        /*//审批跳转
-        .on('click', '.content-cell', function () {
-            if ($('#menulist a[href="/tdp/approveDefinition/index"]').length == 0) {
-                layer.msg('您没有查看权限！', {icon: 7});
-                return;
-            }
-            var param = $(this).attr('data-value');
-            location.href = ctx + '/approveDefinition/index?status=' + param;
-        })*/
+    /*//审批跳转
+    .on('click', '.content-cell', function () {
+        if ($('#menulist a[href="/tdp/approveDefinition/index"]').length == 0) {
+            layer.msg('您没有查看权限！', {icon: 7});
+            return;
+        }
+        var param = $(this).attr('data-value');
+        location.href = ctx + '/approveDefinition/index?status=' + param;
+    })*/
     $("body #menus").resize(function () {
         if (potentRiskChart) {
             potentRiskChart.resize();
@@ -148,10 +145,10 @@ function getAllData() {
                 if (msg.resultCode == 0) {
                     var x = 0;
                     var y = 0;
-                    for (var i = 1; i < 4; i++) {
+                    for (var i = 1; i < 3; i++) {
                         x += Number(msg.data[i]);
                     }
-                    y = allConnt * 3;
+                    y = allConnt * 2;
                     var num = ((Number(((1 - (x / y)).toFixed(2)) * 100)) / 100);
                     if (x == 0) {
                         potentRiskOpt.series[0].data = [1];
@@ -185,9 +182,6 @@ function getAllData() {
             gd.showError('用户总数连接服务器失败');
         }
     });
-
-//视频流转
-
 
     //审批待审批
     getAjax(ctx + "/approveFlow/countApproveByState", {
@@ -231,7 +225,6 @@ function getAllData() {
     });
     //部门视频流转分布
     getAjax(ctx + '/report/countVideoTransferByDepartment', '', function (msg) {
-
         if (msg.resultCode == 0) {
             var legend = new Array();
             var tempData = new Array();
@@ -244,10 +237,10 @@ function getAllData() {
                 tempData.push(deptData);
             }
             if (getObjArrayCount(tempData) == 0) {
-                $('#dept_video').addClass('vedio_export_empty');
-                return;
+                 $('#dept_video').addClass('vedio_export_empty');
+                 return;
             }
-
+            deptMoveOpt.series[1].data[0].label.normal.formatter = "共"+getObjArrayCount(tempData).toString()+"条";
             deptMoveOpt.series[0].data = tempData;
             deptMoveOpt.legend.data = legend;
             deptMoveChart.setOption(deptMoveOpt);
@@ -256,53 +249,32 @@ function getAllData() {
         }
     });
 
-    //top5
-    getAjax(ctx + '/report/countVideoTransferTop5', '', function (msg) {
+    //文件流转类型
+    getAjax(ctx + "/report/getFileTypeCount", '', function (msg) {
         if (msg.resultCode == 0) {
-
-            if (msg.data.length == 0) {
-
-                $('#person_move').addClass('vedio_export_empty');
-                $('.person-move').hide();
-            } else {
-                var temp;
-                var count = new Array();
-                var hunman = new Array();
-                for (var i = 0; i < msg.data.length; i++) {
-                    for (var j = i + 1; j < msg.data.length; j++) {
-                        if (msg.data[i].countTransfer > msg.data[j].countTransfer) {
-                            temp = msg.data[i];
-                            msg.data[i] = msg.data[j];
-                            msg.data[j] = temp;
-                        }
-                    }
-                }
-                for (var k = 0; k < msg.data.length; k++) {
-                    count.push(msg.data[k].countTransfer);
-                    hunman.push(msg.data[k].truename)
-                }
-                if (judgeNum(count, 1)) {
-                    personMoveOpt.xAxis[0].splitNumber = 1;
-                } else if (judgeNum(count, 2)) {
-                    personMoveOpt.xAxis[0].splitNumber = 2;
-                } else if (judgeNum(count, 3)) {
-                    personMoveOpt.xAxis[0].splitNumber = 3;
-                } else if (judgeNum(count, 4)) {
-                    personMoveOpt.xAxis[0].splitNumber = 4;
-                } else {
-                    personMoveOpt.xAxis[0].splitNumber = 5;
-                }
-                personMoveOpt.yAxis[0].data = hunman;
-                personMoveOpt.series[0].data = count;
-                personMoveChart.setOption(personMoveOpt);
+            var legend = new Array();
+            var tempData = new Array();
+            var doc = msg.data.doc;
+            var pdf = msg.data.pdf;
+            var ppt = msg.data.ppt;
+            var xls = msg.data.xls;
+            legend.push(doc, pdf, ppt, xls);
+            for (var i = 0; i < legend.length; i++) {
+                tempData.push(getArrayCount(legend));
+            }
+            personMoveOpt.yAxis[1].data = legend;
+            personMoveOpt.series[0].data = legend;
+            personMoveOpt.series[1].data = tempData;
+            if (getArrayCount(legend) == 0) {
+                $('#file_type').addClass('vedio_export_empty');
+                return;
             }
 
-
+            personMoveChart.setOption(personMoveOpt);
         } else {
-            gd.showError('top5连接服务器失败');
+            gd.showError('文件类型获取连接服务器失败');
         }
     });
-
 
 }
 
@@ -310,7 +282,7 @@ function getAllData() {
 function getRistInfo(day, isAll) {
 
     videoMoveChart.clear();
-    getAjax(ctx + '/report/getVideoTransferLogInHours', {
+    getAjax(ctx + '/report/getFileTransferLogInHours', {
         "departmentId": 1,
         "submitDate": day,
         "startDate": '',
@@ -319,7 +291,7 @@ function getRistInfo(day, isAll) {
         "logType": "OUTCFG"//外发
     }, function (msg) {
         if (msg.resultCode == 0) {
-            getAjax(ctx + '/report/getVideoTransferLogInHours', {
+            getAjax(ctx + '/report/getFileTransferLogInHours', {
                 "departmentId": 1,
                 "submitDate": day,
                 "startDate": '',
@@ -327,8 +299,8 @@ function getRistInfo(day, isAll) {
                 "order": '',
                 "logType": "OPT"//导出
             }, function (msgIn) {
-                if (msgIn.resultCode == 1) {
-                    getAjax(ctx + '/report/getVideoTransferLogInHours', {
+                if (msgIn.resultCode == 0) {
+                    getAjax(ctx + '/report/getFileTransferLogInHours', {
                         "departmentId": 1,
                         "submitDate": day,
                         "startDate": '',
@@ -336,8 +308,8 @@ function getRistInfo(day, isAll) {
                         "order": '',
                         "logType": ''
                     }, function (msgAll) {
-                        if (msgAll.resultCode == 1) {
-                            videoMoveOpt.legend.data = ['视频外发', '视频导出',"总计"];
+                        if (msgAll.resultCode == 0) {
+                            videoMoveOpt.legend.data = ['外发', '导出'];
                             if (day == 'day') {
                                 if (judgeNum(msgAll.data, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -350,7 +322,7 @@ function getRistInfo(day, isAll) {
                                 } else {
                                     videoMoveOpt.yAxis[0].splitNumber = 5;
                                 }
-                                videoMoveOpt.series[2].data = msgAll.data;
+                                // videoMoveOpt.series[2].data = msgAll.data;
                                 videoMoveOpt.xAxis[0].data = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"];
                             } else if (day == 'week') {
                                 if (judgeNum(msgAll.data.countList, 1)) {
@@ -364,7 +336,7 @@ function getRistInfo(day, isAll) {
                                 } else {
                                     videoMoveOpt.yAxis[0].splitNumber = 5;
                                 }
-                                videoMoveOpt.series[2].data = msgAll.data.countList;
+                                // videoMoveOpt.series[2].data = msgAll.data.countList;
                                 videoMoveOpt.xAxis[0].data = msgAll.data.dateList;
                             } else if (day == 'month') {
                                 if (judgeNum(msgAll.data.countList, 1)) {
@@ -378,19 +350,19 @@ function getRistInfo(day, isAll) {
                                 } else {
                                     videoMoveOpt.yAxis[0].splitNumber = 5;
                                 }
-                                videoMoveOpt.series[2].data = msgAll.data.countList;
+                                // videoMoveOpt.series[2].data = msgAll.data.countList;
                                 videoMoveOpt.xAxis[0].data = msgAll.data.dateList;
                             }
 
                             if (day == 'day') {
                                 //暂时保留
                                 if ((getArrayCount(msg.data) + getArrayCount(msgIn.data)) == 0) {
-                                    $('.no-data').show();
-                                    $('.video-move').hide();
-                                    return;
-                                }else {
-                                    $('.video-move').show();
-                                    $('.no-data').hide();
+                                    // $('.no-data').show();
+                                    // $('.video-move').hide();
+                                    // return;
+                                } else {
+                                    // $('.video-move').show();
+                                    // $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data, 1) && judgeNum(msgIn.data, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -410,12 +382,12 @@ function getRistInfo(day, isAll) {
                                 videoMoveOpt.xAxis[0].data = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"];
                             } else if (day == 'week') {
                                 if ((getArrayCount(msg.data.countList) + getArrayCount(msgIn.data.countList)) == 0) {
-                                    $('.no-data').show();
-                                    $('.video-move').hide();
-                                    return;
-                                }else {
-                                    $('.video-move').show();
-                                    $('.no-data').hide();
+                                    // $('.no-data').show();
+                                    // $('.video-move').hide();
+                                    // return;
+                                } else {
+                                    // $('.video-move').show();
+                                    // $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data.countList, 1) && judgeNum(msgIn.data.countList, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -433,12 +405,12 @@ function getRistInfo(day, isAll) {
                                 videoMoveOpt.xAxis[0].data = msg.data.dateList;
                             } else if (day == 'month') {
                                 if ((getArrayCount(msg.data.countList) + getArrayCount(msgIn.data.countList)) == 0) {
-                                    $('.no-data').show();
-                                    $('.video-move').hide();
-                                    return;
-                                }else {
-                                    $('.video-move').show();
-                                    $('.no-data').hide();
+                                    // $('.no-data').show();
+                                    // $('.video-move').hide();
+                                    // return;
+                                } else {
+                                    // $('.video-move').show();
+                                    // $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data.countList, 1) && judgeNum(msgIn.data.countList, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -511,7 +483,7 @@ potentRiskOpt = {
     series: [{
         type: 'liquidFill',
         data: [0.8],
-        color: ['#38D1BF'],
+        color: ['#039BE5'],
         center: ['50%', '48%'],
         radius: '70%',
         amplitude: '8%',
@@ -532,7 +504,7 @@ potentRiskOpt = {
             borderDistance: 4,
             itemStyle: {
                 color: 'none',
-                borderColor: '#38D1BF',
+                borderColor: '#039BE5',
                 borderWidth: 1,
                 shadowBlur: 0
             }
@@ -550,7 +522,7 @@ potentRiskOpt = {
 
         label: {
             show: true,
-            color: '#38D1BF',
+            color: '#039BE5',
             insideColor: '#fff',
             fontSize: 34,
             // fontWeight: 'bold',
@@ -576,29 +548,21 @@ function videoMove() {
 //视频流转
 videoMoveOpt = {
     color: ['#FFBF2D'],
-    /*title: {
-        text: '视频流转',
-        textStyle: {
-            color: '#333',
-            fontSize: 14,
-            fontWeight: 100
-        },
-        left: 6,
-        top: 8
-    },*/
     tooltip: {
         trigger: 'axis',
         // formatter:'{a}: {c}条</br>{a1}: {c1}条</br>{b}'
     },
     legend: {
         orient: "horizontal",
-        icon: 'rect',
-        data: ['视频外发', '视频导出', '总计'],
-        itemWidth: 12,
+        data: ['外发', '导出'],
+        itemWidth: 20,
         itemHeight: 12,
         right: 260,
-        top: 0,
-        selectedMode: false
+        top: "-5",
+        selectedMode: false,
+        icon: 'circle',
+        itemGap: 20,
+        width: 200
     },
     grid: {
         top: '80',
@@ -658,28 +622,24 @@ videoMoveOpt = {
             axisLabel: {
                 textStyle: {
                     color: "#999"
-                },
-                /*formatter:function(text){
-                    console.log(text)
-                    return text+'/条'
-                }*/
+                }
             }
         }
     ],
     series: [
         {
-            name: '视频外发',
+            name: '外发',
             type: 'bar',
             barWidth: "auto",
-            barMinHeight:1,
-            barGap:"10%",
+            barMinHeight: 1,
+            barGap: "10%",
             itemStyle: {
                 normal: {
                     color: new echarts.graphic.LinearGradient(
                         0, 0, 0, 1,
                         [
-                            {offset: 0, color: '#19C0F3'},
-                            {offset: 1, color: '#73E1F7'}
+                            {offset: 0, color: '#6DCCF8'},
+                            {offset: 1, color: '#6DCCF8'}
                         ]
                     )
                 }
@@ -687,30 +647,30 @@ videoMoveOpt = {
             data: []
         },
         {
-            name: '视频导出',
+            name: '导出',
             type: 'bar',
             barWidth: "auto",
-            barMinHeight:1,
-            barGap:"10%",
+            barMinHeight: 1,
+            barGap: "10%",
             itemStyle: {
                 normal: {
                     color: new echarts.graphic.LinearGradient(
                         0, 0, 0, 1,
                         [
-                            {offset: 0, color: '#38D1BF'},
-                            {offset: 1, color: '#69EAE1'}
+                            {offset: 0, color: '#37AAE3'},
+                            {offset: 1, color: '#37AAE3'}
                         ]
                     )
                 }
             },
             data: []
         },
-        {
+        /*{
             name: '总计',
             type: 'line',
             smooth: true,
             data: []
-        }
+        }*/
     ]
 };
 
@@ -721,7 +681,13 @@ function deptMove() {
 }
 
 deptMoveOpt = {
-    color: ['#F9C83F', '#25ABE4', '#4DC1E0', '#3C96AD', '#45D7C8', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'],
+    color: ['#BAE7FC', '#8DD8FA', '#3EBDF6', '#1BA4E7', '#1A84C3'],
+    /*title:{
+        text:158,
+        subtext:"总数",
+        x: 'center',
+        y: 'center',
+    },*/
     tooltip: {
         trigger: 'item',
         formatter: "{b}: {c} ({d}%)"
@@ -731,6 +697,7 @@ deptMoveOpt = {
         orient: 'vertical',
         right: '8%',
         y: 'center',
+        icon: 'circle',
         itemWidth: 12,
         itemHeight: 12,
         itemGap: 20,
@@ -738,8 +705,8 @@ deptMoveOpt = {
             fontSize: 14,
         },
         formatter: function (parse) {
-            if (parse.toString().length > 5) {
-                parse = parse.substring(0, 4) + '...';
+            if (parse.toString().length > 7) {
+                parse = parse.substring(0, 6) + '...';
             }
             return parse;
         },
@@ -750,7 +717,7 @@ deptMoveOpt = {
             name: '访问来源',
             type: 'pie',
             center: ['38%', '50%'],
-            radius: ['35%', '60%'],
+            radius: ['45%', '60%'],
             avoidLabelOverlap: false,
             label: {
                 normal: {
@@ -770,20 +737,55 @@ deptMoveOpt = {
                 }
             },
             data: [
-                {value: 335, name: '直接访问',id:3},
-                {value: 310, name: '邮件营销',id:9}
+                {value: 335, name: '直接访问', id: 3},
+                {value: 310, name: '邮件营销', id: 9}
             ]
+        },
+        {
+            name: '内圈',
+            type: 'pie',
+            center: ['38%', '50%'],
+            radius: [0, '45%'],
+            avoidLabelOverlap: false,
+            hoverAnimation: false,
+            cursor: "default",
+            silent: true,
+            label: {
+                normal: {
+                    position: 'center'
+                }
+            },
+            data: [{
+                value: 0,
+                itemStyle: {
+                    normal: {
+                        color: '#fff'
+                    }
+                },
+                label: {
+                    normal: {
+                        show: true,
+                        formatter: "182",
+                        textStyle: {
+                            color: '#232D3B',
+                            fontSize: 32,
+                            fontWeight: 'bold'
+                        }
+                    }
+                }
+            }]
         }
     ]
 };
 
 
-//人员流转
+//文件流转类型
 function personMove() {
-    personMoveChart = echarts.init(document.getElementById('person_move'));
+    personMoveChart = echarts.init(document.getElementById('file_type'));
+
 }
 
-// 人员视频数据导出信息top10
+// 文件流转类型
 personMoveOpt = {
     tooltip: {
         trigger: 'axis',
@@ -802,101 +804,150 @@ personMoveOpt = {
         bottom: '5%',
         containLabel: true
     },
-    yAxis: [{
-        type: 'category',
-        data: ['杨利伟', '孙杨', '孙浩'],
-        nameGap: 40,
-        axisTick: {
-            alignWithLabel: true,
-        },
-        axisLabel: {
-            margin: 15,
-            textStyle: {
-                fontSize: 12,
-                color: '#000'
+    yAxis: [
+        {
+            type: 'category',
+            show: false,
+            data: ['Word', 'PDF', 'PPT', 'Excel'],
+            axisTick: {
+                show: false
             },
-            formatter: function (pamar) {
-                if (pamar.length > 5) {
-                    pamar = pamar.substring(0, 4) + '...';
+            axisLine: {
+                show: false,
+                lineStyle: {
+                    color: '#fff',
                 }
-                return pamar;
+            },
+            axisLabel: {
+                show: false,
+                inside: false,
+                textStyle: {
+                    color: '#bac0c0',
+                    fontWeight: 'normal',
+                    fontSize: '12',
+                }
             }
-        },
-        axisLine: {
-            lineStyle: {
-                color: '#dbe0e6'
-            }
-        },
 
-    }],
+        },
+        {
+            type: 'category',
+            axisTick: {
+                show: false
+            },
+            splitLine: {
+                show: false,
+            },
+            axisLine: {
+                show: false,
+                lineStyle: {
+                    color: '#000'
+                }
+            },
+            axisLabel: {
+                show: true,
+                color: '#666',
+                interval: '0',
+                fontSize: '18',
+            },
+            position: 'right',
+            offset: 0,
+            data: [20, 30, 40, 50],
+            zLevel: '3'
+        }],
     xAxis: [{
         type: 'value',
-
-        min: null,
-        // max:function(value){
-        //     alert(value);
-        //     if(value<3){
-        //         return value+3;
-        //     }else{
-        //         return value;
-        //     }
-        //
-        // },
-        // scale:true,
-        minInterval: 0,
-        splitNumber: 5,
-
-        axisLabel: {
-            margin: 5,
-            textStyle: {
-                fontSize: 12,
-                color: '#94999f'
-            }
+        show: false,
+        axisTick: {
+            show: false
         },
         axisLine: {
+            show: false,
             lineStyle: {
-                color: '#fff'
+                color: '#2f3640',
             }
         },
         splitLine: {
+            show: false,
             lineStyle: {
-                color: '#dbe0e6'
+                color: '#2f3640 ',
             }
+        },
+        axisLabel: {
+            show: false,
+            textStyle: {
+                color: '#bac0c0',
+                fontWeight: 'normal',
+                fontSize: '12',
+            },
         }
     }],
-    series: [{
-        name: '',
-        type: 'bar',
-        barWidth: 15,
-        data: [20, 30, 40],
-        label: {
-            normal: {
-                show: true,
-                position: 'insideRight',
-                offset: [0, -1],
-                textStyle: {
-                    color: 'white', //color of value
-                    size: 16,
+    series: [
+        {
+            name: '',
+            type: 'bar',
+            barWidth: "20%",
+            data: [20, 30, 50, 40],
+            label: {
+                normal: {
+                    color: '#666666',
+                    show: true,
+                    // position: 'center',
+                    position: [0, '-130%'],
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        fontFamily: 'PingFangSC'
+                    },
+                    formatter: function (a, b) {
+
+                        return a.name;
+                    }
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                        offset: 0,
+                        color: '#81D4FA' // 0% 处的颜色
+                    }, {
+                        offset: 1,
+                        color: '#039BE5' // 100% 处的颜色
+                    }], false),
+                    barBorderRadius: 20,
+                    shadowColor: 'rgba(0,0,0,0.1)',
+                    shadowBlur: 3,
+                    shadowOffsetY: 3
                 }
             }
         },
-        itemStyle: {
-            normal: {
-
-                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                    offset: 0,
-                    color: '#38D1BF' // 0% 处的颜色
-                }, {
-                    offset: 1,
-                    color: '#10B0E1' // 100% 处的颜色
-                }], false),
-                barBorderRadius: [0, 15, 15, 0],
-                shadowColor: 'rgba(0,0,0,0.1)',
-                shadowBlur: 3,
-                shadowOffsetY: 3
-            }
-        }
-    }]
+        {
+            show: true,
+            type: 'bar',
+            barGap: '-100%',
+            barWidth: '20%', //统计条宽度
+            itemStyle: {
+                normal: {
+                    barBorderRadius: 20,
+                    color: '#EBF0F2'
+                },
+                emphasis: {
+                    barBorderRadius: 20,
+                    color: '#EBF0F2'
+                }
+            },
+            markLine: {
+                silent: false,
+                lineStyle: {
+                    emphasis: {
+                        show: false,
+                        width: 0
+                    }
+                }
+            },
+            z: 1,
+            data: [50, 50, 50, 50],
+        },
+    ]
 };
 
 

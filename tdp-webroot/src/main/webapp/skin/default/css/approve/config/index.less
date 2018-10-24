@@ -18,6 +18,15 @@
 .client-state.onway {
   background-color: #58A5E3;
 }
+.client-state.refuse {
+  background-color: red;
+}
+button[style*="visibility: hidden"]{
+  display: none;
+}
+.gd-toolbar{
+  padding: 0px;
+}
 
 .main-contentall {
   position: absolute;
@@ -285,17 +294,18 @@ textarea {
       vertical-align: top;
     }
   }
-  i.icon-btn-review:focus{
-    color: #38D1BF;
+  i.icon-download:focus{
+    color: #58A5E3;
   }
   a{
-    color: #38D1BF;
+    color: #58A5E3;
   }
   a:focus{
-    color: #38D1BF !important;
+    color: #58A5E3 !important;
   }
 }
 //通过和拒绝
+/*
 .refuse{
   display: inline-block;
   width: 40px;
@@ -316,4 +326,4 @@ textarea {
 }
 i:focus{
   color: #38D1BF;
-}
+}*/

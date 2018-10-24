@@ -70,6 +70,20 @@ public class ApproveFlowController {
     }
 
     /**
+     * 审批流程回显给客户端界面
+     *
+     * @return
+     */
+    @RequestMapping(value = "/clientFlowIndex", method = RequestMethod.GET)
+    public ModelAndView clientFlowIndex(String applicantOrType) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("applicantOrType", applicantOrType);
+        modelAndView.setViewName("approve/client/index");
+        return modelAndView;
+    }
+
+
+    /**
      * 审批中和已完成的列表界面切换
      *
      * @param statusType
@@ -120,7 +134,7 @@ public class ApproveFlowController {
             }
 
 
-            //传入的审批流程对象中，flowId指的是，需要使用的审批流程定义id，根据此id，查询model
+            //传入的审批流程对象中，flowId指的是，需要使用的审批流程定义id，根据此id，查询model 查询出几个节点
             List<ApproveModel> modelList = approveModelService.getApproveModelByDefinitionId(approveFlow.getFlowId());
 
             //发起审批流程，根据模型，生成本次流程的环节步骤
@@ -246,13 +260,9 @@ public class ApproveFlowController {
     @RequestMapping(value = "/getApproveFlowPage", method = RequestMethod.GET)
     public ResultMsg getApproveFlowPage(@RequestParam("start") int start, @RequestParam("length") int length, Integer status, Integer needOnly, String applicantOrType) {
         ResultMsg resultMsg = new ResultMsg();
-
+        //解析查询的开始时间和结束时间
+        Map<String, Date> timeMap = DateUtil.analyzeQueryTime("all", "", "");
         try {
-
-
-
-            //解析查询的开始时间和结束时间
-            Map<String, Date> timeMap = DateUtil.analyzeQueryTime("all", "", "");
 
             int count = approveFlowService.countApproveFlowPage(status, needOnly, timeMap, applicantOrType);
             List<ApproveFlow> approveFlows = approveFlowService.getApproveFlowPage(start, length, status, needOnly, timeMap, applicantOrType);

@@ -2,7 +2,6 @@
 <%@ include file="/WEB-INF/jsp/common/taglibs.jsp"%>
 <%@ include file="/WEB-INF/jsp/common/meta.jsp"%>-->
 <head>
-    <title>TDP</title>
     <style>
         .gd-toolbar{
             padding: 0 16px;
@@ -133,21 +132,17 @@
                                 {
                                     text: '确定',
                                     action: function (dom) {
-                                        console.log('ok');
-                                        console.log(validateDep.valid());
                                         if (!validateDep.valid()) {
                                             return false;
                                         }
                                         var postData = $('#addWind #add_dept_form').serializeJSON();
-                                        console.log(postData)
                                         postData.parentId = app.departmentId;
                                         gd.post(ctx + '/department/add', postData, function (msg) {
-                                            console.log(msg);
                                             if (msg.resultCode == '0') {
                                                 gd.showSuccess('保存成功');
                                                 app.getTreeData();
                                             } else {
-                                                gd.showError('保存失败');
+                                                gd.showError('保存失败 ' + (msg.resultMsg || ''));
                                             }
                                             dom.close();
                                         })
@@ -179,7 +174,6 @@
                                                 addWindow.$refs.customSelect.isDroped = false
                                             },
                                             onChange: function (nodes) {
-                                                console.log(nodes);
                                             },
                                             ready: function (data) {
                                                 $('#treeWindowDepartment span[data-id="'+ app.leftDeptId +'"').trigger("click");
@@ -210,11 +204,8 @@
                     app.leftDeptId = node.id;
                 },
                 onChange: function (nodes) {
-                    console.log(nodes);
                 },
                 ready: function (data) {
-                    console.log(data)
-                    console.log(this);
                 }
             },
             //表格配置
@@ -290,9 +281,6 @@
                                 icon: 'icon-edit',
                                 title: '编辑',//设置图标title
                                 action: function (cell, row, raw) {//动作函数,cell为本格数据，row为本行加工后的数据，raw为本行未加工的数据
-                                    console.log(cell);
-                                    console.log(row);
-                                    console.log(raw);
 
                                     var domEdit = gd.showLayer({
                                         id: 'editWind',//可传一个id作为标识
@@ -310,16 +298,14 @@
                                                     }
 
                                                     var postData = $('#editWind #add_dept_form').serializeJSON();
-                                                    console.log(postData)
                                                     postData.id = raw.id;
                                                     postData.parentId = app.departmentId;
                                                     gd.post(ctx + '/department/updateDept', postData, function (msg) {
-                                                        console.log(msg);
                                                         if (msg.resultCode == '0') {
                                                             gd.showSuccess('修改成功');
                                                             app.getTreeData();
                                                         } else {
-                                                            gd.showError('修改失败');
+                                                            gd.showError('修改失败 ' + (msg.resultMsg || ''));
                                                         }
                                                         dom.close();
                                                     })
@@ -346,18 +332,13 @@
                                                         data: app.deptTreeData,
                                                         // linkable: false,
                                                         onSelect: function (node) {
-                                                            console.log(editWindow);
-                                                            console.log(editWindow.selectValue);
                                                             editWindow.selectValue = node.name;
                                                             app.departmentId = node.id;
                                                             editWindow.$refs.customSelect.isDroped = false
                                                         },
                                                         onChange: function (nodes) {
-                                                            console.log(nodes);
                                                         },
                                                         ready: function (data) {
-                                                            console.log(data)
-                                                            console.log(this);
                                                         }
                                                     }
                                                 },
@@ -365,7 +346,6 @@
                                                     $.each(raw, function (index, val) {
                                                         $('#editWind input[name=' + index + ']').val(val);
                                                         if (index == 'parentId') {
-                                                            console.log(val);
                                                             setTimeout(function() {
                                                                 $('#editWind #treeWindowDepartment span[data-id="'+ val +'"]').trigger("click");
                                                             }, 20)
@@ -401,12 +381,11 @@
                                             class: 'gd-btn-danger', //也可以自定义类
                                             action: function (dom) {
                                                 gd.post(ctx + '/department/delete', {id: raw.id}, function(msg) {
-                                                    console.log(msg);
                                                     if (msg.resultCode == 0) {
                                                         gd.showSuccess('删除成功');
                                                         app.getTreeData();
                                                     } else {
-                                                        gd.showError('删除失败');
+                                                        gd.showError('删除失败 ' + (msg.resultMsg || ''));
                                                     }
                                                 })
                                             }
@@ -448,7 +427,6 @@
             getPolicyList: function() {
                 var _this = this;
                 gd.get(ctx + '/policy/getAllPolicys', '', function(msg) {
-                    console.log(msg)
                     if (msg.resultCode == '0') {
                         _this.policyArray = msg.data;
                     }

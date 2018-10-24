@@ -97,14 +97,14 @@ public interface IUserService extends BaseService<UserDO, UserDOCriteria> {
      * @param length
      * @return
      */
-    List<UserDO> getUserListByLoginUserRoleTypeInPages(UserDO user, int start, int length);
+    List<UserDO> getUserListByLoginUserRoleTypeInPages(Map<String, Object> params);
 
     /**
      * 根据登录用户的角色类型，获取相应类型的账户列表的总数
      * @param user 当前登录用户
      * @return
      */
-    int countUserListByLoginUserRoleTypeInPages(UserDO user);
+    int countUserListByLoginUserRoleTypeInPages(Map<String, Object> params);
 
     /**
      * 检查账户名是否重复

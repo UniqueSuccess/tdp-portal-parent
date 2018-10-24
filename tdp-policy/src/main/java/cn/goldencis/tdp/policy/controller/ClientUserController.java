@@ -72,6 +72,7 @@ public class ClientUserController implements ServletContextAware {
 
     @Autowired
     private GuavaCacheManager cacheManager;
+    
 
     private static final String FILE_NAME = "用户信息";
 
@@ -158,15 +159,17 @@ public class ClientUserController implements ServletContextAware {
     @PageLog(module = "创建用户", template = "用户名ip：%s", args = "0.computerguid", type = LogType.INSERT)
     @ResponseBody
     @RequestMapping(value = "/addClientUser", method = RequestMethod.POST)
-    public ResultMsg addClientUser(ClientUserDO clientUser, HttpServletRequest request) {
+    public ResultMsg addClientUser(@RequestBody net.sf.json.JSONObject jsonObject, HttpServletRequest request) {
 
         ResultMsg resultMsg = new ResultMsg();
         try {
+            ClientUserDO clientUser = (ClientUserDO)net.sf.json.JSONObject.toBean(jsonObject, ClientUserDO.class);
             if (StringUtil.isEmpty(clientUser.getComputerguid())) {
                 resultMsg.setResultMsg("缺失字段computerguid");
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
                 return resultMsg;
             }
+            clientUser.setIp(NetworkUtil.getIpAddress(SysContext.getRequest()));
             //插入用户
             Map<String, Object> result = clientUserService.addClientUser(clientUser);
             if (result.containsKey("resultCode")) {
@@ -176,6 +179,7 @@ public class ClientUserController implements ServletContextAware {
                 }
                 return resultMsg;
             }
+            result.put("ip", clientUser.getIp());
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
             resultMsg.setData(result);
             resultMsg.setResultMsg("注册成功！");
@@ -586,12 +590,16 @@ public class ClientUserController implements ServletContextAware {
 
     @ResponseBody
     @RequestMapping(value = "/heartbeat", method = RequestMethod.POST)
-    public ResultMsg heartbeat(String usrunique, HttpServletRequest request) {
+    public ResultMsg heartbeat(@RequestBody JSONObject json, HttpServletRequest request) {
         ResultMsg resultMsg = new ResultMsg();
 
         try {
-            clientUserService.updateHeartbeat(usrunique);
-            Map<String, Object> into = clientUserService.queryDepartmentByUnique(usrunique);
+            if (!json.containsKey("usrunique")) {
+                resultMsg.setResultMsg("缺少必要参数");
+                return resultMsg;
+            }
+            clientUserService.updateHeartbeat(json.getString("usrunique"));
+            Map<String, Object> into = clientUserService.queryDepartmentByUnique(json.getString("usrunique"));
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
             resultMsg.setData(into);
         } catch (Exception e) {

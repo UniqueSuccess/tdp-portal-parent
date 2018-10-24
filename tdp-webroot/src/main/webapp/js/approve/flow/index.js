@@ -39,7 +39,7 @@ var approveFlowIndex = new Vue({
                         id: 'addWind',
                         title: '添加审批流程',
                         content: $('#new_flow').html(),
-                        size: [670, 300],
+                        size: [590, 300],
                         btn: [{
                             text: '确定',
                             enter: true,//响应回车
@@ -98,7 +98,7 @@ var approveFlowIndex = new Vue({
                         content: '确定要删除吗?',
                         btn: [{
                             text: '删除',
-                            class: 'gd-btn-danger',//也可以自定义类
+                            class: 'gd-btn',//也可以自定义类
                             enter: true,//响应回车
                             action: function (dom) {
                                 var id = $("body #flow_list_box .list-active").data("id");

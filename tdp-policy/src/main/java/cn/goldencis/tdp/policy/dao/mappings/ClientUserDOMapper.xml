@@ -505,4 +505,11 @@
   	select id, guid,computerguid, policyid from t_client_user
   	where guid = #{guid}
   </select>
+  <select id="queryChangeClient" resultType="string">
+  	 SELECT guid FROM t_client_user WHERE computerguid IN
+  	 <foreach close=")" collection="ids" item="item" open="(" separator=",">
+        #{item}
+      </foreach>
+  	  AND policyid &lt;&gt; #{strategy}
+  </select>
 </mapper>

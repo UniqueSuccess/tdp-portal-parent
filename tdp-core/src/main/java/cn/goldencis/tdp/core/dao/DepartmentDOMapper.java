@@ -39,4 +39,6 @@ public interface DepartmentDOMapper extends BaseDao {
     List<Map<String, String>> queryPolicyNameById(@Param("idList")List<Integer> idList);
 
     Integer queryPolicyIdByDepartmentId(@Param("deptguid")Integer deptguid);
+
+    List<String> queryClientUserList(@Param("id")Integer id, @Param("policyId")Integer oldPolicyId);
 }

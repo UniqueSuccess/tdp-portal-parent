@@ -8,7 +8,7 @@
 
 <head>
     <title>金盾VDP</title>
-    <link href="${ctxCss}/dataTables/dataTablesgray.css" rel="stylesheet" type="text/css"/>
+    <%--<link href="${ctxCss}/dataTables/dataTablesgray.css" rel="stylesheet" type="text/css"/>--%>
     <link href="${ctxCss}/approve/config/index.css" rel="stylesheet" type="text/css"/>
 </head>
 <div id="approve" class="" v-cloak style="height: calc(100% - 37px)">
@@ -58,7 +58,7 @@
 </div>--%>
 
 
-<script src="${ctxJs}/plugins/dataTables/jquery.dataTables.min.js"></script>
+<%--<script src="${ctxJs}/plugins/dataTables/jquery.dataTables.min.js"></script>--%>
 <script src="${ctxJs}/plugins/template/template-web.js"></script>
 <script src="${ctxJs}/public.js"></script>
 <script src="${ctxJs}/approve/config/process.js"></script>

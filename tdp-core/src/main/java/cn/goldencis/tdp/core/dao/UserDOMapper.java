@@ -3,6 +3,7 @@ package cn.goldencis.tdp.core.dao;
 import cn.goldencis.tdp.common.dao.BaseDao;
 import cn.goldencis.tdp.core.entity.UserDO;
 import cn.goldencis.tdp.core.entity.UserDOCriteria;
+
 import java.util.List;
 import java.util.Map;
 
@@ -43,4 +44,8 @@ public interface UserDOMapper extends BaseDao {
 
     void updateErrorLoginCount(@Param("userId") String userId, @Param("lastDate") String lastDate,
                                @Param("errorCount") int errorCount);
+
+    List<UserDO> getUserListByLoginUserRoleTypeInPages(Map<String, Object> params);
+
+    int countUserListByLoginUserRoleTypeInPages(Map<String, Object> params);
 }

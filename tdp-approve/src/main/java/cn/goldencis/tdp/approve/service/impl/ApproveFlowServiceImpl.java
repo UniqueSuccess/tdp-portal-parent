@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.System.out;
+
 /**
  * Created by limingchao on 2018/1/16.
  */
@@ -59,6 +61,7 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
     public void init() {
         webSocketHandler.getOnMessageServiceMap().put("approveFlow", this);
     }
+
     /**
      * 发起审批流程
      *
@@ -245,8 +248,48 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
         if (needOnly != null && needOnly == 1) {
             userGuid = GetLoginUser.getLoginUser().getGuid();
         }
-
         List<ApproveFlow> approveFlowInPage = cMapper.getApproveFlowPage(start, length, status, userGuid, startDate, endDate, applicantOrType);
+        for (ApproveFlow approveFlow : approveFlowInPage) {
+            if (approveFlow.getSeniorId() == 0) {
+                approveFlow.setModifyTime(null);
+            }else{
+                ApproveDetailCriteria criteria = new ApproveDetailCriteria();
+                criteria.createCriteria().andPointIdEqualTo(approveFlow.getSeniorId()).andFlowIdEqualTo(approveFlow.getId());
+                List<ApproveDetail> details = detailMapper.selectByExample(criteria);
+                approveFlow.setModifyTime(details.get(0).getModifyTime());
+            }
+
+        }
+
+        return approveFlowInPage;
+    }
+
+    /**
+     * 根据查询条件，获取审批流程。分页查询
+     *
+     * @param start
+     * @param length
+     * @param status
+     * @param timeMap
+     * @param uuid
+     * @return
+     */
+    @Override
+    public List<ApproveFlow> getApproveFlowPageClient(int start, int length, Integer status, Map<String, Date> timeMap, String uuid) {
+        //添加审批人或者类型条件
+
+        Date startDate = null;
+        Date endDate = null;
+        if (timeMap != null && timeMap.size() > 1) {
+            //添加时间条件
+            startDate = timeMap.get("startDateTime");
+            endDate = timeMap.get("endDateTime");
+        }
+
+        //添加审批人条件
+        String userGuid = null;
+
+        List<ApproveFlow> approveFlowInPage = cMapper.getApproveFlowPageClient(start, length, status, userGuid, startDate, endDate, uuid);
         return approveFlowInPage;
     }
 
@@ -276,6 +319,31 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
         }
 
         long count = cMapper.countApproveFlowPage(status, userGuid, startDate, endDate, applicantOrType);
+        return (int) count;
+    }
+
+    /**
+     * 根据查询条件，获取审批流程的数量
+     *
+     * @param status
+     * @param timeMap
+     * @return
+     */
+    @Override
+    public int countApproveFlowPageClient(Integer status, Map<String, Date> timeMap, String uuid) {
+        Date startDate = null;
+        Date endDate = null;
+        if (timeMap != null && timeMap.size() > 1) {
+            //添加时间条件
+            startDate = timeMap.get("startDateTime");
+            endDate = timeMap.get("endDateTime");
+        }
+
+        //添加审批人条件
+        String userGuid = null;
+
+
+        long count = cMapper.countApproveFlowPageClient(status, userGuid, startDate, endDate, uuid);
         return (int) count;
     }
 
@@ -336,7 +404,7 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
         List<ApproveFlowInfo> approveFlowInfoList = infoMapper.selectByExample(infoExample);
         for (ApproveFlowInfo approveFlowInfo : approveFlowInfoList) {
             //判断日志文件是否存在，存在则删除
-            realPath = ctp +approveFlowInfo.getFilePath();
+            realPath = ctp + approveFlowInfo.getFilePath();
             file = new File(realPath);
             if (file.exists()) {
                 if (!file.delete()) {
@@ -354,6 +422,7 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
 
     /**
      * 通知审批流程当前环节的审批人，参数为null时，通知当前登录账户
+     *
      * @param approveFlow
      */
     @Override
@@ -381,6 +450,7 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
 
     /**
      * 通知当前登录账户，更新待审批数量
+     *
      * @param userGuid
      */
     @Override
@@ -405,7 +475,7 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
     public long countApproveByState(Integer status) {
 
         String userGuid = null;
-        if (status.intValue() == 0 ) {
+        if (status.intValue() == 0) {
             userGuid = GetLoginUser.getLoginUser().getGuid();
         }
         long count = cMapper.countApproveByState(userGuid, status);

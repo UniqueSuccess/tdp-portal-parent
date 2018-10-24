@@ -3,6 +3,7 @@ package cn.goldencis.tdp.policy.service.impl;
 import cn.goldencis.tdp.common.dao.BaseDao;
 import cn.goldencis.tdp.common.service.impl.AbstractBaseServiceImpl;
 import cn.goldencis.tdp.common.utils.DateUtil;
+import cn.goldencis.tdp.common.utils.ListUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.common.utils.SysContext;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
@@ -21,6 +22,7 @@ import cn.goldencis.tdp.policy.service.IClientUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,12 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
 
     @Autowired
     private DynamicScheduledTask dynamicScheduledTask;
+
+    @Autowired
+    private PolicyPublishImpl policyPublish;
+
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
 
     @Value("${golbalcfg.path}")
     public String golbalcfgpath;
@@ -183,6 +191,18 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
         //根据策略id查询策略地址
         PolicyDO policy = policyDOMapper.selectByPrimaryKey(policyId);
         result.put("policy", policy.getPath());
+        result.put("policytime", (policy.getModifyTime().getTime() + "").substring(0,10));
+      //设置全局配置信息
+        result.put("golbalcfgpath", golbalcfgpath);
+
+        String realPath = SysContext.getRequest().getSession().getServletContext().getRealPath(golbalcfgpath);
+        File globalCfgFile = new File(realPath);
+
+        if (globalCfgFile.exists()) {
+            long globalcfgtime = globalCfgFile.lastModified();
+            //为符合Python端的处理，截掉毫秒
+            result.put("globalcfgtime", (globalcfgtime + "").substring(0,10));
+        }
         return result;
     }
 
@@ -619,8 +639,26 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
 
     @Override
     public void updateClientUser(Map<String, Object> params) {
+        List<String> list = queryChangeClient(params);
         mapper.updateClientUser(params);
-        
+        /**
+         * 查询哪些用户策略有变化 下发策略
+         */
+        if (!ListUtils.isEmpty(list)) {
+            while (true) {
+                boolean flag = policyPublish.getInitPolicyId().compareAndSet(0, Integer.valueOf(String.valueOf(params.get("strategy"))))
+                        && policyPublish.getInitClientUserList().compareAndSet(null, ListUtils.covertStringByList(list, null));
+                if (flag) {
+                    //策略更新完成后，启动线程，通知客户端。
+                    taskExecutor.execute(policyPublish);
+                    break;
+                }
+            }
+        }
+    }
+
+    private List<String> queryChangeClient(Map<String, Object> params) {
+        return mapper.queryChangeClient(params);
     }
 
     @Override

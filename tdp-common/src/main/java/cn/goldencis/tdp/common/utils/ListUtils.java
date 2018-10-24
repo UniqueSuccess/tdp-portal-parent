@@ -12,4 +12,15 @@ public class ListUtils {
         }
         return true;
     }
+
+    public static String covertStringByList(List<String> list, String space) {
+        String split = ";";
+        if (ListUtils.isEmpty(list)) {
+            return "";
+        }
+        if (space != null) {
+            split = space;
+        }
+        return String.join(split, list);
+    }
 }

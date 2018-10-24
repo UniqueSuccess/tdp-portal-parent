@@ -7,7 +7,6 @@ var app = new Vue({
                 type: 'searchbox',
                 placeholder: "申请人",
                 action: function (val) {
-                    console.log('ok');
                     gd.table('approveTable').reload(1, {applicantOrType: val}, false);
                 }
             }
@@ -33,7 +32,6 @@ var app = new Vue({
                 url: ctx + "/approveFlow/getApproveFlowPage",
                 //改变从服务器返回的数据给table
                 dataSrc: function (data) {
-                    console.log(data);
                     data.rows = data.rows.map(function (obj) {
                         return [
                             obj.checked,
@@ -43,6 +41,7 @@ var app = new Vue({
                             obj.name || '--',
                             obj.pointName || '--',
                             obj.applyTime || '--',
+                            obj.modifyTime || '--',
                             obj.checked
                         ]
                     });
@@ -71,6 +70,7 @@ var app = new Vue({
                         }
                     ],
                     render: function (cell, row, raw) {//自定义表格内容
+                        console.log(raw)
                         var html = '';
                         if (raw.checked == true) {
                             html = '<span class="client-state backlog">待审批</span>';
@@ -93,9 +93,19 @@ var app = new Vue({
                 {
                     name: 'type',
                     head: '类型',
+                    filterName: 'type',//高级查询字段名，不写为name
+                    filters: [//设置检索条件
+                        {
+                            label: '导出',
+                            value: '3'
+                        }, {
+                            label: '外发',
+                            value: '11'
+                        }
+                    ],
                     render: function (cell, row, raw) {//自定义表格内容
                         var html = '';
-                        if (raw.type == 2) {
+                        if (raw.type == 10 || raw.type == 11) {
                             html = '<span class="">外发</span>';
                         } else {
                             html = '<span class="">导出</span>';
@@ -116,6 +126,11 @@ var app = new Vue({
                 {
                     name: 'applyTime',
                     head: '申请时间',
+                    title: true
+                },
+                {
+                    name: 'modifyTime',
+                    head: '上一环节审批时间',
                     title: true
                 },
                 {
@@ -152,7 +167,6 @@ var app = new Vue({
                                                     gd.showWarning('请输入拒绝理由！');
                                                     return false;
                                                 }
-                                                app.detailId;
                                                 gd.post(ctx + '/approveFlow/approveFlow', {
                                                     approveDetailId: app.detailId,
                                                     result: result,
@@ -190,7 +204,6 @@ var app = new Vue({
                                         });
                                         //获取环节
                                         gd.get(ctx + '/approveDetail/getApproveFlowModel', {approveFlowId: id}, function (msg) {
-                                            console.log(msg)
                                             if (msg.resultCode == 0) {
                                                 app.detailId = msg.data.detailId;
                                                 if (type == 2) {
@@ -218,7 +231,6 @@ var app = new Vue({
                             icon: 'icon-btn-document',
                             title: '查看',//设置图标title
                             show: function (cell, row, raw) {//是否展示，可控制权限
-                                console.log(raw.checked)
                                 return raw.checked == false;
                             },
                             action: function (cell, row, raw) {//动作函数,cell为本格数据，row为本行加工后的数据，raw为本行未加工的数据
@@ -228,7 +240,7 @@ var app = new Vue({
                                 var detailId;
                                 var domBacklog = gd.showLayer({
                                     id: 'openWind',//可传一个id作为标识
-                                    title: '审批',//窗口标题
+                                    title: '查看详情',//窗口标题
                                     content: $('#approve_wind').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                                     //url: './layer_content.html',//也可以传入url作为content,
                                     size: [900, 650],//窗口大小，直接传数字即可，也可以是['600px','400px']
@@ -254,7 +266,7 @@ var app = new Vue({
                                             if (msg.resultCode == 0) {
                                                 msg.data.flowInfo.policyParam = JSON.parse(msg.data.flowInfo.policyParam);
 
-                                                if (type == 2) {
+                                                if (type == 10 || type == 11) {
                                                     $("#openWind .top").html(template('approve_tem_out_top', msg.data));
                                                 } else {
                                                     $("#openWind .top").html(template('approve_tem_export_top', msg.data));
@@ -264,10 +276,9 @@ var app = new Vue({
                                         });
                                         //获取环节
                                         gd.get(ctx + '/approveDetail/getApproveFlowModel', {approveFlowId: id}, function (msg) {
-                                            console.log(msg)
                                             if (msg.resultCode == 0) {
                                                 detailId = msg.data.detailId;
-                                                if (type == 2) {
+                                                if (type == 10 || type == 11) {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
                                                 } else {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
@@ -294,94 +305,17 @@ var app = new Vue({
         },
     },
     mounted: function() {
+        this.$nextTick(function(){
+            app.buttonChange();
+        })
     },
     methods: {
         selectChange: function (data) {
             log(data)
+        },
+        buttonChange:function(data){
+            $("button[visibility=hidden]").css("display","none");
         }
     }
 });
 
-/*
-
-//审批流程细节表
-function ProcessTable(id) {
-
-    var appTable = new Vue({
-        el: '.approveHistory',
-        data: {
-            //表格配置
-            tableConfig: {
-                id: 'approveDetailTable',//给table一个id,调用gd.tableReload('demoTable');可重新加载表格数据并保持当前页码，gd.tableReload('demoTable'，1)，第二个参数可在加载数据时指定页码
-                length: 50, //每页多少条,默认50，可选
-                curPage: 1, //当前页码，默认1，可选
-                lengthMenu: [10, 30, 50, 100], //可选择每页多少条，默认[10, 30, 50, 100]，可选
-                enableJumpPage: false, //启用跳页，默认false，可选
-                enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
-                enablePaging: false,//启用分页,默认true，可选
-                //orderColumn: 'ip',//排序列
-                //orderType: 'desc',//排序规则，desc或asc,默认desc
-                columnResize: true, //启用列宽调，默认true，可选
-                //showFooter: false,//显示footer,默认为true
-                //lazy: true,//懒加载数据，调用gd.table('id').reload()对表格数据进行加载,默认为false
-                //loading: true,//显示loading,默认为false
-                ajax: {
-                    //其它ajax参数同jquery
-                    url: ctx + "/approveDetail/getApproveDetailsByFlowId",
-                    //改变从服务器返回的数据给table
-                    dataSrc: function (data) {
-                        console.log(data);
-                        data.rows = data.rows.map(function (obj) {
-                            return [
-                                obj.approverName, obj.result, obj.remark || '--', obj.modifyTime
-                            ]
-                        });
-                        return data;
-                    },
-                    //请求参数
-                    data: {
-                        "approveFlowId": id,
-                    }
-                },
-                columns: [
-                    {
-                        name: 'approverName',
-                        head: '审批人',
-                        title: true
-                    },
-                    {
-                        name: 'result',
-                        head: '审批结果',
-                        render: function (cell, row, raw) {//自定义表格内容
-                            console.log(cell)
-                            if (cell == 1) {
-                                return '<span>同意</span>'
-                            } else {
-                                return '<span>拒绝</span>'
-                            }
-                        }
-                    },
-                    {
-                        name: 'remark',
-                        head: '备注',
-                        title: true
-                    },
-
-                    {
-                        name: 'modifyTime',
-                        head: '审批时间',
-                        title: true
-                    }
-
-                ]
-            },
-        },
-        methods: {
-            selectChange: function (data) {
-                log(data)
-            }
-        }
-    });
-
-
-}*/

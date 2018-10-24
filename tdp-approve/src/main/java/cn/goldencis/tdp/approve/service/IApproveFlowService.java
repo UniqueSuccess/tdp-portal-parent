@@ -62,6 +62,19 @@ public interface IApproveFlowService extends BaseService<ApproveFlow, ApproveFlo
      */
     List<ApproveFlow> getApproveFlowPage(int start, int length, Integer status, Integer needOnly, Map<String, Date> timeMap, String applicantOrType);
 
+
+    /**
+     * 根据查询条件，获取审批流程。分页查询
+     * @param start
+     * @param length
+     * @param status
+     * @param timeMap
+     * @param uuid
+     * @return
+     */
+    List<ApproveFlow> getApproveFlowPageClient(int start, int length, Integer status, Map<String, Date> timeMap, String uuid);
+
+
     /**
      * 根据查询条件，获取审批流程的数量
      * @param status
@@ -71,6 +84,14 @@ public interface IApproveFlowService extends BaseService<ApproveFlow, ApproveFlo
      * @return
      */
     int countApproveFlowPage(Integer status, Integer needOnly, Map<String, Date> timeMap, String applicantOrType);
+    /**
+     * 根据查询条件，获取审批流程的数量
+     * @param status
+     * @param timeMap
+     * @param uuid
+     * @return
+     */
+    int countApproveFlowPageClient(Integer status, Map<String, Date> timeMap, String uuid);
 
     /**
      * 根据流程id，获取流程详细信息

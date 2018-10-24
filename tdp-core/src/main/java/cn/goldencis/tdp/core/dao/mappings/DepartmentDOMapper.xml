@@ -339,7 +339,7 @@
     </if>
   </select>
   <select id="queryPolicyNameById" resultType="map">
-  	SELECT id, name  FROM `t_policy`
+  	SELECT id, name, path, DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s') modify_time  FROM `t_policy`
   	where id in 
   	<foreach close=")" collection="idList" item="item" open="(" separator=",">
         #{item}
@@ -347,5 +347,8 @@
   </select>
   <select id="queryPolicyIdByDepartmentId" resultType="int">
   	select policy_id from t_department where id = #{deptguid}
+  </select>
+  <select id="queryClientUserList" resultType="string">
+  	SELECT guid FROM `t_client_user` WHERE policyid = #{policyId} AND deptguid = #{id}
   </select>
 </mapper>

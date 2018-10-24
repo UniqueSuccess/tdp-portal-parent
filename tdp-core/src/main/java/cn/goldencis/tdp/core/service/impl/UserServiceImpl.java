@@ -6,6 +6,7 @@ import cn.goldencis.tdp.core.dao.*;
 import cn.goldencis.tdp.core.entity.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import cn.goldencis.tdp.common.service.impl.AbstractBaseServiceImpl;
 import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.service.IUserService;
+import cn.goldencis.tdp.core.utils.GetLoginUser;
 
 /**
  * 管理员service实现类
@@ -177,15 +179,13 @@ public class UserServiceImpl extends AbstractBaseServiceImpl<UserDO, UserDOCrite
      * @return
      */
     @Override
-    public List<UserDO> getUserListByLoginUserRoleTypeInPages(UserDO user, int start, int length) {
-        RowBounds rowBounds = new RowBounds(start, length);
-
-        UserDOCriteria example = new UserDOCriteria();
+    public List<UserDO> getUserListByLoginUserRoleTypeInPages(Map<String, Object> params) {
+        UserDO user = GetLoginUser.getLoginUser();
         //如果是超级管理员，返回查询所有用户,如果是其他用户，根据角色类型，查询相同类型的用户
         if (!"1".equals(user.getGuid())) {
-            example.createCriteria().andRoleTypeEqualTo(user.getRoleType());
+            params.put("roleType", user.getRoleType());
         }
-        List<UserDO> userList = mapper.selectByExampleWithRowbounds(example, rowBounds);
+        List<UserDO> userList = mapper.getUserListByLoginUserRoleTypeInPages(params);
 
         return userList;
     }
@@ -196,14 +196,14 @@ public class UserServiceImpl extends AbstractBaseServiceImpl<UserDO, UserDOCrite
      * @return
      */
     @Override
-    public int countUserListByLoginUserRoleTypeInPages(UserDO user) {
-        UserDOCriteria example = new UserDOCriteria();
+    public int countUserListByLoginUserRoleTypeInPages(Map<String, Object> params) {
+        UserDO user = GetLoginUser.getLoginUser();
         //如果是超级管理员，返回查询所有用户,如果是其他用户，根据角色类型，查询相同类型的用户
         if (!"1".equals(user.getGuid())) {
-            example.createCriteria().andRoleTypeEqualTo(user.getRoleType());
+            params.put("roleType", user.getRoleType());
         }
 
-        return (int)mapper.countByExample(example);
+        return mapper.countUserListByLoginUserRoleTypeInPages(params);
     }
 
     /**

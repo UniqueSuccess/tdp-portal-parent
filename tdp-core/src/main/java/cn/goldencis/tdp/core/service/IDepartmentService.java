@@ -5,6 +5,7 @@ import java.util.List;
 import cn.goldencis.tdp.common.service.BaseService;
 import cn.goldencis.tdp.core.entity.DepartmentDO;
 import cn.goldencis.tdp.core.entity.DepartmentDOCriteria;
+
 import com.alibaba.fastjson.JSONArray;
 
 /**
@@ -125,4 +126,11 @@ public interface IDepartmentService extends BaseService<DepartmentDO, Department
      * @return
      */
     List<DepartmentDO> getDepartmentLevelOne();
+
+    /**
+     * 通知客户端 改变策略
+     * @param id
+     * @param policyId
+     */
+    void changePolicy(Integer id, Integer newPolicyId, Integer oldPolicyId);
 }

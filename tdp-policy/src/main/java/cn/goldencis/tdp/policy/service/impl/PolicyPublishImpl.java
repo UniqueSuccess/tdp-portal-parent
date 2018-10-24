@@ -1,19 +1,24 @@
 package cn.goldencis.tdp.policy.service.impl;
 
 import cn.goldencis.tdp.common.mqclient.MQClient;
+import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.policy.dao.ClientUserDOMapper;
 import cn.goldencis.tdp.policy.dao.PolicyDOMapper;
 import cn.goldencis.tdp.policy.entity.ClientUserDO;
 import cn.goldencis.tdp.policy.entity.ClientUserDOCriteria;
 import cn.goldencis.tdp.policy.entity.PolicyDO;
 import cn.goldencis.tdp.policy.service.IPolicyPublish;
+
 import com.alibaba.fastjson.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 审批流程结束，通知申请流程的客户端用户
@@ -36,6 +41,17 @@ public class PolicyPublishImpl implements IPolicyPublish {
 
     private AtomicInteger initClientUserId = new AtomicInteger();
 
+    private ThreadLocal<String> clientUserListStr = new ThreadLocal<>();
+
+    private AtomicReference initClientUserList = new AtomicReference(null);
+
+    public AtomicReference getInitClientUserList() {
+        return initClientUserList;
+    }
+
+    public void setInitClientUserList(AtomicReference initClientUserList) {
+        this.initClientUserList = initClientUserList;
+    }
     @Autowired
     private MQClient publisher;
 
@@ -48,6 +64,10 @@ public class PolicyPublishImpl implements IPolicyPublish {
         //如果主线程对初始化参数赋值，且不为0，则用该值对线程clientUserId进行初始化
         if (initClientUserId.get() != 0) {
             clientUserId.set(initClientUserId.getAndSet(0));
+        }
+
+        if(initClientUserList.get() != null) {
+            clientUserListStr.set(String.valueOf(initClientUserList.getAndSet(null)));
         }
 
         //保证策略id存在
@@ -63,30 +83,24 @@ public class PolicyPublishImpl implements IPolicyPublish {
             PolicyDO policy = policyMapper.selectByPrimaryKey(policyId.get());
 
             List<ClientUserDO> clientUserList;
-
-            if (clientUserId.get() == null) {
-                //获取跟该策略id关联的用户集合
-                ClientUserDOCriteria example = new ClientUserDOCriteria();
-                example.createCriteria().andPolicyidEqualTo(policyId.get());
-                clientUserList = clientUserMapper.selectByExample(example);
-            } else {
-                //单个用户更新策略的情况，通知该用户客户端
+            String clientUserIdsStr = null;
+            if (clientUserId.get() != null) {
+              //单个用户更新策略的情况，通知该用户客户端
                 clientUserList = new ArrayList<>();
                 ClientUserDO clientUser = clientUserMapper.selectByPrimaryKey(clientUserId.get());
                 clientUserList.add(clientUser);
+                clientUserIdsStr = convertClientUserList(clientUserList);
+            } else if (!StringUtil.isEmpty(clientUserListStr.get())){
+                clientUserIdsStr = clientUserListStr.get();
+            } else {
+              //获取跟该策略id关联的用户集合
+                ClientUserDOCriteria example = new ClientUserDOCriteria();
+                example.createCriteria().andPolicyidEqualTo(policyId.get());
+                clientUserList = clientUserMapper.selectByExample(example);
+                clientUserIdsStr = convertClientUserList(clientUserList);
             }
 
-            if (clientUserList != null && clientUserList.size() > 0) {
-                StringBuffer sb = new StringBuffer();
-
-                //转化为用户id命名的频道字符串，以";"分开
-                for (ClientUserDO clientUser : clientUserList) {
-                    //
-                    sb.append(clientUser.getGuid() + ";");
-                }
-                //去掉最后一个";"，完成发送频道拼接
-                String clientUserIdsStr = sb.substring(0, sb.length() - 1);
-
+            if (!StringUtil.isEmpty(clientUserIdsStr)) {
                 //设置消息为策略消息
                 String message = "bdppolicy";
 
@@ -103,6 +117,19 @@ public class PolicyPublishImpl implements IPolicyPublish {
                 publisher.clientNotify(clientUserIdsStr ,message, content, type);
             }
         }
+    }
+
+    public String convertClientUserList(List<ClientUserDO> clientUserList) {
+        StringBuffer sb = new StringBuffer();
+        if (clientUserList != null && clientUserList.size() > 0) {
+            //转化为用户id命名的频道字符串，以";"分开
+            for (ClientUserDO clientUser : clientUserList) {
+                sb.append(clientUser.getGuid() + ";");
+            }
+            //去掉最后一个";"，完成发送频道拼接
+            return sb.substring(0, sb.length() - 1);
+        }
+        return null;
     }
 
     public ThreadLocal<Integer> getPolicyId() {

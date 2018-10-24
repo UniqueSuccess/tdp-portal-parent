@@ -369,4 +369,35 @@
 			WHERE flow_id IN 
 		(SELECT flow_id FROM t_approve_flow WHERE applicant_id = #{usrunique} AND tran_unique = #{tranunique} )
   </select>
+  <sql id="FileTransferLogBaseResultMap">
+  	select
+    <include refid="Base_Column_List" />
+    from t_file_transfer_log t1
+    <where>
+      <if test='searchStr != null and searchStr != ""'>
+        and (instr(t1.ip, #{searchStr}) &gt; 0 or instr(t1.file_name, #{searchStr}) &gt; 0 )
+      </if>
+      <if test='fftype != null and fftype.size > 0'>
+        and fftype in
+        <foreach close=")" collection="fftype" item="item" open="(" separator=",">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+  <select id="queryFileTransferLog" resultMap="BaseResultMap">
+  	<include refid="FileTransferLogBaseResultMap"></include>
+  	<if test='orderColumn != null and orderColumn == "transferTime" '>
+      order by transfer_time ${orderType}
+    </if>
+  	<if test='start != null and length != null'>
+      limit ${start} , ${length}
+    </if>
+  </select>
+    
+  <select id="queryFileTransferLogCount" resultType="int">
+    select count(1) cnt from (
+    	<include refid="FileTransferLogBaseResultMap"></include>
+    ) t
+  </select>
 </mapper>

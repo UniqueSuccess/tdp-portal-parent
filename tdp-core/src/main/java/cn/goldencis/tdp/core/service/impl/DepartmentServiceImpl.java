@@ -9,10 +9,12 @@ import cn.goldencis.tdp.core.entity.*;
 import org.apache.ibatis.session.RowBounds;
 import org.aspectj.weaver.ast.HasAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.goldencis.tdp.common.dao.BaseDao;
+import cn.goldencis.tdp.common.mqclient.MQClient;
 import cn.goldencis.tdp.common.service.impl.AbstractBaseServiceImpl;
 import cn.goldencis.tdp.common.utils.ListUtils;
 import cn.goldencis.tdp.common.utils.StringUtils;
@@ -45,6 +47,12 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
 
     @Autowired
     private UserDOMapper userMapper;
+
+    @Autowired
+    private MQClient publisher;
+
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -606,4 +614,54 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
         }
         return addlist;
     }
+
+    @Override
+    public void changePolicy(Integer id, Integer newPolicyId, Integer oldPolicyId) {
+        try {
+            /**
+             * 1 查询该部门下使用之前老策略的用户
+             * 2 通知这些用户使用新策略
+             */
+            List<String> list = mapper.queryClientUserList(id, oldPolicyId);
+            if (ListUtils.isEmpty(list)) {
+                return;
+            }
+            List<Map<String, String>> policyList = mapper.queryPolicyNameById(Arrays.asList(id));
+            if (ListUtils.isEmpty(policyList)) {
+                return;
+            }
+            /**
+             * 逻辑按照之前vdp 这里没法复用之前代码 会造成循环引用
+             */
+            taskExecutor.execute(new Runnable() {
+                
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(15000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //设置消息为策略消息
+                    String message = "bdppolicy";
+
+                    //设置type为及时消息
+                    int type = MQClient.MSG_REALTIME;
+
+                    //组装消息内容
+                    JSONObject contentJson = new JSONObject();
+                    contentJson.put("url", policyList.get(0).get("path"));
+                    contentJson.put("time", policyList.get(0).get("modify_time"));
+                    String content = contentJson.toJSONString();
+
+                    //使用消息缓存服务
+                    publisher.clientNotify(ListUtils.covertStringByList(list, null) ,message, content, type);
+                }
+            });
+          
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

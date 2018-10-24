@@ -443,4 +443,39 @@
     WHERE user_name = #{userId}
     and status = 1
   </update>
+  <sql id="UserRoleTypeInPages">
+  	select 
+  	<include refid="Base_Column_List" />
+    from t_user
+    <where>
+        <if test='searchStr != null and searchStr !=""'>
+        	instr(user_name, #{searchStr,jdbcType=VARCHAR}) &gt; 0
+      	</if>
+      	<if test='roleType != null and roleType.size > 0'>
+		        and role_type in
+		        <foreach close=")" collection="roleType" item="item" open="(" separator=",">
+		          #{item}
+		        </foreach>
+		        
+        </if>
+        <if test='readonly != null and readonly.size > 0'>
+		        and readonly in
+		        <foreach close=")" collection="readonly" item="item" open="(" separator=",">
+		          #{item}
+		        </foreach>
+		        
+        </if>
+    </where>
+  </sql>
+  <select id="getUserListByLoginUserRoleTypeInPages" resultMap="BaseResultMap">
+  	<include refid="UserRoleTypeInPages" />
+    <if test='start != null and length != null'>
+      limit ${start} , ${length}
+    </if>
+  </select>
+  <select id="countUserListByLoginUserRoleTypeInPages" resultType="int">
+  	select count(1) cnt from  (
+  		<include refid="UserRoleTypeInPages" />
+  	) t
+  </select>
 </mapper>

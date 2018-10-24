@@ -295,8 +295,8 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         //统计该风险类型对应的用户数量，并放入结果集
         this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_SCRNWATERMARK, countMap);
         this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOUTCFG, countMap);
-        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOPT, countMap);
-        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_APPRO, countMap);
+//        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOPT, countMap);
+//        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_APPRO, countMap);
 
         return countMap;
     }
@@ -385,7 +385,7 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         JSONObject policyJson = JSONObject.fromObject(policyContent);
 
         //校验是否存在屏幕无水印的风险
-        Object sbscrnwatermarkEnable = policyJson.getJSONObject("sbscrnwatermark").get("enable");
+        Object sbscrnwatermarkEnable = policyJson.getJSONObject("scrnwatermark").get("enable");
         //检查屏幕水印开关，关闭则存在风险
         if (ConstantsDto.POLICYOPTIONUNENABLE.equals(sbscrnwatermarkEnable)) {
             //处理策略风险
@@ -409,7 +409,7 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
 
         //校验是否存在导出无水印的风险
         Object sbfileoptEnable = policyJson.getJSONObject("sbfileopt").get("enable");
-        Object optScwatermarEnable = policyJson.getJSONObject("sbfileopt").getJSONObject("content").getJSONObject("sbfileoptwatermark").get("enable");
+        /*Object optScwatermarEnable = policyJson.getJSONObject("sbfileopt").getJSONObject("content").getJSONObject("sbfileoptwatermark").get("enable");
         //如果文件导出开关打开，内部水印开关关闭，则存在风险
         if (ConstantsDto.POLICYOPTIONENABLE.equals(sbfileoptEnable) && ConstantsDto.POLICYOPTIONUNENABLE.equals(optScwatermarEnable)) {
             //处理策略风险
@@ -417,7 +417,7 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         } else {
             //移除该策略风险的关联
             this.removePolicyPotentialRisk(ConstantsDto.RISK_OF_FILEOPT, policyId);
-        }
+        }*/
 
         //校验是否存在无审批的风险
         Object outcfgApproEnable = policyJson.getJSONObject("sbfileoutcfg").getJSONObject("content").get("mode");

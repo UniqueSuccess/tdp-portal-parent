@@ -126,6 +126,14 @@
                     icon: 'icon-strategy',
                     title: '策略',
                     action: function (dom) {
+                        var ids = app.batchDatas.map(function(item) {
+                            return item[0];
+                        });
+                        if (ids.length == 0) {
+                            gd.showWarning('请选择需要修改策略的终端');
+                            return;
+                        }
+
                         gd.showLayer({
                             id: 'updateWind',//可传一个id作为标识
                             title: '策略',//窗口标题
@@ -137,21 +145,16 @@
                                 {
                                     text: '确定',
                                     action: function (dom) {
-                                        var ids = app.batchDatas.map(function(item) {
-                                            console.log(item);
-                                            return item[0];
-                                        });
-                                        if (ids.length == 0) {
-                                            gd.showWarning('请选择需要修改策略的终端');
-                                            return;
+                                        var postData = {
+                                            ids: ids.join(';'),
+                                            strategy: $('#updateWind input[name="strategy"]').val()
                                         }
-                                        gd.post(ctx + '/clientUser/updateClientUser', {ids: ids.join(';')}, function (msg) {
-                                            console.log(msg);
+                                        gd.post(ctx + '/clientUser/updateClientUser', postData, function (msg) {
                                             if (msg.resultCode == '0') {
                                                 gd.showSuccess('批量修改策略成功');
                                                 gd.table('clientUserTable').reload();
                                             } else {
-                                                gd.showError('批量修改策略失败');
+                                                gd.showError('批量修改策略失败 ' + (msg.resultMsg || ''));
                                             }
                                             dom.close();
                                         })
@@ -184,7 +187,6 @@
                     type: 'searchbox',
                     placeholder: "计算机名/IP",
                     action: function (val) {
-                        console.log('ok');
                         gd.table('clientUserTable').reload(1, {searchStr: val}, false);
                     }
                 }
@@ -214,7 +216,7 @@
                 enableJumpPage: false, //启用跳页，默认false，可选
                 enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
                 enablePaging: true,//启用分页,默认true，可选
-                orderColumn: 'onlineTime',//排序列
+                orderColumn: 'loginTime',//排序列
                 orderType: 'desc',//排序规则，desc或asc,默认desc
                 columnResize: true, //启用列宽调，默认true，可选
                 //showFooter: false,//显示footer,默认为true
@@ -254,7 +256,6 @@
                         //class: 'xxx',//加入自定义类
                         align: 'center',//对齐方式，默认left，与class不同，class只影响内容，align会影响内容和表头
                         change: function (data) {//复选框改变，触发事件，返回所有选中的列的数据
-                            console.log(data);
                             app.batchDatas = data;
                         }
                     },
@@ -309,7 +310,7 @@
                         title: true
                     },
                     {
-                        name: 'onlineTime',
+                        name: 'loginTime',
                         head: '登录时间',
                         title: true,
                         orderable: true,
@@ -324,9 +325,6 @@
                                 icon: 'icon-edit',
                                 title: '编辑',//设置图标title
                                 action: function (cell, row, raw) {//动作函数,cell为本格数据，row为本行加工后的数据，raw为本行未加工的数据
-                                    console.log(cell);
-                                    console.log(row);
-                                    console.log(raw);
 
                                     var domEdit = gd.showLayer({
                                         id: 'editWind',//可传一个id作为标识
@@ -346,14 +344,14 @@
                                                     var postData = {};
                                                     postData.ids = raw.computerguid;
                                                     postData.department = app.departmentId;
-                                                    postData.strategy = $('input[name="strategy"]').val();
-                                                    console.log(postData);
+                                                    postData.strategy = $('#editWind input[name="strategy"]').val();
+
                                                     gd.post(ctx + '/clientUser/updateClientUser', postData, function (msg) {
                                                         if (msg.resultCode == '0') {
                                                             gd.showSuccess('修改成功');
                                                             gd.table('clientUserTable').reload();
                                                         } else {
-                                                            gd.showError('修改失败');
+                                                            gd.showError('修改失败 ' + (msg.resultMsg || ''));
                                                         }
                                                         dom.close();
                                                     })
@@ -380,27 +378,21 @@
                                                         data: app.deptTreeData,
                                                         // linkable: false,
                                                         onSelect: function (node) {
-                                                            console.log(editWindow);
-                                                            console.log(editWindow.selectValue);
                                                             editWindow.selectValue = node.name;
                                                             app.departmentId = node.id;
                                                             editWindow.$refs.customSelect.isDroped = false
                                                         },
                                                         onChange: function (nodes) {
-                                                            console.log(nodes);
+
                                                         },
                                                         ready: function (data) {
-                                                            console.log(data)
-                                                            console.log(this);
                                                         }
                                                     }
                                                 },
                                                 mounted: function() {
                                                     $.each(raw, function (index, val) {
-                                                        console.log(index);
                                                         $('#editWind span#edit_'+ index +'').html(val);
                                                         if (index == 'deptguid') {
-                                                            console.log(val);
                                                             setTimeout(function() {
                                                                 $('#editWind #treeWindowDepartment span[data-id="'+ val +'"]').trigger("click");
                                                             }, 20)
@@ -440,7 +432,7 @@
                                                         gd.showSuccess('删除成功');
                                                         gd.table('clientUserTable').reload();
                                                     } else {
-                                                        gd.showError('删除失败');
+                                                        gd.showError('删除失败 ' + (msg.resultMsg || ''));
                                                     }
                                                 })
                                             }
@@ -479,7 +471,6 @@
             getPolicyList: function() {
                 var _this = this;
                 gd.get(ctx + '/policy/getAllPolicys', '', function(msg) {
-                    console.log(msg)
                     if (msg.resultCode == '0') {
                         _this.policyArray = msg.data;
                     }

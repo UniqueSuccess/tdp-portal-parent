@@ -52,6 +52,11 @@
             <artifactId>tdp-access</artifactId>
             <version>6.0.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+        	<groupId>cn.goldencis</groupId>
+        	<artifactId>tdp-external</artifactId>
+        	<version>6.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

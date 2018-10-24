@@ -3,24 +3,54 @@
 <!--
 <%@ page language="java" pageEncoding="UTF-8" %>
 -->
-<%@ include file="/WEB-INF/jsp/common/taglibs.jsp" %>
-<%@ include file="/WEB-INF/jsp/common/meta.jsp" %>
+<%@ page import="sun.misc.*" %>
+<%@ page import="java.util.*" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <head>
-    <title>金盾TDP</title>
+    <title>金盾VDP</title>
+    <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+    <c:set var="ctxJs" value="${pageContext.request.contextPath}/js"/>
+    <c:set var="ctxCss" value="${pageContext.request.contextPath}/skin/default/css"/>
+    <c:set var="ctxImg" value="${pageContext.request.contextPath}/skin/default/images"/>
+    <c:set var="version" value="1"/>
     <%--<link href="${ctxCss}/dataTables/dataTablesgray.css" rel="stylesheet" type="text/css"/>--%>
-    <%--<link href="${ctxCss}/approve/config/index.css" rel="stylesheet" type="text/css"/>--%>
-</head>
+    <link rel="stylesheet" href="${ctxCss}/font_icon/iconfont.css?v=${version}"/>
+    <script src="${ctxJs}/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="${ctxJs}/plugins/gdui/js/gd_iecheck.js?v=${version}"></script>
+    <script type="text/javascript" src="${ctxJs}/plugins/vue.min.js?v=${version}"></script>
+    <script type="text/javascript" src="${ctxJs}/plugins/gdui/js/gdui.min.js?v=${version}"></script>
+    <link href="${ctxCss}/approve/config/index.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="${ctxJs}/plugins/gdui/css/gdui.min.css?v=${version}"/>
+    <style>
+        .wind-row{
+            padding: 6px 0;
+            position: relative;
+        }
+    </style>
+    <script>
+        var ctx = "${ctx}";
+        var uuid = query("uuid");
+        function query(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var param = window.location.search.substr(1).match(reg);
+            if (param !== null) {
+                return unescape(param[2]);
+            } else {
+                return '';
+            }
+        };
 
-<div id="app" class="gd-right-content gd-padding-lg" v-cloak>
-    <gd-tab style="height: 100%;" @change="change">
-        <gd-tab-item label="审批中">
-            <div class="process" style="height:100%"></div>
-        </gd-tab-item>
-        <gd-tab-item label="已完成">
-            <div class="processover" style="height: 100%"></div>
-        </gd-tab-item>
-    </gd-tab>
+
+    </script>
+</head>
+<div id="client_approve" class="" v-cloak style="height: calc(100%)">
+    <%--<gd-toolbar :config="toolbarConfig"></gd-toolbar>--%>
+    <gd-table :config="tableConfig"></gd-table>
 </div>
 <script id="approve_wind" type="text/html">
     <div class="top">
@@ -167,110 +197,7 @@
         </div>
     </div>
 </script>
-<script>
-    var ctx = "${ctx}";
-    var app = new Vue({
-        el: '#app',
-        mounted: function () {
-            this.initLoad();
-        },
-        methods: {
-            initLoad: function () {
-                $(".process").load(ctx + '/approveFlow/listPage?statusType=process');
-            },
-            change: function (data) {
-                log(data)
-                if (data.index == 0) {
-                    $(".process").load(ctx + '/approveFlow/listPage?statusType=process');
-                } else {
-                    $(".processover").load(ctx + '/approveFlow/listPage?statusType=processover');
-                }
-            }
-        },
-        data: {},
-
-    })
-
-    //审批流程细节表
-    function ProcessTable(id) {
-
-        var appTable = new Vue({
-            el: '.approveHistory',
-            data: {
-                //表格配置
-                tableConfig: {
-                    id: 'approveDetailTable',//给table一个id,调用gd.tableReload('demoTable');可重新加载表格数据并保持当前页码，gd.tableReload('demoTable'，1)，第二个参数可在加载数据时指定页码
-                    length: 50, //每页多少条,默认50，可选
-                    curPage: 1, //当前页码，默认1，可选
-                    lengthMenu: [10, 30, 50, 100], //可选择每页多少条，默认[10, 30, 50, 100]，可选
-                    enableJumpPage: false, //启用跳页，默认false，可选
-                    enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
-                    enablePaging: false,//启用分页,默认true，可选
-                    //orderColumn: 'ip',//排序列
-                    //orderType: 'desc',//排序规则，desc或asc,默认desc
-                    columnResize: true, //启用列宽调，默认true，可选
-                    //showFooter: false,//显示footer,默认为true
-                    //lazy: true,//懒加载数据，调用gd.table('id').reload()对表格数据进行加载,默认为false
-                    //loading: true,//显示loading,默认为false
-                    ajax: {
-                        //其它ajax参数同jquery
-                        url: ctx + "/approveDetail/getApproveDetailsByFlowId",
-                        //改变从服务器返回的数据给table
-                        dataSrc: function (data) {
-                            console.log(data);
-                            data.rows = data.rows.map(function (obj) {
-                                return [
-                                    obj.approverName, obj.result, obj.remark || '--', obj.modifyTime
-                                ]
-                            });
-                            return data;
-                        },
-                        //请求参数
-                        data: {
-                            "approveFlowId": id,
-                        }
-                    },
-                    columns: [
-                        {
-                            name: 'approverName',
-                            head: '审批人',
-                            title: true
-                        },
-                        {
-                            name: 'result',
-                            head: '审批结果',
-                            render: function (cell, row, raw) {//自定义表格内容
-                                console.log(cell)
-                                if (cell == 1) {
-                                    return '<span>同意</span>'
-                                } else {
-                                    return '<span>拒绝</span>'
-                                }
-                            }
-                        },
-                        {
-                            name: 'remark',
-                            head: '备注',
-                            title: true
-                        },
-
-                        {
-                            name: 'modifyTime',
-                            head: '审批时间',
-                            title: true
-                        }
-
-                    ]
-                },
-            },
-            methods: {
-                selectChange: function (data) {
-                    log(data)
-                }
-            }
-        });
-
-
-    }
-
-</script>
+<%--<script src="${ctxJs}/plugins/dataTables/jquery.dataTables.min.js"></script>--%>
+<script src="${ctxJs}/plugins/template/template-web.js"></script>
+<%--<script src="${ctxJs}/public.js"></script>--%>
+<script src="${ctxJs}/approve/client/index.js"></script>

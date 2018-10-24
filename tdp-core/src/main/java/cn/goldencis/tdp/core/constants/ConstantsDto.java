@@ -1,5 +1,12 @@
 package cn.goldencis.tdp.core.constants;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cn.goldencis.tdp.core.utils.MapUtils;
+
 public class ConstantsDto {
 
     public static final Integer CONST_TRUE = 1;
@@ -33,6 +40,7 @@ public class ConstantsDto {
     //导出
     public static final String TRANSFER_TYPE_EXPORT = "OPT";
     public static final Integer SELF_EXPORT = 1;
+    public static final Integer SECRET_EXPORT = 2;
     public static final Integer APPROVE_EXPORT = 3;
     //外发
     public static final String TRANSFER_TYPE_OUT = "OUTCFG";
@@ -118,4 +126,12 @@ public class ConstantsDto {
      * 日志提交类型
      */
     public static final String SUBMIT_REPORT_FILE_TRANSFER = "fileTransferLog";
+
+    public static final List<Map> ROLE_LIST = new ArrayList<Map>();
+    static {
+        ROLE_LIST.add(MapUtils.createMap("0", "超级管理员"));
+        ROLE_LIST.add(MapUtils.createMap("1", "管理员"));
+        ROLE_LIST.add(MapUtils.createMap("2", "操作员"));
+        ROLE_LIST.add(MapUtils.createMap("3", "审计员"));
+    }
 }

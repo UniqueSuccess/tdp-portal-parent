@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +19,8 @@ import cn.goldencis.tdp.core.annotation.PageLog;
 import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.entity.UserDO;
 import cn.goldencis.tdp.core.service.*;
-
 import net.sf.json.JSONArray;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ import cn.goldencis.tdp.common.cache.manager.GuavaCacheManager;
 import cn.goldencis.tdp.common.utils.CommonPoiXsl;
 import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.common.utils.FileDownLoad;
+import cn.goldencis.tdp.common.utils.HttpServletRequestUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
@@ -67,18 +69,18 @@ public class UserController implements ServletContextAware {
      */
     @ResponseBody
     @RequestMapping(value = "/getUserPages")
-    public ResultMsg getUserPages(@RequestParam("start") int start, @RequestParam("length") int length) {
+    public ResultMsg getUserPages(HttpServletRequest request) {
+        //获取入参
+        Map<String, Object> params = HttpServletRequestUtils.getRequestParams(request);
+        params = HttpServletRequestUtils.replaceStr2List(params, "roleType", "readonly");
         ResultMsg resultMsg = new ResultMsg();
-        int count = 0;
         try {
-            //获取当前登录用户
-            UserDO user = GetLoginUser.getLoginUser();
-
             //根据登录用户的角色类型，获取相应类型的账户列表。分页查询
-            List<UserDO> userList = userService.getUserListByLoginUserRoleTypeInPages(user, start, length);
-            count = userService.countUserListByLoginUserRoleTypeInPages(user);
+            List<UserDO> userList = userService.getUserListByLoginUserRoleTypeInPages(params);
+            int total = userService.countUserListByLoginUserRoleTypeInPages(params);
 
-            resultMsg.setData(userList);
+            resultMsg.setRows(userList);
+            resultMsg.setTotal(total);
             resultMsg.setResultMsg("用户列表获取成功！");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         } catch (Exception e) {
@@ -86,11 +88,6 @@ public class UserController implements ServletContextAware {
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
             resultMsg.setData(e);
         }
-        resultMsg.setExportstart(start);
-        resultMsg.setExportlength(length);
-        resultMsg.setRecordsFiltered(count);
-        resultMsg.setRecordsTotal(count);
-
         return resultMsg;
     }
 

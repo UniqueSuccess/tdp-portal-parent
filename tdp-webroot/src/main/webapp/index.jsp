@@ -5,7 +5,7 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>金盾tdp</title>
+    <title>金盾TDP</title>
     <c:set var="ctx" value="${pageContext.request.contextPath}"/>
     <c:set var="ctxJs" value="${pageContext.request.contextPath}/js"/>
     <c:set var="ctxCss" value="${pageContext.request.contextPath}/skin/default/css"/>
@@ -64,7 +64,7 @@
                 name: 'tdp',
                 api: ctx+'/login',
                 logo: ctxImg + '/login/login_ra.png',
-                cover: ctxImg + '/login/tsa_cover.jpg',
+                cover: ctxImg + '/login/tdp_cover.jpg',
                 href: ctx+'/homepage/index?navId=1',
                 encrypt: function (data) {
                     data.password = encrypt(data.password).toUpperCase();

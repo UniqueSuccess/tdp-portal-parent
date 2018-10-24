@@ -1,6 +1,7 @@
 package cn.goldencis.tdp.report.controller;
 
 import cn.goldencis.tdp.common.utils.DateUtil;
+import cn.goldencis.tdp.common.utils.HttpServletRequestUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.entity.ChildNodeDO;
@@ -11,12 +12,17 @@ import cn.goldencis.tdp.core.service.IChildNodeService;
 import cn.goldencis.tdp.core.service.IDepartmentService;
 import cn.goldencis.tdp.core.utils.LegalTimeUtil;
 import cn.goldencis.tdp.report.entity.IllegalOperationAlarmDO;
+import cn.goldencis.tdp.report.entity.TFileTransferLog;
 import cn.goldencis.tdp.report.entity.VideoTransferLogDO;
 import cn.goldencis.tdp.report.entity.VideoTransferLogDOCriteria;
+import cn.goldencis.tdp.report.service.IFileTransferLogSevice;
 import cn.goldencis.tdp.report.service.IIllegalOperationAlarmService;
 import cn.goldencis.tdp.report.service.IVideoTransferLogService;
+
 import com.alibaba.fastjson.JSONArray;
+
 import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -27,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.*;
 
 /**
@@ -44,6 +51,9 @@ public class ReportController {
 
     @Autowired
     private IDepartmentService departmentService;
+
+    @Autowired
+    private IFileTransferLogSevice fileTransferLogSevice;
 
     @Autowired
     private IChildNodeService childNodeService;
@@ -209,6 +219,69 @@ public class ReportController {
         return resultMsg;
     }
 
+
+    /**
+     * 报表模块，图表接口，最初按小时查询，后来改为时间段可选。
+     * @param departmentId
+     * @param submitDate
+     * @param startDate
+     * @param endDate
+     * @param order
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getFileTransferLogInHours", method = RequestMethod.GET)
+    public ResultMsg getFileTransferLogInHours(Integer departmentId, String logType, String submitDate, String startDate, String endDate , String order) {
+        ResultMsg resultMsg = new ResultMsg();
+
+        try {
+            List<DepartmentDO> departmentList = null;
+            if (departmentId != null && departmentId != 0) {
+                //根据部门id，查询部门及其子类集合
+                departmentList = departmentService.getDeptarMentListByParent(departmentId);
+                //校验登录账户的权限，保留传入的部门集合中，拥有权限的部门
+                departmentService.checkLoginUserDepartment(departmentList);
+            }
+
+            //将获取视频流转日志列表
+//            List<VideoTransferLogDO> videoTransferLogList = videoTransferLogService.getVideoTransferLogListByParams(departmentList, logType, submitDate, startDate, endDate, order);
+            List<TFileTransferLog> fileTransferLogList = fileTransferLogSevice.getFileTransferLogListByParams(departmentList, logType, submitDate, startDate, endDate, order);
+
+            if ("day".equals(submitDate)) {
+                //将获取视频流转日志列表转化为按小时分类的集合
+//                List<Integer> hoursCount = videoTransferLogService.getVideoTransferLogInHours(fileTransferLogList);
+                List<Integer> hoursCount = fileTransferLogSevice.getFileTransferLogInHours(fileTransferLogList);
+                resultMsg.setData(hoursCount);
+            } else {
+                //填充开始和结束时间
+                if ("week".equals(submitDate)) {
+                    startDate = DateUtil.getWeekEndStr();
+                    endDate = DateUtil.getNowDateStr();
+                } else if ("month".equals(submitDate)) {
+                    startDate = DateUtil.getMonthEndStr();
+                    endDate = DateUtil.getNowDateStr();
+                }
+
+                if (!StringUtil.isEmpty(startDate) && !StringUtil.isEmpty(endDate)) {
+                    //将获取视频流转日志列表转化为按日期分类的Map，存放两个List，一个存放日期集合，一个存放数量
+//                    Map<String, Object> videoTransferLogMap = videoTransferLogService.getVideoTransferLogInDate(videoTransferLogList, startDate, endDate);
+                    Map<String, Object> fileTransferLogMap = fileTransferLogSevice.getFileTransferLogInDate(fileTransferLogList, startDate, endDate);
+                    resultMsg.setData(fileTransferLogMap);
+                }
+            }
+
+            resultMsg.setResultMsg("获取视频流转日志图表信息成功");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+        } catch (Exception e) {
+            resultMsg.setData(e);
+            resultMsg.setResultMsg("获取视频流转日志图表信息错误");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+        }
+
+        return resultMsg;
+    }
+
+
     /**
      * 首页中，数据导出统计接口
      * @return
@@ -313,7 +386,8 @@ public class ReportController {
                 //校验登录账户的权限，保留传入的部门集合中，拥有权限的部门
                 departmentService.checkLoginUserDepartment(departmentList);
                 //查询全部视频流转日志数量
-                int count = videoTransferLogService.countVideoTransferLog(departmentList, ConstantsDto.CURRENT_NODE, null, null, null, null, null);
+//                int count = videoTransferLogService.countVideoTransferLog(departmentList, ConstantsDto.CURRENT_NODE, null, null, null, null, null);
+                int count = fileTransferLogSevice.countFileTransferLog(departmentList, ConstantsDto.CURRENT_NODE, null, null, null, null, null);
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("id", department.getId());
                 dataJson.put("name", department.getName());
@@ -451,6 +525,62 @@ public class ReportController {
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
         }
 
+        return resultMsg;
+    }
+
+    /**
+     * 外发日志查询
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryFileTransferLog", method = RequestMethod.GET)
+    public ResultMsg queryFileTransferLog (HttpServletRequest request) {
+        //获取入参
+        Map<String, Object> params = HttpServletRequestUtils.getRequestParams(request);
+        params = HttpServletRequestUtils.replaceStr2List(params, "fftype");
+        ResultMsg resultMsg = new ResultMsg();
+        try {
+            List<TFileTransferLog> list = fileTransferLogSevice.queryFileTransferLog(params);
+            Integer count = fileTransferLogSevice.queryFileTransferLogCount(params);
+            resultMsg.setRows(list);
+            resultMsg.setTotal(count);
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMsg.setData(e);
+            resultMsg.setResultMsg("外发日志查询失败！");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+        }
+
+        return resultMsg;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getFileTypeCount",method = RequestMethod.GET)
+    public ResultMsg getFileTypeCount(){
+        ResultMsg resultMsg = new ResultMsg();
+        try{
+            JSONObject jsonArray = new JSONObject();
+            ArrayList<Map<String, Integer>> maps = new ArrayList<>();
+            int xls = Math.toIntExact(fileTransferLogSevice.getFileTypeCount("xls"));
+            int doc = Math.toIntExact(fileTransferLogSevice.getFileTypeCount("doc"));
+            int ppt = Math.toIntExact(fileTransferLogSevice.getFileTypeCount("ppt"));
+            int pdf = Math.toIntExact(fileTransferLogSevice.getFileTypeCount("pdf"));
+            jsonArray.put("xls",xls);
+            jsonArray.put("doc",doc);
+            jsonArray.put("ppt",ppt);
+            jsonArray.put("pdf",pdf);
+//            maps.add(jsonArray);
+            resultMsg.setData(jsonArray);
+            resultMsg.setResultMsg("文件类型数量获取成功！");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            resultMsg.setData(e);
+            resultMsg.setResultMsg("文件类型数量获取失败！");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+
+        }
         return resultMsg;
     }
 }

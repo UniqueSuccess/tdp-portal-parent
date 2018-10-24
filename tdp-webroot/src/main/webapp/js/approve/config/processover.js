@@ -15,12 +15,11 @@ var app = new Vue({
                         btn: [
                             {
                                 text: '删除',
-                                class: 'gd-btn-danger',//也可以自定义类
+                                class: 'gd-btn',//也可以自定义类
                                 enter: true,//响应回车
                                 action: function (dom) {
 
                                     var ids = app.batchDatas.map(function (item) {
-                                        console.log(item);
                                         return item[0];
                                     });
                                     if (ids.length == 0) {
@@ -30,7 +29,6 @@ var app = new Vue({
                                     }
                                     var postData = {};
                                     postData.approveFlowArr = ids.join(',');
-                                    console.log(postData);
                                     gd.post(ctx + '/approveFlow/deleteApproveFlow',postData,function (msg) {
                                         if (msg.resultCode == 0) {
                                             gd.table('approveOverTable').reload(1);
@@ -87,7 +85,6 @@ var app = new Vue({
                 url: ctx + "/approveFlow/getApproveFlowPage",
                 //改变从服务器返回的数据给table
                 dataSrc: function (data) {
-                    console.log(data);
                     data.rows = data.rows.map(function (obj) {
                         return [
                             obj.flowId,
@@ -96,7 +93,6 @@ var app = new Vue({
                             obj.reason || '--',
                             obj.type || '--',
                             obj.name || '--',
-                            obj.pointName || '--',
                             obj.applyTime || '--',
                             obj.finishTime || '--',
                             obj.flowId
@@ -141,12 +137,11 @@ var app = new Vue({
                         }
                     ],*/
                     render: function (cell, row, raw) {//自定义表格内容
-                        console.log(raw);
                         var html = '';
                         if (raw.status == 1) {
                             html = '<span class="client-state backlog">通过</span>';
                         } else {
-                            html = '<span class="client-state onway">拒绝</span>';
+                            html = '<span class="client-state refuse">拒绝</span>';
                         }
                         return html;
                     }
@@ -166,7 +161,7 @@ var app = new Vue({
                     head: '类型',
                     render: function (cell, row, raw) {//自定义表格内容
                         var html = '';
-                        if (raw.type == 2) {
+                        if (raw.type == 10 || raw.type == 11) {
                             html = '<span class="">外发</span>';
                         } else {
                             html = '<span class="">导出</span>';
@@ -177,11 +172,6 @@ var app = new Vue({
                 {
                     name: 'name',
                     head: '审批流程',
-                    title: true
-                },
-                {
-                    name: 'pointName',
-                    head: '当前环节',
                     title: true
                 },
                 {
@@ -201,7 +191,7 @@ var app = new Vue({
                     operates: [
                         {
                             icon: 'icon-btn-document',
-                            title: '详情',//设置图标title
+                            title: '查看详情',//设置图标title
                             action: function (cell, row, raw) {//动作函数,cell为本格数据，row为本行加工后的数据，raw为本行未加工的数据
                                 var id = raw.id;//他的id是多少
                                 var type = raw.type;//类型是不是外发
@@ -228,10 +218,11 @@ var app = new Vue({
                                     success: function (dom) {//参数为当前窗口dom对象
                                         // 获取详情
                                         gd.get(ctx + '/approveFlow/getApproveFlowInfoById', {approveFlowId: id}, function (msg) {
+                                            console.log(msg)
                                             if (msg.resultCode == 0) {
                                                 msg.data.flowInfo.policyParam = JSON.parse(msg.data.flowInfo.policyParam);
 
-                                                if (type == 2) {
+                                                if (type == 10 || type == 11) {
                                                     $("#openWind .top").html(template('approve_tem_out_top', msg.data));
                                                 } else {
                                                     $("#openWind .top").html(template('approve_tem_export_top', msg.data));
@@ -241,10 +232,9 @@ var app = new Vue({
                                         });
                                         //获取环节
                                         gd.get(ctx + '/approveDetail/getApproveFlowModel', {approveFlowId: id}, function (msg) {
-                                            console.log(msg)
                                             if (msg.resultCode == 0) {
                                                 app.detailId = msg.data.detailId;
-                                                if (type == 2) {
+                                                if (type == 10 || type == 11) {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
                                                 } else {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
@@ -271,14 +261,13 @@ var app = new Vue({
                                     btn: [
                                         {
                                             text: '删除',
-                                            class: 'gd-btn-danger',//也可以自定义类
+                                            class: 'gd-btn',//也可以自定义类
                                             enter: true,//响应回车
                                             action: function (dom) {
 
                                                 var ids = [];
                                                 var postData = {};
                                                 postData.approveFlowArr = ids.push(cell);
-                                                console.log(postData);
                                                 gd.post(ctx + '/approveFlow/deleteApproveFlow', postData, function (msg) {
                                                     if (msg.resultCode == 0) {
                                                         gd.table('approveOverTable').reload(1);

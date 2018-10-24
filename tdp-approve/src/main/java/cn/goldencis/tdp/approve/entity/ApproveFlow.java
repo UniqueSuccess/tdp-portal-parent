@@ -35,6 +35,26 @@ public class ApproveFlow extends BaseEntity implements Serializable {
 
     private Date finishTime;
 
+    private Date modifyTime;
+
+    private Integer seniorId;
+
+    public Integer getSeniorId() {
+        return seniorId;
+    }
+
+    public void setSeniorId(Integer seniorId) {
+        this.seniorId = seniorId;
+    }
+
+    public Date getModifyTime() {
+        return modifyTime;
+    }
+
+    public void setModifyTime(Date modifyTime) {
+        this.modifyTime = modifyTime;
+    }
+
     private boolean checked;
 
     private JSONObject flowInfo;

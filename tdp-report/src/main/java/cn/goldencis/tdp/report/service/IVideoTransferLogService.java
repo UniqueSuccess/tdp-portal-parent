@@ -49,6 +49,10 @@ public interface IVideoTransferLogService extends BaseService<VideoTransferLogDO
      */
     int countVideoTransferLog(List<DepartmentDO> departmentId, String nodeType, String logType, String submitDate, String startDate, String endDate, String order);
 
+
+
+
+
     /**
      * 获取视频流转日志列表,分页查询，暂无查询条件
      * @param start

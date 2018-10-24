@@ -36,19 +36,19 @@
                     </div>
                     <span>外发无水印</span>
                 </div>
-                <div class="cell-bottom-cell">
+                <%--<div class="cell-bottom-cell">
                     <i class="iconfont icon-btn-export"></i>
                     <div>
                         <span class="export"></span>人
                     </div>
                     <span>导出无水印</span>
-                </div>
+                </div>--%>
             </div>
         </div>
         <div class="cell">
-            <p class="section-title">视频流转</p>
+            <p class="section-title">文件流转</p>
             <div id="video_move" class="echarts-content"></div>
-            <span class="video-move">单位 : 条</span>
+            <%--<span class="video-move">单位 : 条</span>--%>
             <div class="no-data vedio_export_empty none"></div>
             <div class="data-select">
                 <div class="right fr">
@@ -87,13 +87,13 @@
         </div>
         <div class="cell">
             <div class="cell-left">
-                <p class="section-title">部门视频流转分布</p>
+                <p class="section-title">部门文件流转TOP5</p>
                 <div id="dept_video" class="echarts-content"></div>
             </div>
             <div class="cell-right">
-                <p class="section-title">人员视频流转top5</p>
-                <div id="person_move" class="echarts-content"></div>
-                <span class="person-move">条</span>
+                <p class="section-title">文件流转类型排行</p>
+                <div id="file_type" class="echarts-content"></div>
+                <%--<span class="person-move">条</span>--%>
             </div>
         </div>
     </div>

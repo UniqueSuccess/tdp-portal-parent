@@ -75,6 +75,7 @@ public class SubmitController implements ServletContextAware {
              *  将数据保存至数据库表中
              */
             JSONObject argvJson = JSONObject.fromObject(argv);
+            LOG.info("提交外发日志：" + argvJson.toString());
             if (argvJson.getString("dataType") == null) {
                 result.put("resultMsg", "缺少数据类型【dataType】");
                 return result;
