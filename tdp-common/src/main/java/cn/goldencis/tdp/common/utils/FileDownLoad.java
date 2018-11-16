@@ -58,6 +58,9 @@ public class FileDownLoad {
                     && "csv".equalsIgnoreCase(request.getAttribute("fileType").toString())) {
                 response.setContentType("multipart/form-data");
                 toClient.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+            } else if (request.getAttribute("fileType") != null
+                    && "exe".equalsIgnoreCase(request.getAttribute("fileType").toString())) {
+                response.setContentType("application/octet-stream");
             } else {
                 response.setContentType("application/vnd.ms-excel;charset=ISO8859-1");
             }

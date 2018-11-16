@@ -57,7 +57,9 @@ public class GuavaCache implements Cache {
 
     @Override
     public void put(Object key, Object value) {
-        this.store.put(key, value);
+        if (key != null && value != null) {
+            this.store.put(key, value);
+        }
     }
 
     @Override

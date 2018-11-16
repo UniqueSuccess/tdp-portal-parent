@@ -16,6 +16,7 @@ import com.alibaba.druid.support.logging.LogFactory;
 
 import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.common.utils.FileUpload;
+import cn.goldencis.tdp.common.utils.ListUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.common.utils.SysContext;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
@@ -27,6 +28,15 @@ public class FileTransferLogSubmitReportImpl implements IExternalSubmitReport {
     private final static Log LOG = LogFactory.getLog(FileTransferLogSubmitReportImpl.class);
     @Value("${videotransferlog.rootPath}${filetransferlog.dirPath}")
     private String filePath;
+
+    @Value("${pdf}")
+    private String PDF_TYPE;
+    @Value("${doc}")
+    private String DOC_TYPE;
+    @Value("${xls}")
+    private String XLS_TYPE;
+    @Value("${ppt}")
+    private String PPT_TYPE;
 
     @Autowired
     private TFileTransferLogMapper fileTransferLogMapper;
@@ -55,7 +65,7 @@ public class FileTransferLogSubmitReportImpl implements IExternalSubmitReport {
                 argvJson.put("filePath", dirPath + "/" + time + "_" + fileName);
             }
             //有审批流程的不上传文件 从流程中获取文件地址
-            if (argvJson.containsKey("tranunique") && !StringUtil.isEmpty(argvJson.getString("tranunique"))) {
+            if (argvJson.get("filePath") == null && argvJson.containsKey("tranunique") && !StringUtil.isEmpty(argvJson.getString("tranunique"))) {
                 String flowFilePath = fileTransferLogMapper.queryApproveFlowAttachment(argvJson.getString("usrunique"), argvJson.getString("tranunique"));
                 if (!StringUtil.isEmpty(flowFilePath)) {
                     flowFilePath = flowFilePath.substring(1);
@@ -73,20 +83,29 @@ public class FileTransferLogSubmitReportImpl implements IExternalSubmitReport {
     public TFileTransferLog convertLog(JSONObject argvJson) throws ParseException {
         TFileTransferLog log = new TFileTransferLog();
         log.setApplicantId(argvJson.getString("usrunique"));
-        log.setTranUnique(argvJson.getString("tranunique"));
+        log.setTranUnique(argvJson.containsKey("tranunique") ? argvJson.getString("tranunique") : "");
         log.setDepartmentId(argvJson.containsKey("depid") ? (StringUtil.isEmpty(argvJson.getString("depid")) ? 0 : Integer.valueOf(argvJson.getString("depid"))) : 0);
         log.setFftype(argvJson.getInt("fftype"));
         log.setFileName(argvJson.getString("fileName"));
         log.setFileType(convertFileType(log.getFileName()));
         log.setIp(argvJson.containsKey("ip") ? argvJson.getString("ip") : "");
-        log.setReceiver(argvJson.getJSONObject("extradata").getString("receiver"));
+        log.setReceiver(argvJson.getJSONObject("extradata").containsKey("receiver") ? argvJson.getJSONObject("extradata").getString("receiver") : "");
         log.setReason(argvJson.getJSONObject("extradata").containsKey("reason") ? argvJson.getJSONObject("extradata").getString("reason") : "");
         log.setTransferTime(DateUtil.getDateByStrWithFormat(argvJson.getString("time"), DateUtil.DateTimeFormat));
         log.setFilePath(argvJson.containsKey("filePath") ? argvJson.getString("filePath") : "");
         return log;
     }
     public String convertFileType(String fileName) {
-        String type = fileName.substring(fileName.lastIndexOf(".") + 1);
-        return type.substring(0, 3);
+        String type = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (ListUtils.contain(type, PDF_TYPE)) {
+            return "pdf";
+        } else if (ListUtils.contain(type, DOC_TYPE)) {
+            return "doc";
+        } else if (ListUtils.contain(type, XLS_TYPE)) {
+            return "xls";
+        } else if (ListUtils.contain(type, PPT_TYPE)) {
+            return "ppt";
+        }
+        return "unknown";
     }
 }

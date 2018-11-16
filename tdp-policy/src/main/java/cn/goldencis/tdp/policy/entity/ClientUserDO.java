@@ -45,8 +45,18 @@ public class ClientUserDO extends BaseEntity implements Serializable {
 
     private String remark;
 
-    private String departmentName;;
+    private String departmentName;
     private String policyName;
+
+    private String nickName;
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
 
     public String getDepartmentName() {
         return departmentName;

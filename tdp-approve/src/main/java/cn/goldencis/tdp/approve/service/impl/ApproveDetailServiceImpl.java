@@ -37,6 +37,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 仅批准当前细节步骤
+     *
      * @param detail
      */
     @Override
@@ -48,6 +49,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 根据流程id和环节id，查询所属所有细节列表
+     *
      * @param flowId
      * @param pointId
      * @return
@@ -62,6 +64,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 根据id获取审批细节步骤
+     *
      * @param approveDetailId
      * @return
      */
@@ -72,6 +75,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 根据流程id，获取该流程全部细节集合
+     *
      * @param approveFlowId
      * @return
      */
@@ -85,6 +89,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 将流程细节集合转化为有序的细节名称，以json数组的形式返回。
+     *
      * @param detailList
      * @return
      */
@@ -106,6 +111,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 将流程细节集合转化为模型
+     *
      * @param detailList
      * @return
      */
@@ -133,6 +139,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 根据流程id，获取该流程已经审批完成的细节集合
+     *
      * @param approveFlowId
      * @return
      */
@@ -146,6 +153,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 将流程细节集合转化为有序列表
+     *
      * @param detailList
      * @return
      */
@@ -156,7 +164,8 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
         int startPoint = 0;
 
         //按照SeniorId归类
-        outloop: for (ApproveDetail detail : detailList) {
+        outloop:
+        for (ApproveDetail detail : detailList) {
             //按照SeniorId创建子集
             if (!detailMap.containsKey(detail.getSeniorId())) {
                 List<ApproveDetail> subList = new ArrayList<>();
@@ -193,6 +202,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 获取当前账户待审批细节id
+     *
      * @param detailList
      * @param pointId
      * @return
@@ -212,6 +222,7 @@ public class ApproveDetailServiceImpl extends AbstractBaseServiceImpl<ApproveDet
 
     /**
      * 为流程细节设置审批人姓名
+     *
      * @param detailList
      */
     @Override

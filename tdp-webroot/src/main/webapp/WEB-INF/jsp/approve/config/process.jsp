@@ -7,7 +7,7 @@
 <%@ include file="/WEB-INF/jsp/common/meta.jsp" %>
 
 <head>
-    <title>金盾VDP</title>
+    <title></title>
     <%--<link href="${ctxCss}/dataTables/dataTablesgray.css" rel="stylesheet" type="text/css"/>--%>
     <link href="${ctxCss}/approve/config/index.css" rel="stylesheet" type="text/css"/>
 </head>

@@ -117,7 +117,7 @@ function initEvents() {
             }
 
             if ($(this).parents('label.default').data('stepid') == '') {
-                gd.showWarning('该流程还未保存，不能删除！');
+                gd.showWarning('该节点还未保存，不能删除！');
                 return false;
             } else {
                 var stepid = $(this).data("stepid");
@@ -125,10 +125,10 @@ function initEvents() {
 
                 gd.showConfirm({
                     id: 'deleteFlow',
-                    content: '确定要删除该流程？',
+                    content: '确定要删除该节点？',
                     btn: [{
-                        text: '删除',
-                        class: 'gd-btn-danger',//也可以自定义类
+                        text: '确定',
+                        class: 'gd-btn',//也可以自定义类
                         enter: true,//响应回车
                         action: function (dom) {
 
@@ -137,7 +137,7 @@ function initEvents() {
                                     gd.showSuccess('删除成功！');
                                     $(indexDom).parents('label.default').fadeOut(300).remove();
                                 } else {
-                                    gd.showError('删除失败！');
+                                    gd.showError('删除失败！'+msg.resultMsg);
                                 }
                             })
 

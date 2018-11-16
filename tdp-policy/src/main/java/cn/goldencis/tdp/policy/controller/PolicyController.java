@@ -6,12 +6,18 @@ import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.entity.UserDO;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
+import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.policy.service.IClientUserService;
 import cn.goldencis.tdp.policy.entity.PolicyDO;
 import cn.goldencis.tdp.policy.service.IPolicyService;
 import cn.goldencis.tdp.policy.service.impl.PolicyPublishImpl;
 import net.sf.json.JSONObject;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +43,10 @@ import java.util.Map;
 @PageLog(module = "策略")
 @RequestMapping(value = "/policy")
 public class PolicyController implements ServletContextAware {
+    private static final Log LOGGER = LogFactory.getLog(PolicyController.class);
 
+    @Value("${golbalcfg.path}")
+    private String golbalcfg;
     @Autowired
     public IPolicyService policyService;
 
@@ -51,6 +64,59 @@ public class PolicyController implements ServletContextAware {
     @Override
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    @PostConstruct
+    public void copyDefaultPolicy() {
+        //检查默认策略是否在 如果不存在复制一份到制定目录
+        checkPolocy();
+        //检查全局文件
+        checkGolbal();
+    }
+    public void checkPolocy() {
+        String path = PathConfig.HOM_PATH + PathConfig.POLICY_BASECATALOG + "/1";
+        File file = new File(path);
+        boolean flag = false;
+        if (!file.exists()) {
+            file.mkdirs();
+            flag = true;
+        } else {
+            File jsonFile = new File(path + "/" + PathConfig.POLICY_JSONFILENAME);
+            if (!jsonFile.exists()) {
+                flag = true;
+            }
+        }
+        if (flag) {
+            //复制文件到制定目录
+            String parentPolicyFile = "/resource/policy/1/" + PathConfig.POLICY_JSONFILENAME;
+            try {
+                FileUtils.copyFile(new File(servletContext.getRealPath(parentPolicyFile)), new File(path + "/" + PathConfig.POLICY_JSONFILENAME));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void checkGolbal() {
+        String path = PathConfig.HOM_PATH + ConstantsDto.CLIENT_GLOBAL;
+        File file = new File(path);
+        boolean flag = false;
+        if (!file.exists()) {
+            file.mkdirs();
+            flag = true;
+        } else {
+            File jsonFile = new File(PathConfig.HOM_PATH + golbalcfg);
+            if (!jsonFile.exists()) {
+                flag = true;
+            }
+        }
+        if (flag) {
+            //复制文件到制定目录
+            try {
+                FileUtils.copyFile(new File(servletContext.getRealPath(golbalcfg)), new File(PathConfig.HOM_PATH + golbalcfg));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -201,7 +267,7 @@ public class PolicyController implements ServletContextAware {
      * @return
      */
     @ResponseBody
-    @PageLog(module = "编辑策略", template = "策略名称：%s", args = "0.name", type = LogType.UPDATE)
+    @PageLog(module = "编辑策略", template = "策略id：%s", args = "0.policyid", type = LogType.UPDATE)
     @RequestMapping(value = "/updatePolicyJsonFile", method = RequestMethod.POST)
     public ResultMsg updatePolicyJsonFile(@RequestBody JSONObject jsonObject) {
         ResultMsg resultMsg = new ResultMsg();
@@ -218,25 +284,15 @@ public class PolicyController implements ServletContextAware {
             //更新策略的Json文件内容
             policyService.updatePolicyJsonFile(jsonObject);
 
-            //利用CAS算法，确保给初始化参数赋值的安全性，成功赋值后，会启动线程，子线程完成本地数据初始化后，会将初始化参数恢复默认值。
-            //一个请求赋值后，其他多个请求由于CAS算法赋值不成功，仍然在循环中，但不阻塞，等赋值成功的线程完成初始化，则其他线程尝试进行赋值。
-            while (true) {
-                boolean flag = policyPublish.getInitPolicyId().compareAndSet(0, (Integer)jsonObject.get("policyid"));
+            policyPublish.send((Integer)jsonObject.get("policyid"), null, null);
 
-                if (flag) {
-                    //策略更新完成后，启动线程，通知客户端。
-                    taskExecutor.execute(policyPublish);
-                    break;
-                }
-            }
-
-            resultMsg.setData(jsonObject);
+            //resultMsg.setData(jsonObject);
             resultMsg.setResultMsg("更新策略成功！");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         } catch (Exception e) {
+            LOGGER.error("更新策略错误:", e);
             resultMsg.setResultMsg("更新策略错误！");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
-            resultMsg.setData(e);
         }
 
         return resultMsg;

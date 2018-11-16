@@ -10,7 +10,7 @@ import cn.goldencis.tdp.approve.service.IApproveFlowService;
 import cn.goldencis.tdp.approve.service.IApproveModelService;
 import cn.goldencis.tdp.approve.service.impl.ApproveResultPublish4ClientRunnable;
 import cn.goldencis.tdp.common.mqclient.MQClient;
-import cn.goldencis.tdp.common.utils.DateUtil;
+import cn.goldencis.tdp.common.utils.HttpServletRequestUtils;
 import cn.goldencis.tdp.core.annotation.LogType;
 import cn.goldencis.tdp.core.annotation.PageLog;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
@@ -23,13 +23,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by limingchao on 2018/1/16.
@@ -117,12 +118,13 @@ public class ApproveFlowController {
         Map<String, Object> resultMsg = new HashMap<>();
 
         try {
+            JSONObject jsonObject = JSONObject.fromObject(argv);
             //参数封装
             ApproveFlow approveFlow = new ApproveFlow();
             approveFlow.setFlowId(pId);
-            approveFlow.setReason(rem);
+            approveFlow.setReason(jsonObject.getString("reason"));
             approveFlow.setApplicantId(uid);
-            approveFlow.setApplicantName(uname);
+            approveFlow.setApplicantName(jsonObject.getString("proposer"));
             approveFlow.setTranUnique(tranUnique);
             approveFlow.setType(aType);
 
@@ -165,9 +167,9 @@ public class ApproveFlowController {
      * @return
      */
     @ResponseBody
-    @PageLog(module = "进行审批操作", template = "审批细节id：%s，审批结果：%s，审批备注：%s", args = "0,1,2", type = LogType.UPDATE)
+    @PageLog(module = "进行审批操作", template = "审批细节流程名：%s，审批结果：%s，审批备注：%s", args = "4,3,2", type = LogType.UPDATE)
     @RequestMapping(value = "/approveFlow", method = RequestMethod.POST)
-    public ResultMsg approveFlow(Integer approveDetailId, Integer result, String remark) {
+    public ResultMsg approveFlow(Integer approveDetailId, Integer result, String remark, String resultName, String approveDetailName) {
         ResultMsg resultMsg = new ResultMsg();
 
         try {
@@ -252,33 +254,33 @@ public class ApproveFlowController {
     /**
      * 获取审批流程。分页查询。
      *
-     * @param start
-     * @param length
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/getApproveFlowPage", method = RequestMethod.GET)
-    public ResultMsg getApproveFlowPage(@RequestParam("start") int start, @RequestParam("length") int length, Integer status, Integer needOnly, String applicantOrType) {
+    public ResultMsg getApproveFlowPage(HttpServletRequest request) {
+        Map<String, Object> params = HttpServletRequestUtils.getRequestParams(request);
+        params = HttpServletRequestUtils.replaceStr2List(params, "status", "type", "needOnly");
+
+
         ResultMsg resultMsg = new ResultMsg();
-        //解析查询的开始时间和结束时间
-        Map<String, Date> timeMap = DateUtil.analyzeQueryTime("all", "", "");
+
+
         try {
 
-            int count = approveFlowService.countApproveFlowPage(status, needOnly, timeMap, applicantOrType);
-            List<ApproveFlow> approveFlows = approveFlowService.getApproveFlowPage(start, length, status, needOnly, timeMap, applicantOrType);
+            List<ApproveFlow> approveFlows = approveFlowService.getApproveFlowPage(params);
+            int count = approveFlowService.countApproveFlowPage(params);
 
             //根据是否需要当前登录账户审批
             approveFlowService.isNeedApprove(approveFlows);
 
             resultMsg.setRows(approveFlows);
-            resultMsg.setRecordsFiltered(count);
-            resultMsg.setRecordsTotal(count);
-            resultMsg.setExportstart(start);
-            resultMsg.setExportlength(length);
+            resultMsg.setTotal(count);
             resultMsg.setResultMsg("获取审批流程列表成功");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         } catch (Exception e) {
             resultMsg.setData(e);
+            e.printStackTrace();
             resultMsg.setResultMsg("获取审批流程列表错误");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
         }

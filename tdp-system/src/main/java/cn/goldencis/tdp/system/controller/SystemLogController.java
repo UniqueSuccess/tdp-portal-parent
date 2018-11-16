@@ -60,7 +60,7 @@ public class SystemLogController {
      */
     @ResponseBody
     @RequestMapping(value = "/getSystemLogonLogInPage")
-    public ResultMsg getSystemLogonLogInPage(Integer start, Integer length, String submitDate, String startDate, String endDate , String order) {
+    public ResultMsg getSystemLogonLogInPage(Integer start, Integer length, String submitDate, String startDate, String endDate , String order, String orderType) {
         ResultMsg resultMsg = new ResultMsg();
 
         try {
@@ -72,7 +72,7 @@ public class SystemLogController {
             int count = operationLogService.countSystemLogListByParams(ConstantsDto.LOGON_LOG_TYPE, timeMap, order);
 
             //多条件分页查询登录日志
-            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.LOGON_LOG_TYPE, timeMap, order);
+            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.LOGON_LOG_TYPE, timeMap, order, orderType);
 
             resultMsg.setExportstart(start);
             resultMsg.setExportlength(length);
@@ -114,7 +114,7 @@ public class SystemLogController {
             int count = operationLogService.countSystemLogListByParams(ConstantsDto.CLIENT_LOGON_LOG_TYPE, timeMap, order);
 
             //多条件分页查询登录日志
-            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.CLIENT_LOGON_LOG_TYPE, timeMap, order);
+            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.CLIENT_LOGON_LOG_TYPE, timeMap, order, "desc");
 
             resultMsg.setExportstart(start);
             resultMsg.setExportlength(length);
@@ -144,7 +144,7 @@ public class SystemLogController {
      */
     @ResponseBody
     @RequestMapping(value = "/getSystemOperationLogInPage")
-    public ResultMsg getSystemOperationLogInPage(Integer start, Integer length, String submitDate, String startDate, String endDate , String order) {
+    public ResultMsg getSystemOperationLogInPage(Integer start, Integer length, String submitDate, String startDate, String endDate , String searchStr, String orderType) {
         ResultMsg resultMsg = new ResultMsg();
 
         try {
@@ -153,10 +153,10 @@ public class SystemLogController {
             Map<String, Date> timeMap = DateUtil.analyzeQueryTime(submitDate, startDate, endDate);
 
             //查询操作日志总数
-            int count = operationLogService.countSystemLogListByParams(ConstantsDto.OPERATION_LOG_TYPE, timeMap, order);
+            int count = operationLogService.countSystemLogListByParams(ConstantsDto.OPERATION_LOG_TYPE, timeMap, searchStr);
 
             //多条件分页查询操作日志
-            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.OPERATION_LOG_TYPE, timeMap, order);
+            List<OperationLogDO> operationLogList = operationLogService.getSystemLogListInPageByParams(start, length, ConstantsDto.OPERATION_LOG_TYPE, timeMap, searchStr, orderType);
 
             resultMsg.setExportstart(start);
             resultMsg.setExportlength(length);

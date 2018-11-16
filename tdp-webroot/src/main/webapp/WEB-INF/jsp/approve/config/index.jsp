@@ -7,7 +7,7 @@
 <%@ include file="/WEB-INF/jsp/common/meta.jsp" %>
 
 <head>
-    <title>金盾TDP</title>
+    <title></title>
     <%--<link href="${ctxCss}/dataTables/dataTablesgray.css" rel="stylesheet" type="text/css"/>--%>
     <%--<link href="${ctxCss}/approve/config/index.css" rel="stylesheet" type="text/css"/>--%>
 </head>
@@ -84,8 +84,8 @@
                 <label for="">申请人：{{applicantName}}</label>
             </div>
             <div class="wind-row">
-                <label for="">接收方信息：<span class="text-ellipsis w150 inline-block text-top"
-                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.recv}}</span></label>
+                <label for="">接收方：<span class="text-ellipsis w150 inline-block text-top"
+                                          title="{{flowInfo.policyParam.receiver}}">{{flowInfo.policyParam.receiver}}</span></label>
                 <!--<label for="">禁止截屏：{{if flowInfo.policyParam.forbidScreenShot == 1}} 是 {{else}} 否 {{/if}}</label>-->
             </div>
             <div class="wind-row">
@@ -119,9 +119,12 @@
                     class="iconfont icon-download"></i></a>
             </div>
             <div class="wind-row">
-                <label for="">接收方信息：<span class="text-ellipsis w300 inline-block text-top"
-                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.recv}}</span></label>
+                <label for="">接收方：<span class="text-ellipsis w300 inline-block text-top"
+                                          title="{{flowInfo.policyParam.receiver}}">{{flowInfo.policyParam.receiver}}</span></label>
             </div>
+
+        </div>
+        <div class="right">
             <div class="wind-row">
                 <label for="">申请人：{{applicantName}}</label>
             </div>
@@ -129,8 +132,6 @@
                 <label for="">导出原因：<span class="text-ellipsis w300 inline-block text-top"
                                          title="{{flowInfo.policyParam.reason}}">{{flowInfo.policyParam.reason}}</span></label>
             </div>
-        </div>
-        <div class="right">
         </div>
     </div>
 </script>
@@ -177,6 +178,7 @@
         methods: {
             initLoad: function () {
                 $(".process").load(ctx + '/approveFlow/listPage?statusType=process');
+                $(".processover").load(ctx + '/approveFlow/listPage?statusType=processover');
             },
             change: function (data) {
                 log(data)

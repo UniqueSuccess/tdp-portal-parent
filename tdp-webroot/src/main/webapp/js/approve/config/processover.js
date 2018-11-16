@@ -8,13 +8,14 @@ var app = new Vue({
                 type: 'button',
                 icon: 'icon-delete',
                 title: '删除',
+                disabled: true,
                 action: function (dom) {
                     gd.showConfirm({
                         id: 'openWind',//可传一个id作为标识
                         content: '确定要删除选中的流程吗?',
                         btn: [
                             {
-                                text: '删除',
+                                text: '确定',
                                 class: 'gd-btn',//也可以自定义类
                                 enter: true,//响应回车
                                 action: function (dom) {
@@ -60,7 +61,7 @@ var app = new Vue({
                 type: 'searchbox',
                 placeholder: "申请人",
                 action: function (val) {
-                    gd.table('approveOverTable').reload(1, {applicantOrType: val}, false);
+                    gd.table('approveOverTable').reload(1, {applicantOrType: val, isApprove: 1}, false);
                 }
             }
         ],
@@ -74,8 +75,8 @@ var app = new Vue({
             enableJumpPage: false, //启用跳页，默认false，可选
             enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
             enablePaging: true,//启用分页,默认true，可选
-            //orderColumn: 'ip',//排序列
-            //orderType: 'desc',//排序规则，desc或asc,默认desc
+            orderColumn: 'applyTime',//排序列
+            orderType: 'desc',//排序规则，desc或asc,默认desc
             columnResize: true, //启用列宽调，默认true，可选
             //showFooter: false,//显示footer,默认为true
             //lazy: true,//懒加载数据，调用gd.table('id').reload()对表格数据进行加载,默认为false
@@ -87,7 +88,7 @@ var app = new Vue({
                 dataSrc: function (data) {
                     data.rows = data.rows.map(function (obj) {
                         return [
-                            obj.flowId,
+                            obj.id,
                             obj.status || '--',
                             obj.applicantName || '--',
                             obj.reason || '--',
@@ -95,15 +96,17 @@ var app = new Vue({
                             obj.name || '--',
                             obj.applyTime || '--',
                             obj.finishTime || '--',
-                            obj.flowId
+                            obj.id
                         ]
                     });
                     return data;
                 },
                 //请求参数
                 data: {
+                    // "needOnly": 0,
                     "applicantOrType": "",
-                    "status": 2
+                    "status": "1;-1",
+                    "type":"1;2",
                 }
             },
             columns: [
@@ -115,27 +118,24 @@ var app = new Vue({
                     //class: 'xxx',//加入自定义类
                     align: 'center',//对齐方式，默认left，与class不同，class只影响内容，align会影响内容和表头
                     change: function (data) {//复选框改变，触发事件，返回所有选中的列的数据
-                        console.log(data);
                         app.batchDatas = data;
+                        app.toolbarConfig[0].disabled = app.batchDatas.length == 0 ? true : false; //批量删除是否禁用
                     }
                 },
                 {
                     name: 'status',
                     head: '结果',
                     width: '120', //列宽
-                    /*filterName: 'status',//高级查询字段名，不写为name
+                    filterName: 'status',//高级查询字段名，不写为name
                     filters: [//设置检索条件
-                        {
-                            label: '已审批',
-                            value: 2
-                        }, {
-                            label: '已通过',
+                         {
+                            label: '通过',
                             value: 1
                         }, {
-                            label: '已拒绝',
+                            label: '拒绝',
                             value: -1
                         }
-                    ],*/
+                    ],
                     render: function (cell, row, raw) {//自定义表格内容
                         var html = '';
                         if (raw.status == 1) {
@@ -159,9 +159,19 @@ var app = new Vue({
                 {
                     name: 'type',
                     head: '类型',
+                    filterName: 'type',//高级查询字段名，不写为name
+                    filters: [//设置检索条件
+                        {
+                            label: '导出',
+                            value: 1
+                        }, {
+                            label: '外发',
+                            value: 2
+                        }
+                    ],
                     render: function (cell, row, raw) {//自定义表格内容
                         var html = '';
-                        if (raw.type == 10 || raw.type == 11) {
+                        if (raw.type == 2) {
                             html = '<span class="">外发</span>';
                         } else {
                             html = '<span class="">导出</span>';
@@ -177,7 +187,7 @@ var app = new Vue({
                 {
                     name: 'applyTime',
                     head: '申请时间',
-                    title: true
+                    orderable: true,
                 }, {
                     name: 'finishTime',
                     head: '完成时间',
@@ -202,7 +212,7 @@ var app = new Vue({
                                     //url: './layer_content.html',//也可以传入url作为content,
                                     size: [900, 650],//窗口大小，直接传数字即可，也可以是['600px','400px']
                                     //autoFocus:true,//自动对输入框获取焦点，默认为ture
-                                    btn: [
+                                    /*btn: [
                                         {
                                             text: '确定',
                                             action: function (dom) {
@@ -214,15 +224,14 @@ var app = new Vue({
 
                                             }
                                         }
-                                    ],
+                                    ],*/
                                     success: function (dom) {//参数为当前窗口dom对象
                                         // 获取详情
                                         gd.get(ctx + '/approveFlow/getApproveFlowInfoById', {approveFlowId: id}, function (msg) {
-                                            console.log(msg)
                                             if (msg.resultCode == 0) {
                                                 msg.data.flowInfo.policyParam = JSON.parse(msg.data.flowInfo.policyParam);
 
-                                                if (type == 10 || type == 11) {
+                                                if (type == 2) {
                                                     $("#openWind .top").html(template('approve_tem_out_top', msg.data));
                                                 } else {
                                                     $("#openWind .top").html(template('approve_tem_export_top', msg.data));
@@ -234,7 +243,7 @@ var app = new Vue({
                                         gd.get(ctx + '/approveDetail/getApproveFlowModel', {approveFlowId: id}, function (msg) {
                                             if (msg.resultCode == 0) {
                                                 app.detailId = msg.data.detailId;
-                                                if (type == 10 || type == 11) {
+                                                if (type == 2) {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
                                                 } else {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
@@ -260,14 +269,12 @@ var app = new Vue({
                                     content: '确定要删除该流程吗?',
                                     btn: [
                                         {
-                                            text: '删除',
+                                            text: '确定',
                                             class: 'gd-btn',//也可以自定义类
                                             enter: true,//响应回车
                                             action: function (dom) {
-
-                                                var ids = [];
                                                 var postData = {};
-                                                postData.approveFlowArr = ids.push(cell);
+                                                postData.approveFlowArr = cell;
                                                 gd.post(ctx + '/approveFlow/deleteApproveFlow', postData, function (msg) {
                                                     if (msg.resultCode == 0) {
                                                         gd.table('approveOverTable').reload(1);

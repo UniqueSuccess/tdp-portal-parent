@@ -1,7 +1,6 @@
 package cn.goldencis.tdp.core.constants;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class ConstantsDto {
     public static final Integer POLICYOPTIONENABLE = 1;
     public static final Integer POLICYOPTIONUNENABLE = 0;
 
-    //策略潜在风险类型:1为屏幕无水印，2为文件外发无水印，3为文件导出无水印，4为无审批
+    //策略潜在风险类型:1为屏幕无水印，2为文件外发无水印，3为文件导出无审批，无加密有风险，4为无审批
     public static final Integer RISK_OF_SCRNWATERMARK = 1;
     public static final Integer RISK_OF_FILEOUTCFG = 2;
     public static final Integer RISK_OF_FILEOPT = 3;
@@ -106,12 +105,12 @@ public class ConstantsDto {
     public static final String AUTH_FILE_NAME = "tdpauthorized.auth";
     public static final String EXPORT_AUTH_FILE_NAME = "goldencis.tdp";
     public static final Long LIMIT_TIME = 2 * 1000 * 6l;
-    public static final Integer VALIDATE_FLAG = 0;
+    public static final Integer VALIDATE_FLAG = 1;
 
     /**
      * 以后改
      */
-    public static final String PROCJECT_IDENTIFICATION = "vdp";
+    public static final String PROCJECT_IDENTIFICATION = "tdp";
 
     public static final String READ_VDP_AUTH_FILE_NAME = "readauth.out";
 
@@ -129,9 +128,9 @@ public class ConstantsDto {
 
     public static final List<Map> ROLE_LIST = new ArrayList<Map>();
     static {
-        ROLE_LIST.add(MapUtils.createMap("0", "超级管理员"));
-        ROLE_LIST.add(MapUtils.createMap("1", "管理员"));
-        ROLE_LIST.add(MapUtils.createMap("2", "操作员"));
-        ROLE_LIST.add(MapUtils.createMap("3", "审计员"));
+        ROLE_LIST.add(MapUtils.createMap("1", "系统管理员"));
+        ROLE_LIST.add(MapUtils.createMap("2", "系统操作员"));
+        ROLE_LIST.add(MapUtils.createMap("3", "系统审计员"));
     }
+    public static final String CLIENT_GLOBAL = "/resource/clientglobal";
 }

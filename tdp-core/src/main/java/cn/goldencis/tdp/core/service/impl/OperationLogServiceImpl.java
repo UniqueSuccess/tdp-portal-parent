@@ -2,12 +2,14 @@ package cn.goldencis.tdp.core.service.impl;
 
 import cn.goldencis.tdp.common.dao.BaseDao;
 import cn.goldencis.tdp.common.service.impl.AbstractBaseServiceImpl;
+import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.core.annotation.LogType;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.dao.OperationLogDOMapper;
 import cn.goldencis.tdp.core.entity.OperationLogDO;
 import cn.goldencis.tdp.core.entity.OperationLogDOCriteria;
 import cn.goldencis.tdp.core.service.IOperationLogService;
+
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,12 +40,12 @@ public class OperationLogServiceImpl extends AbstractBaseServiceImpl<OperationLo
      * @param order    @return
      */
     @Override
-    public List<OperationLogDO> getSystemLogListInPageByParams(Integer start, Integer length, String logType, Map<String, Date> timeMap, String order) {
+    public List<OperationLogDO> getSystemLogListInPageByParams(Integer start, Integer length, String logType, Map<String, Date> timeMap, String search, String orderType) {
         RowBounds row = new RowBounds(start, length);
 
         //生成日志查询参数
-        OperationLogDOCriteria example = this.generatorSystemLogExample(logType, timeMap, order);
-        example.setOrderByClause("time Desc");
+        OperationLogDOCriteria example = this.generatorSystemLogExample(logType, timeMap, search);
+        example.setOrderByClause("time " + orderType);
 
         List<OperationLogDO> operationLogList = mapper.selectByExampleWithBLOBsWithRowbounds(example, row);
         return operationLogList;
@@ -122,8 +124,8 @@ public class OperationLogServiceImpl extends AbstractBaseServiceImpl<OperationLo
             }
         }
         //添加查询条件
-        if (order != null) {
-            criteria.andUserNameLikeInsensitive("%" + order + "%");
+        if (!StringUtil.isEmpty(order)) {
+            criteria.andSearchLike(" (instr(ip, '" + order + "') or " + " instr(log_operate_param, '" + order + "') or " + " instr(user_name, '" + order + "')) ");
         }
         return example;
     }

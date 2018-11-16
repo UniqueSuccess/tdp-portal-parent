@@ -1,6 +1,7 @@
 package cn.goldencis.tdp.report.service;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,4 +56,10 @@ public interface IFileTransferLogSevice {
      *@param endDate @return
      */
     Map<String,Object> getFileTransferLogInDate(List<TFileTransferLog> fileTransferLogList, String startDate, String endDate) throws ParseException;
+
+    /**
+     * 删除外发日志
+     * @param clearDate
+     */
+    void deleteFileTransferLog(Date clearDate);
 }

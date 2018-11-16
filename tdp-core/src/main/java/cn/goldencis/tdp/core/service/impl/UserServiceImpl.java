@@ -7,7 +7,6 @@ import cn.goldencis.tdp.core.entity.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -183,7 +182,7 @@ public class UserServiceImpl extends AbstractBaseServiceImpl<UserDO, UserDOCrite
         UserDO user = GetLoginUser.getLoginUser();
         //如果是超级管理员，返回查询所有用户,如果是其他用户，根据角色类型，查询相同类型的用户
         if (!"1".equals(user.getGuid())) {
-            params.put("roleType", user.getRoleType());
+            params.put("roleType", Arrays.asList(user.getRoleType()));
         }
         List<UserDO> userList = mapper.getUserListByLoginUserRoleTypeInPages(params);
 
@@ -200,7 +199,7 @@ public class UserServiceImpl extends AbstractBaseServiceImpl<UserDO, UserDOCrite
         UserDO user = GetLoginUser.getLoginUser();
         //如果是超级管理员，返回查询所有用户,如果是其他用户，根据角色类型，查询相同类型的用户
         if (!"1".equals(user.getGuid())) {
-            params.put("roleType", user.getRoleType());
+            params.put("roleType", Arrays.asList(user.getRoleType()));
         }
 
         return mapper.countUserListByLoginUserRoleTypeInPages(params);

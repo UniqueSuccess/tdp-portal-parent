@@ -48,9 +48,7 @@ var approveFlowIndex = new Vue({
                                     return false;
                                 }
                                 var postData = $('#addWind #add_flow_form').serializeJSON();
-                                console.log(postData)
                                 gd.post(ctx + '/approveDefinition/addApproveDefinition',postData,function (msg) {
-                                    console.log(msg);
                                     if (msg.resultCode == '0') {
                                         gd.showSuccess('新建成功！');
                                         approveFlowIndex.getApproveFlow('.left-list:last');
@@ -92,6 +90,7 @@ var approveFlowIndex = new Vue({
                 type: 'button',
                 icon: 'icon-delete',
                 title: '删除',
+                disabled: true,
                 action: function () {
                     gd.showConfirm({
                         id: 'deleteWind',
@@ -151,10 +150,13 @@ function initEvents() {
     //流程列表点击切换
         .on('click', '.left-list', function () {
             if (!$(this).hasClass('list-active')) {
+
                 $('.list-active').removeClass('list-active');
+
                 $(this).addClass('list-active');
                 $("#approveFlow_box").html('').load(ctx + '/approveDefinition/approveDetailView?approveDefinitionId=' + $(this).attr('data-id'));
                 // getRoleInfo($(this).attr('data-id'));
+                approveFlowIndex.toolbarConfig[1].disabled = $(this).data("id") == 1 ? true : false; //批量删除是否禁用
             }
         })
 

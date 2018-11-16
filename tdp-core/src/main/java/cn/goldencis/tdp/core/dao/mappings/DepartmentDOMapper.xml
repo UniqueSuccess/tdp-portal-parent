@@ -339,7 +339,7 @@
     </if>
   </select>
   <select id="queryPolicyNameById" resultType="map">
-  	SELECT id, name, path, DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s') modify_time  FROM `t_policy`
+  	SELECT id, name, path, FLOOR(UNIX_TIMESTAMP(modify_time) * 1000) modify_time  FROM `t_policy`
   	where id in 
   	<foreach close=")" collection="idList" item="item" open="(" separator=",">
         #{item}
@@ -351,4 +351,17 @@
   <select id="queryClientUserList" resultType="string">
   	SELECT guid FROM `t_client_user` WHERE policyid = #{policyId} AND deptguid = #{id}
   </select>
+  <update id="updateClientUserPolicy">
+  	update t_client_user
+  		set policyid = #{policyId}
+    where guid in 
+    <foreach close=")" collection="list" item="item" open="(" separator=",">
+        #{item}
+    </foreach>
+  </update>
+  <update id="updateDepartmentPolicyByPolicyId">
+  	UPDATE `t_department`
+	   SET policy_id = #{newPolicy}
+	WHERE policy_id = #{oldPolicy}
+  </update>
 </mapper>

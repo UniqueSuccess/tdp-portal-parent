@@ -2,6 +2,7 @@ package cn.goldencis.tdp.core.controller;
 
 import java.io.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,10 +11,11 @@ import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.common.utils.FileDownLoad;
 import cn.goldencis.tdp.core.annotation.LogType;
 import cn.goldencis.tdp.core.annotation.PageLog;
-import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.entity.*;
 import cn.goldencis.tdp.core.utils.PathConfig;
+
 import com.alibaba.fastjson.JSONArray;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -97,9 +99,9 @@ public class DepartmentController {
             //获取父类部门树
             String treePath = parentDept.getTreePath() + parentDept.getId() + ",%";
             //查询子类部门数量
-            long count = departmentService.getDeptarMentCountByParent(pid, treePath);
+            long count = departmentService.getDeptarMentCountByParent(pid, treePath, searchstr);
             //查询子类部门分页列表
-            List<DepartmentDO> departmentList = departmentService.getDeptarMentListByParent(start, length, pid, treePath, orderCase);
+            List<DepartmentDO> departmentList = departmentService.getDeptarMentListByParent(start, length, pid, treePath, orderCase, searchstr);
 
             //为列表中的部门添加父类部门名称
             departmentService.setParentDepartmentNames(parentDept, departmentList);
@@ -183,8 +185,11 @@ public class DepartmentController {
     public ResultMsg updateDept(@ModelAttribute DepartmentDO bean) {
         ResultMsg resultMsg = new ResultMsg();
         try {
+            List<DepartmentDO> list = new ArrayList<DepartmentDO>();
             //通过修改后传入的名称，查询相同名称的部门列表
-            List<DepartmentDO> list = departmentService.selectDepartmentByName(bean.getName());
+            if (bean.getId().intValue() != 1 && bean.getId().intValue() != 2) {
+                list = departmentService.selectDepartmentByName(bean.getName());
+            }
             //通过id，获取原部门
             DepartmentDO dep = departmentService.getDepartmentById(bean.getId());
 
@@ -287,5 +292,23 @@ public class DepartmentController {
         }
         FileDownLoad filedownload = new FileDownLoad();
         filedownload.download(response, request, path, null);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getManagerNodes", method = RequestMethod.GET)
+    public ResultMsg getManagerNodes() {
+        ResultMsg resultMsg = new ResultMsg();
+
+        try {
+            JSONArray ja = departmentService.getManagerNodes();
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+            resultMsg.setData(ja);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMsg.setResultMsg("修复用户屏幕水印错误！");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+        }
+
+        return resultMsg;
     }
 }

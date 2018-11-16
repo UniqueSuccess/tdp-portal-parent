@@ -89,4 +89,6 @@ public interface IPolicyService extends BaseService<PolicyDO, PolicyDOCriteria> 
      * @return 若存在则返回false，不存在返回true
      */
     boolean checkApproveInUsing(List<PolicyDO> policyList, Integer approveDefinitionId);
+
+    void copyDefaultPolicy();
 }

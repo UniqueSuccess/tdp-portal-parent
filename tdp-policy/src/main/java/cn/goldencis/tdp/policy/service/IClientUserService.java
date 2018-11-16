@@ -187,4 +187,6 @@ public interface IClientUserService extends BaseService<ClientUserDO, ClientUser
      * @return
      */
     Map<String, Object> queryDepartmentByUnique(String usrunique);
+
+    void modifyClientUserStatus(Map<String, Object> params);
 }

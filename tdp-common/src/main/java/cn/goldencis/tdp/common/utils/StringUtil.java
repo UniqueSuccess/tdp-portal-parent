@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -27,6 +29,23 @@ public class StringUtil {
         } else {
             return "".equals(chkStr.trim()) ? true : false;
         }
+    }
+
+    /**
+     * 
+     * @param str
+     * @return
+     */
+    public static Integer getNumber(String str) {
+        Pattern pattern = Pattern.compile("[^0-9]");
+        Matcher a1 = pattern.matcher(str);
+        String[] arr = a1.replaceAll(" ").split("\\s+");
+        StringBuffer sb = new StringBuffer();
+        
+        for(int i = 0;i<arr.length;i++){
+            sb.append(arr[i]);
+        }
+        return Integer.valueOf(StringUtil.isEmpty(sb.toString()) ? "0" :sb.toString());
     }
 
     /**

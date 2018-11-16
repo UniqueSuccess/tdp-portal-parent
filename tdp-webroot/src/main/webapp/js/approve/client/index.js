@@ -41,8 +41,8 @@ var app = new Vue({
                 //请求参数
                 data: {
                     "uuid": uuid,
-                    "status": 0, //这个是全部
-                    "client":2 //这个是未完成
+                    "status": 0, //这个是未完成
+                    "client":2 //这个是全部
 
                 }
             },
@@ -81,7 +81,7 @@ var app = new Vue({
                     head: '类型',
                     render: function (cell, row, raw) {//自定义表格内容
                         var html = '';
-                        if (raw.type == 11) {
+                        if (raw.type == 2) {
                             html = '<span class="">外发</span>';
                         } else {
                             html = '<span class="">导出</span>';
@@ -146,7 +146,7 @@ var app = new Vue({
                                             if (msg.resultCode == 0) {
                                                 msg.data.flowInfo.policyParam = JSON.parse(msg.data.flowInfo.policyParam);
 
-                                                if (type == 11) {
+                                                if (type == 2) {
                                                     $("#openWind .top").html(template('approve_tem_out_top', msg.data));
                                                 } else {
                                                     $("#openWind .top").html(template('approve_tem_export_top', msg.data));
@@ -157,7 +157,7 @@ var app = new Vue({
                                         //获取环节
                                         gd.get(ctx + '/approveOpen/getApproveFlowModelClient', {approveFlowId: id}, function (msg) {
                                             if (msg.resultCode == 0) {
-                                                if (type == 11) {
+                                                if (type == 2) {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));
                                                 } else {
                                                     $("#openWind .flow").html(template('getNode_tem', msg));

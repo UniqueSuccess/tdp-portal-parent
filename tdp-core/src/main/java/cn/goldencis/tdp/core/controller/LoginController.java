@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.entity.UserDO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ import cn.goldencis.tdp.core.service.INavigationService;
 import cn.goldencis.tdp.core.service.IUserService;
 import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
-import cn.goldencis.tdp.core.utils.PathConfig;
 
 /**
  * 登录
@@ -92,6 +92,8 @@ public class LoginController implements ServletContextAware {
         //获取当前登录用户对应权限的对应导航栏
         List<NavigationDO> list = navigationService.getUserNavigation(user);
 
+//        int size = userService.getAllUser().size();
+
         //获取授权文件的信息
         Map<String, Object> authInfo = AuthUtils.getAuthInfo(servletContext);
 
@@ -103,6 +105,8 @@ public class LoginController implements ServletContextAware {
         }
 
         request.getSession().setAttribute("maxCustomerCnt", authInfo.get("maxCustomerCnt") == null ? "0" : authInfo.get("maxCustomerCnt").toString());
+        request.getSession().setAttribute("endDate", "永久".equals(authInfo.get("endDate")) ? "" : authInfo.get("endDate"));
+//        request.getSession().setAttribute("userNum", size);
 
         if (!"".equals(authInfo.get("authmsg"))) {
             request.getSession().setAttribute("unauthority", "1");
@@ -124,7 +128,31 @@ public class LoginController implements ServletContextAware {
             }
         }
 
-        /*String url = "";
+        result.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+        return result;
+    }
+
+    @RequestMapping(value = "/pathDispatch", method = RequestMethod.GET)
+    public void pathDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+
+//获取当前登录用户
+        UserDO user = GetLoginUser.getLoginUser();
+        Map<String, Object> authInfo = AuthUtils.getAuthInfo(servletContext);
+        List<NavigationDO> list = new ArrayList<>();
+
+        if (!"".equals(authInfo.get("authmsg"))) {
+            //只允许system用户显示页面
+            if (ConstantsDto.ADMIN_ID.equals(user.getId())) {
+                //如果没有授权 或者 过期 只让system登录关于页面
+                navigationService.addAboutNavigationInList(list);
+//                model.addObject("authmsg", authInfo.get("authmsg"));
+            }
+        } else {
+            list = navigationService.getUserNavigation(user);
+        }
+
+        String url = "";
         //登录第一个url
         if (list != null && list.size() > 0) {
             for (NavigationDO nd : list) {
@@ -147,12 +175,10 @@ public class LoginController implements ServletContextAware {
         //空白页面
         if (StringUtil.isEmpty(url)) {
             url = "/blank/index";
-        }*/
+        }
 
-        //redirectStrategy.sendRedirect(request, response, url);
-        
-        result.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
-        return result;
+        redirectStrategy.sendRedirect(request, response, url);
     }
+
 
 }

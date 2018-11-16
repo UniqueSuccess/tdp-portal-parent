@@ -30,7 +30,7 @@ public class AuthUtils {
         File f = new File(PathConfig.HOM_PATH + "/" + ConstantsDto.AUTH_FILE_NAME);
         String authmsg = "";
         //增加个标识
-        if (ConstantsDto.VALIDATE_FLAG == 1) {
+        if (ConstantsDto.VALIDATE_FLAG != 1) {
             if (f.isFile() && f.exists()) {
                 InputStreamReader read = null;
                 BufferedReader reader = null;
@@ -72,6 +72,7 @@ public class AuthUtils {
                     authInfo.put("supportDate", supportDate);
                     authInfo.put("deviceUnique", jasonObject.get("hwserial").toString());
                     authInfo.put("maxCustomerCnt", maxCustomerCnt);
+                    authInfo.put("endDate",endDate);
 
                     if ("".equals(deviceUnique) || !deviceUnique.equals(jasonObject.get("hwserial").toString())) {
                         authmsg = "设备唯一标识码验证失败";

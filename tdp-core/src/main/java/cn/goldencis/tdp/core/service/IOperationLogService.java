@@ -21,7 +21,7 @@ public interface IOperationLogService extends BaseService<OperationLogDO, Operat
      * @param order
      * @return
      */
-    List<OperationLogDO> getSystemLogListInPageByParams(Integer start, Integer length, String logType, Map<String, Date> timeMap, String order);
+    List<OperationLogDO> getSystemLogListInPageByParams(Integer start, Integer length, String logType, Map<String, Date> timeMap, String search, String orderType);
 
     /**
      * 查询登录日志总数

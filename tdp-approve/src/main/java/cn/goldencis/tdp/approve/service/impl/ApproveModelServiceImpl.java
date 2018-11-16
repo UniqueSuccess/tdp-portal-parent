@@ -18,7 +18,7 @@ import java.util.List;
  * Created by limingchao on 2018/1/16.
  */
 @Service
-public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveModel, ApproveModelCriteria> implements IApproveModelService{
+public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveModel, ApproveModelCriteria> implements IApproveModelService {
 
     @Autowired
     private ApproveModelMapper mapper;
@@ -30,6 +30,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 根据流程定义id，获取定义流程的环节信息，并以此构建审批流程模型
+     *
      * @param approveDefinitionId
      * @return
      */
@@ -52,7 +53,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
                     isend = false;
                     break;
                 }
-                isend =true;
+                isend = true;
             }
         }
         return approveModelList;
@@ -60,6 +61,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 通过审批环节名获取数据库中的审批环节
+     *
      * @param approveModelName
      * @return
      */
@@ -81,6 +83,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 校验在同一个流程中，是否有重名的环节名称
+     *
      * @param approveModel
      * @return
      */
@@ -104,6 +107,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 添加或新建审批环节，没有id为新建，有id为更新
+     *
      * @param approveModel
      */
     @Override
@@ -133,6 +137,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 根据审批流程模型，获取其中审批人的guid集合
+     *
      * @param modelList
      * @return
      */
@@ -155,6 +160,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 根据环节id，校验该环节是否为流程中唯一的环节
+     *
      * @param flowId
      * @return
      */
@@ -173,6 +179,7 @@ public class ApproveModelServiceImpl extends AbstractBaseServiceImpl<ApproveMode
 
     /**
      * 根据环节id，删除环节，并后一个环节与前一个环节连接。
+     *
      * @param approveModel
      */
     @Override

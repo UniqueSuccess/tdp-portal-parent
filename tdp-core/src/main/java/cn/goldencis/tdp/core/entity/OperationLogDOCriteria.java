@@ -584,6 +584,16 @@ public class OperationLogDOCriteria {
             addCriterion("upper(log_desc) like", value.toUpperCase(), "logDesc");
             return (Criteria) this;
         }
+
+        public Criteria andlogOperateParamLikeInsensitive(String value) {
+            addCriterion("upper(log_operate_param) like", value.toUpperCase(), "logPage");
+            return (Criteria) this;
+        }
+        
+        public Criteria andSearchLike(String value) {
+            addCriterion(value);
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

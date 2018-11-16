@@ -73,13 +73,13 @@
         </div>
     </div>
 </div>
-<!--新增弹框-->
+<!--新增弹框--> 
 <script id="add_dept_temp" class="gd-none" type="text/html">
     <div class="container" id="add_dept" v-cloak>
         <form id="add_dept_form">
             <div class="row">
                 <label class="gd-label-required">部门名称</label>
-                <input type="text" class="gd-input gd-input-lg" gd-validate="required" name="name">
+                <input type="text" class="gd-input gd-input-lg" gd-validate="required maxLength" gdv-maxLength="32" name="name">
             </div>
             <div class="row">
                 <label class="">上级部门</label>
@@ -94,11 +94,11 @@
                 </gd-select>
             </div>
             <div class="row">
-                <label class="">部门负责人</label>
+                <label class="">负责人</label>
                 <input type="text" class="gd-input gd-input-lg" maxlength="20" gd-validate="exceptSpecialChar" name="owner">
             </div>
             <div class="row">
-                <label class="">联系方式</label>
+                <label class="">电话</label>
                 <input type="text" class="gd-input gd-input-lg" gd-validate="phone" name="departmentTel">
             </div>
         </form>
@@ -120,23 +120,31 @@
                     type: 'button',
                     icon: 'icon-add',
                     title: '添加',
+                    disabled: false,
                     action: function (dom) {
                         gd.showLayer({
                             id: 'addWind',//可传一个id作为标识
                             title: '新建部门',//窗口标题
                             content: $('#add_dept_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                             //url: './layer_content.html',//也可以传入url作为content,
-                            size: [600, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                            size: [560, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
                             //autoFocus:true,//自动对输入框获取焦点，默认为ture
                             btn: [
                                 {
                                     text: '确定',
                                     action: function (dom) {
+                                        validateDep = gd.validate('#add_dept_form', {
+                                            autoPlaceholer: true,
+                                        });
                                         if (!validateDep.valid()) {
                                             return false;
                                         }
                                         var postData = $('#addWind #add_dept_form').serializeJSON();
                                         postData.parentId = app.departmentId;
+                                        if (postData.parentId == 2) {
+                                            gd.showWarning('未分组下不能新建部门');
+                                            return false;
+                                        }
                                         gd.post(ctx + '/department/add', postData, function (msg) {
                                             if (msg.resultCode == '0') {
                                                 gd.showSuccess('保存成功');
@@ -179,11 +187,6 @@
                                                 $('#treeWindowDepartment span[data-id="'+ app.leftDeptId +'"').trigger("click");
                                             }
                                         }
-                                    },
-                                    mounted: function() {
-                                        validateDep = gd.validate('#add_dept_form', {
-                                            autoPlaceholer: true,
-                                        });
                                     }
                                 });
                             },
@@ -191,6 +194,13 @@
                                 // gd.showSuccess('窗口关闭了');
                             }
                         });
+                    }
+                },
+                {
+                    type: 'searchbox',
+                    placeholder: "部门名称",
+                    action: function (val) {
+                        gd.table('departmentTable').reload(false, {searchstr: val});
                     }
                 }
             ],
@@ -202,6 +212,7 @@
                 onSelect: function (node) {
                     gd.table('departmentTable').reload(false, {pid: node.id});
                     app.leftDeptId = node.id;
+                    app.toolbarConfig[0].disabled = node.id == 2 ? true : false;
                 },
                 onChange: function (nodes) {
                 },
@@ -242,7 +253,8 @@
                     },
                     //请求参数
                     data: {
-                        pid: 1
+                        pid: 1,
+                        searchstr: ''
                     }
                 },
                 columns: [
@@ -287,12 +299,16 @@
                                         title: '编辑部门',//窗口标题
                                         content: $('#add_dept_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                                         //url: './layer_content.html',//也可以传入url作为content,
-                                        size: [600, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                                        size: [560, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
                                         //autoFocus:true,//自动对输入框获取焦点，默认为ture
                                         btn: [
                                             {
                                                 text: '确定',
                                                 action: function (dom) {
+                                                    validateDep = gd.validate('#add_dept_form', {
+                                                        autoPlaceholer: true,
+                                                    });
+                                                    
                                                     if (!validateDep.valid()) {
                                                         return false;
                                                     }
@@ -348,20 +364,23 @@
                                                         if (index == 'parentId') {
                                                             setTimeout(function() {
                                                                 $('#editWind #treeWindowDepartment span[data-id="'+ val +'"]').trigger("click");
-                                                            }, 20)
+                                                            }, 100)
                                                         }
                                                         if (index == 'policyId') {
                                                             setTimeout(function() {
                                                                 editWindow.selectPolicyValue = val;
-                                                            }, 20)
+                                                            }, 100)
                                                         }
                                                     })
-
-                                                    validateDep = gd.validate('#add_dept_form', {
-                                                        autoPlaceholer: true,
-                                                    });
                                                 }
-                                            })
+                                            });
+                                            if (raw.id == 2) {
+                                                $('#editWind').find('input[name=name]').attr('disabled', true);
+                                                setTimeout(function() {
+                                                    $('#editWind').find('input[name=parentId]').attr('disabled', true);
+                                                }, 100)
+                                                
+                                            }
                                         },
                                         end: function (dom) {//参数为当前窗口dom对象
                                             // gd.showSuccess('窗口关闭了');
@@ -372,6 +391,9 @@
                             {
                                 icon: 'icon-delete',
                                 text: '删除',
+                                disabled: function(cell, row, raw) {
+                                    return raw.id == 2 ? true : false;
+                                },
                                 action: function (cell, row, raw) {
                                     gd.showConfirm({
                                         id: 'wind',
@@ -421,7 +443,7 @@
                     gd.tree('treeDepartment').setData(data);
                     setTimeout(function() {
                         $('#treeDepartment span[data-id="'+ app.leftDeptId +'"]').trigger("click");
-                    }, 20)
+                    }, 100)
                 });
             },
             getPolicyList: function() {

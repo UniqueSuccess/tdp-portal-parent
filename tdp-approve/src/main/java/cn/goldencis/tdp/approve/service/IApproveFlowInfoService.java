@@ -8,16 +8,18 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Created by limingchao on 2018/1/20.
  */
-public interface IApproveFlowInfoService extends BaseService<ApproveFlowInfo, ApproveFlowInfoCriteria>{
+public interface IApproveFlowInfoService extends BaseService<ApproveFlowInfo, ApproveFlowInfoCriteria> {
 
     /**
      * 插入审批流程详细信息
+     *
      * @param flowInfo
      */
     void addapproveFlowInfo(ApproveFlowInfo flowInfo);
 
     /**
      * 根据流程id获取流程信息
+     *
      * @param approveFlowInfoId
      * @return
      */
@@ -25,6 +27,7 @@ public interface IApproveFlowInfoService extends BaseService<ApproveFlowInfo, Ap
 
     /**
      * 保存文件，并在流程信息中添加路径
+     *
      * @param flowInfo
      * @param approvfile
      */

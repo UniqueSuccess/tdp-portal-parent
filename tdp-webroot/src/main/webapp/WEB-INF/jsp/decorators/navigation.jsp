@@ -21,9 +21,8 @@
         margin-bottom: 10px;
     }
     .policy-list li{
-        width: 175px;
+        width: 172px;
         height: 85px;
-        line-height: 85px;
         float: left;
         margin: 8px 8px 0 0;
         border: 1px solid #e5e5e5;
@@ -31,6 +30,15 @@
         text-align: center;
         position: relative;
         cursor: pointer;
+        display: table;
+    }
+    .policy-list li .policy-item{
+        width: 175px;
+        height: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        padding: 10px;
+        word-break: break-all; 
     }
     .policy-list li:nth-of-type(4n) {
         margin-right: 0;
@@ -42,6 +50,7 @@
     .policy-list li:hover .icon-delete{
         display: inline-block;
     }
+
     .policy-list li .icon-delete{
         position: absolute;
         right: 8px;
@@ -50,7 +59,16 @@
         display: none;
         line-height: 14px;
     }
+    .policy-list li .icon-delete:hover{
+        color: #58a5e3;
+    }
+    .policy-list li .icon-delete[disabled]{
+        opacity: 0.2;
+    }
 
+    #policy_add .gd-select .gd-select-drop{
+        max-height: 210px;
+    }
 </style>
 
 <div id="leftnav">
@@ -62,8 +80,10 @@
         <i title="添加" class="gd-btn-icon icon-add" @click="addPolicy()"></i>
         <ul class="policy-list clearfix">
             <li v-for="item in policyArray" @click="goPage(item.id)">
-                <span>{{item.name}}</span>
-                <i title="删除" class="icon-delete" @click.stop="deletePolicy(item.id)"></i>
+                <div class="policy-item">
+                    <span>{{item.name}}</span>
+                    <i title="删除" class="icon-delete" v-show="item.id !== 1" @click.stop="deletePolicy(item.id)"></i>
+                </div>
             </li>
         </ul>
     </div>
@@ -74,7 +94,7 @@
         <form id="add_dept_form">
             <div class="row">
                 <label class="gd-label-required">策略名</label>
-                <input type="text" class="gd-input gd-input-lg" gd-validate="required" name="name">
+                <input type="text" class="gd-input gd-input-lg" gd-validate="required maxLength" gdv-maxLength="32" name="name">
             </div>
             <div class="row">
                 <label class="">继承自</label>
@@ -149,19 +169,25 @@
                                     title: '新建策略',//窗口标题
                                     content: $('#policy_add_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                                     //url: './layer_content.html',//也可以传入url作为content,
-                                    size: [670, 280],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                                    size: [560, 280],//窗口大小，直接传数字即可，也可以是['600px','400px']
 //                                            autoFocus:true,//自动对输入框获取焦点，默认为ture
                                     btn: [
                                         {
                                             text: '确定',
                                             action: function (dom) {
+                                                validateDep = gd.validate('#add_dept_form', {
+                                                    autoPlaceholer: true,
+                                                });
+                                                if (!validateDep.valid()) {
+                                                    return false;
+                                                }
+
                                                 var postData = $('#policyAddWind #add_dept_form').serializeJSON();
-                                                console.log(postData)
                                                 gd.post(ctx + '/policy/addPolicy', postData, function (msg) {
-                                                    console.log(msg);
                                                     if (msg.resultCode == '0') {
-                                                        gd.showSuccess('保存成功');
-                                                        selectWindow.getPolicyList();
+                                                        // gd.showSuccess('保存成功');
+                                                        // selectWindow.getPolicyList();
+                                                       window.location.href = ctx + msg.data;
                                                     } else {
                                                         gd.showError('保存失败 ' + (msg.resultMsg || ''));
                                                     }
@@ -198,7 +224,6 @@
                             // 删除策略
                             deletePolicy: function (id) {
                                 if (id == 1) {
-                                    gd.showWarning('默认策略不可删除');
                                     return;
                                 }
                                 gd.showConfirm({
@@ -368,6 +393,8 @@
 */
                if(data != 0){
                    gd.menu('审批请求').addTip();//添加红点提示
+               }else{
+                   gd.menu('审批请求').removeTip();//移除红点提示
                }
 
 

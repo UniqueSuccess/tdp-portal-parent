@@ -9,6 +9,7 @@ import cn.goldencis.tdp.core.service.INavigationService;
 import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
 import cn.goldencis.tdp.policy.entity.PolicyDO;
+import cn.goldencis.tdp.policy.service.IClientUserService;
 import cn.goldencis.tdp.policy.service.IPolicyService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -41,7 +42,12 @@ public class NavigationController implements ServletContextAware {
     @Autowired
     private IPolicyService policyService;
 
+    @Autowired
+    private IClientUserService clientUserService;
+
     private ServletContext servletContext;
+
+
 
     /**
      * 左侧菜单
@@ -67,6 +73,9 @@ public class NavigationController implements ServletContextAware {
         } else {
             list = navigationService.getUserNavigation(user);
         }
+        int size = clientUserService.countAllClientUser();
+        request.getSession().setAttribute("userNum", size);
+
 
         //获取策略集合
         List<PolicyDO> allPolicyList = policyService.getAllPolicyList();
@@ -160,7 +169,9 @@ public class NavigationController implements ServletContextAware {
     public ModelAndView getDecoratorTop() {
         ModelAndView model = new ModelAndView();
         model.setViewName("decorators/top");
-        model.addObject("userId", GetLoginUser.getLoginUser().getId());
+        UserDO user = GetLoginUser.getLoginUser();
+        model.addObject("userId", user.getId());
+        model.addObject("userName", user.getUserName());
         // model.addObject("unreadalarm",alarmLogsService.countUnread(user.getUserName()));
         return model;
     }

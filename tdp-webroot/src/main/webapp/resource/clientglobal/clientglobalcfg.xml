@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cfg>
-    <sandbox downloadpolicy="1"/>
+    <sandbox downloadpolicy="1" forbidwrite="1" writeproc=""/>
+    <extendfileext word="" ppt="" excel="" pdf=""/>
     <ipmgr>
     </ipmgr>
     <servip>
@@ -8,4 +9,5 @@
     <legaltime week="1;2;3;4;5" begin="08:00" end="18:00" sound="false"></legaltime>
     <usbkey pwdneeded="true"></usbkey>
     <screenmgr enable="0" scrncutclass="" scrnrecordproc=""/>
+    
 </cfg>

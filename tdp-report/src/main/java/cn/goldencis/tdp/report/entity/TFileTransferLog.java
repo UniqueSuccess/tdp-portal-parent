@@ -33,6 +33,8 @@ public class TFileTransferLog extends BaseEntity implements Serializable {
 
     private String reason;
 
+    private String md5Value;
+
     private static final long serialVersionUID = 1L;
 
     public Integer getId() {
@@ -149,5 +151,13 @@ public class TFileTransferLog extends BaseEntity implements Serializable {
 
     public String getPrimaryKey() {
         return String.valueOf(getId());
+    }
+
+    public String getMd5Value() {
+        return md5Value;
+    }
+
+    public void setMd5Value(String md5Value) {
+        this.md5Value = md5Value;
     }
 }

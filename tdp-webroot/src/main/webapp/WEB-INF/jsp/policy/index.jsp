@@ -6,6 +6,7 @@
 <%@ include file="/WEB-INF/jsp/common/meta.jsp" %>
 <head>
     <title>策略</title>
+    <link rel="stylesheet" href="${ctxCss}/policy/iconfont/iconfont.css">
     <link rel="stylesheet" href="${ctxJs}/plugins/element-ui/element-ui-color.css">
     <style>
         .container{
@@ -21,8 +22,6 @@
         }
         .main-content .gd-toolbar{
             background-color: #fff;
-            -webkit-box-shadow: 0 1px 2px 1px rgba(0,0,0,.04);
-            box-shadow: 0 1px 2px 1px rgba(0,0,0,.04);
         }
         .main-content .gd-tab-vertical{
             border-top: 1px solid #eee;
@@ -60,11 +59,27 @@
         .policy-item .policy-row .unit{
             margin-left: -24px;
         }
+        .policy-item .icon-help{
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+            left: 5px;
+            color: #cfd6e1;
+        }
+        .policy-item .hint-text {
+            padding-left: 6px;
+            color: #cfd6e1;
+            position: relative;
+            top: 1px;
+        }
         .save-wrap{
             position: absolute;
             z-index: 99999;
-            bottom: 10px;
-            left: 20px;
+            bottom: 0;
+            left: 0;
+            width: calc(100% - 100px);
+            padding: 10px 40px;
+            background-color: #fff;
         }
         .gd-tab-vertical{
             height: calc(100% - 56px);
@@ -89,9 +104,11 @@
             margin-top: 9px;
         }
         .gd-tab-vertical>div.gd-tab-content .gd-tab-item{
-            padding: 20px 40px;
+            padding: 20px 40px 70px 40px;
         }
-
+        .gd-tab-vertical>div.gd-tab-content .gd-tab-item .policy-item:last-child{
+            padding-bottom: 60px;
+        }
         [class*=" el-icon-"], [class^=el-icon-]{
             font-family: iconfont;
             font-size: 16px;
@@ -100,6 +117,16 @@
         }
         .el-icon-arrow-down:before{
             content: "\e75e";
+        }
+        .file-color-picker{
+            left: 456px !important;
+        }
+        .policy-item .policy-row .scan-type-radio{
+            width: auto;
+            margin-right: 30px;
+        }
+        .gd-toolbar>.gd-toolbar-text{
+            margin-right: 24px;
         }
     </style>
 </head>
@@ -113,7 +140,7 @@
                         <div class="policy-title">启用状态</div>
                         <div class="policy-content">
                             <label class="gd-switch">
-                                <input type="checkbox" v-model="scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                             </label>
 
@@ -123,37 +150,37 @@
                         <div class="policy-title">水印内容</div>
                         <div class="policy-content j-screen-water">
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="scrnwatermark.content.computername" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.content.computername" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 计算机名
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="scrnwatermark.content.ip" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.content.ip" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 IP地址
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="scrnwatermark.content.mac" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.content.mac" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 MAC地址
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="scrnwatermark.content.depname" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.content.depname" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 部门名称
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="scrnwatermark.content.pctime" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="sbscrnwatermark.content.pctime" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 终端时间
                             </label>
                             <div class="gd-margin-top-lg">
                                 <label class="gd-checkbox gd-margin-right-sm">
-                                    <input type="checkbox" v-model="scrnwatermark.content.manual" :disabled="!scrnwatermark.enable" :true-value='1' :false-value='0'>
+                                    <input type="checkbox" v-model="sbscrnwatermark.content.manual" :disabled="!sbscrnwatermark.enable" :true-value='1' :false-value='0'>
                                     <i></i>
                                     自定义
                                 </label>
-                                <input type="text" id="screen_manual_text" class="gd-input gd-input-lg" v-model="scrnwatermark.content.manualtext" :disabled="!scrnwatermark.content.manual || !scrnwatermark.enable">
+                                <input type="text" id="screen_manual_text" class="gd-input gd-input-lg" v-model="sbscrnwatermark.content.manualtext" :disabled="!sbscrnwatermark.content.manual || !sbscrnwatermark.enable">
                             </div>
                         </div>
                     </div>
@@ -162,11 +189,11 @@
                         <div class="policy-content">
                             <div class="policy-row">
                                 <label>颜色</label>
-                                <el-color-picker v-model="scrnwatermark.content.mycolor" :disabled="!scrnwatermark.enable"></el-color-picker>
+                                <el-color-picker v-model="sbscrnwatermark.content.mycolor" :disabled="!sbscrnwatermark.enable"></el-color-picker>
                             </div>
                             <div class="policy-row">
                                 <label>透明度</label>
-                                <gd-select class="gd-select-lg"  name="selectDemo" v-model="scrnwatermark.content.opacity" :disabled="!scrnwatermark.enable">
+                                <gd-select class="gd-select-lg"  name="selectDemo" v-model="sbscrnwatermark.content.opacity" :disabled="!sbscrnwatermark.enable">
                                     <gd-option value="255">0%</gd-option>
                                     <gd-option value="225">10%</gd-option>
                                     <gd-option value="200">20%</gd-option>
@@ -181,7 +208,7 @@
                             </div>
                             <div class="policy-row">
                                 <label>方向</label>
-                                <gd-select class="gd-select-lg" name="selectDemo" v-model="scrnwatermark.content.direction" :disabled="!scrnwatermark.enable">
+                                <gd-select class="gd-select-lg" v-model="sbscrnwatermark.content.mydirection" :disabled="!sbscrnwatermark.enable">
                                     <gd-option value="0">左斜</gd-option>
                                     <gd-option value="1">右斜</gd-option>
                                     <gd-option value="2">横向</gd-option>
@@ -190,7 +217,7 @@
                             </div>
                             <div class="policy-row">
                                 <label>字体大小</label>
-                                <gd-select class="gd-select-lg" name="selectDemo" v-model="scrnwatermark.content.fontsize" :disabled="!scrnwatermark.enable">
+                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbscrnwatermark.content.fontsize" :disabled="!sbscrnwatermark.enable">
                                     <gd-option value="14">14</gd-option>
                                     <gd-option value="16">16</gd-option>
                                     <gd-option value="18">18</gd-option>
@@ -212,7 +239,8 @@
                                 <input type="checkbox" v-model="sbfileoutcfg.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                             </label>
-                            <%--<i class="icon-help" tooltip="将文件发送给企业外部人员"></i>--%>
+                            <i class="gd-icon icon-help"></i>
+                            <span class="hint-text">将文件发送给企业外部人员</span>
                         </div>
                         <div class="policy-content">
                             <div class="policy-row">
@@ -221,35 +249,35 @@
                                     <i></i>
                                     审批外发
                                 </label>
-                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileoutcfg.content.flowid" :disabled="!sbfileoutcfg.enable">
+                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileoutcfg.content.flowid" :disabled="!sbfileoutcfg.content.approve || !sbfileoutcfg.enable">
                                     <gd-option v-for="item in approveArray" :value="item.id">{{item.name}}</gd-option>
                                 </gd-select>
                             </div>
                             <div class="policy-row">
                                 <label class="gd-checkbox gd-margin-right-xxl">
-                                    <input type="checkbox" id="file_valid_time" v-model="sbfileoutcfg.content.isvalidtime" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0'>
+                                    <input type="checkbox"  v-model="sbfileoutcfg.content.isvalidtime" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0' gd-validate="minValue" gdv-minvalue="1" gdv-msg="只可输入大于0的整数">
                                     <i></i>
                                     有效期限
                                 </label>
-                                <input type="text" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.validtime" :disabled="!sbfileoutcfg.enable">
+                                <input type="text" id="file_valid_time" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.validtime" :disabled="!sbfileoutcfg.content.isvalidtime || !sbfileoutcfg.enable">
                                 <span class="unit">天</span>
                             </div>
                             <div class="policy-row">
                                 <label class="gd-checkbox gd-margin-right-xxl">
-                                    <input type="checkbox"  v-model="sbfileoutcfg.content.ispsw" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0'>
+                                    <input type="checkbox"  v-model="sbfileoutcfg.content.ispwd" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0' gd-validate="minValue" gdv-minvalue="1" gdv-msg="只可输入大于0的整数">
                                     <i></i>
                                     密码验证
                                 </label>
-                                <input type="text" id="file_psw" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.psw" :disabled="!sbfileoutcfg.enable">
+                                <input type="text" id="file_psw" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.pwd" :disabled="!sbfileoutcfg.content.ispwd || !sbfileoutcfg.enable">
                                 <span class="unit">位</span>
                             </div>
                             <div class="policy-row">
                                 <label class="gd-checkbox gd-margin-right-xxl">
-                                    <input type="checkbox" v-model="sbfileoutcfg.content.isopencount" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0'>
+                                    <input type="checkbox" v-model="sbfileoutcfg.content.isopencount" :disabled="!sbfileoutcfg.enable" :true-value='1' :false-value='0' gd-validate="minValue" gdv-minvalue="1" gdv-msg="只可输入大于0的整数">
                                     <i></i>
                                     打开次数
                                 </label>
-                                <input type="text" id="file_open_count" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.opentime" :disabled="!sbfileoutcfg.enable">
+                                <input type="text" id="file_open_count" class="gd-input gd-input-lg" v-model="sbfileoutcfg.content.opencount" :disabled="!sbfileoutcfg.content.isopencount || !sbfileoutcfg.enable">
                                 <span class="unit">次</span>
                             </div>
                             <div class="policy-row">
@@ -299,7 +327,7 @@
                                         <div class="policy-content">
                                             <div class="policy-row">
                                                 <label>颜色</label>
-                                                <el-color-picker v-model="sbfileoutcfg.content.scwatermark.mycolor" :disabled="!sbfileoutcfg.enable"></el-color-picker>
+                                                <el-color-picker :popper-class="popperClass" v-model="sbfileoutcfg.content.scwatermark.mycolor" :disabled="!sbfileoutcfg.enable"></el-color-picker>
                                             </div>
                                             <div class="policy-row">
                                                 <label>透明度</label>
@@ -318,7 +346,7 @@
                                             </div>
                                             <div class="policy-row">
                                                 <label>方向</label>
-                                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileoutcfg.content.scwatermark.direction" :disabled="!sbfileoutcfg.enable">
+                                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileoutcfg.content.scwatermark.mydirection" :disabled="!sbfileoutcfg.enable">
                                                     <gd-option value="0">左斜</gd-option>
                                                     <gd-option value="1">右斜</gd-option>
                                                     <gd-option value="2">横向</gd-option>
@@ -337,6 +365,8 @@
                                 <input type="checkbox" v-model="sbfileopt.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                             </label>
+                            <i class="gd-icon icon-help"></i>
+                            <span class="hint-text">企业内文件共享，以下两项不勾选为自主导出</span>
                         </div>
                         <div class="policy-content j-file-out">
                             <div class="policy-row">
@@ -345,7 +375,7 @@
                                     <i></i>
                                     审批导出
                                 </label>
-                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileopt.content.flowid" :disabled="!sbfileopt.enable">
+                                <gd-select class="gd-select-lg" name="selectDemo" v-model="sbfileopt.content.flowid" :disabled="!sbfileopt.content.approve || !sbfileopt.enable">
                                     <gd-option v-for="item in approveArray" :value="item.id">{{item.name}}</gd-option>
                                 </gd-select>
                             </div>
@@ -359,7 +389,7 @@
                         </div>
                     </div>
                 </gd-tab-item>
-                <gd-tab-item label="涉密扫描">
+                <gd-tab-item label="文件扫描">
                     <div class="policy-item">
                         <div class="policy-title">启用状态</div>
                         <div class="policy-content">
@@ -372,53 +402,75 @@
                     <div class="policy-item">
                         <div class="policy-title">识别方式</div>
                         <div class="policy-content">
-                            <div class="policy-row">
-                                <label class="gd-checkbox gd-margin-right-xxl">
-                                    <input type="checkbox" class="j-scan-checkbox" class="" v-model="filescan.content.datalist[0].iskeywords" :disabled="!filescan.enable" :true-value='1' :false-value='0'>
+                            <div class="policy-row gd-margin-bottom-md">
+                                <label class="gd-radio scan-type-radio gd-margin-right-0">
+                                    <input type="radio" value="0" name="scanType" v-model="filescan.content.type" :disabled="!filescan.enable">
                                     <i></i>
-                                    关键字扫描
+                                    全面扫描
                                 </label>
-                                <div class="gd-margin-left-xl gd-margin-top-lg">
-                                    <input type="text" id="keywords_value" placeholder="关键字之间用分号隔开" class="gd-input gd-input-lg" v-model="filescan.content.datalist[0].keywords" :disabled = "!filescan.content.datalist[0].iskeywords || !filescan.enable"/>
-                                </div>
+                                <i class="gd-icon icon-help" style="top: 1px"></i>
+                                <span class="hint-text" style="top: 2px">开启全面扫描会扫描全部格式为word文档、电子表格演示文稿、pdf文档的文件，请谨慎选择</span>
                             </div>
-                            <div class="policy-row">
-                                <label class="gd-checkbox gd-margin-right-xxl">
-                                    <input class="j-scan-checkbox" type="checkbox" v-model="filescan.content.datalist[0].isregexps" :disabled="!filescan.enable" :true-value='1' :false-value='0'>
+                            <div class="policy-row gd-margin-bottom-md">
+                                <label class="gd-radio scan-type-radio">
+                                    <input type="radio" value="1" name="scanType" v-model="filescan.content.type" :disabled="!filescan.enable">
                                     <i></i>
-                                    自然语义
+                                    涉密扫描
                                 </label>
-                                <div class="nature-wrap">
-                                    <div class="nature-tool-bar">
-                                        <i title="添加" class="gd-btn-icon icon-add" @click="addNature(!filescan.content.datalist[0].isregexps || !filescan.enable)" :disabled="!filescan.content.datalist[0].isregexps || !filescan.enable"></i>
-                                        <i title="删除" class="gd-btn-icon icon-delete" @click="delNatureMore(!filescan.content.datalist[0].isregexps || !filescan.enable)" :disabled="!filescan.content.datalist[0].isregexps || !filescan.enable"></i>
+                            </div>
+                            <div class="policy-content" v-show="filescan.content.type == 1">
+                                <div class="policy-row">
+                                    <label class="gd-checkbox gd-margin-right-xxl">
+                                        <input type="checkbox" class="j-scan-checkbox" class="" v-model="filescan.content.datalist[0].iskeywords" :disabled="!filescan.enable" :true-value='1' :false-value='0'>
+                                        <i></i>
+                                        关键字扫描
+                                    </label>
+                                    <div class="gd-margin-left-xl gd-margin-top-lg">
+                                        <input type="text" id="keywords_value" placeholder="关键字之间用分号隔开" class="gd-input gd-input-lg" v-model="filescan.content.datalist[0].keywords" :disabled = "!filescan.content.datalist[0].iskeywords || !filescan.enable"/>
                                     </div>
-                                    <div class="gd-table-wrapper">
-                                        <div class="gd-table-scroll-h">
-                                            <div class="gd-table-body">
-                                                    <table id="nature_table">
-                                                        <tr>
-                                                            <th width="40"><label class="gd-checkbox"><input class="j-check-all" type="checkbox" :checked="filescan.content.datalist[0].regexps.length === regexpsIds.length" :disabled="!filescan.content.datalist[0].isregexps || !filescan.enable"> <i></i></label></th>
-                                                            <th><span class="gd-table-col-head">语义功能</span></th>
-                                                            <th><span class="gd-table-col-head">匹配方式</span></th>
-                                                            <th><span class="gd-table-col-head">扩展内容</span></th>
-                                                            <th><span class="gd-table-col-head">备注</span></th>
-                                                            <th><span class="gd-table-col-head">操作</span></th>
-                                                        </tr>
-                                                        <tr v-for="regexp in filescan.content.datalist[0].regexps">
-                                                            <td><label class="gd-checkbox" ><input class="j-check-one" :data-id="regexp.id" type="checkbox" @click="checkedOne(regexp.id)" :checked="regexpsIds.indexOf(regexp.id)>=0" :disabled="!filescan.content.datalist[0].isregexps || !filescan.enable"> <i></i></label></td>
-                                                            <td>{{regexp.rulename}}</td>
-                                                            <td>{{regexp.extend_name}}</td>
-                                                            <td>{{regexp.extend_content}}</td>
-                                                            <td>{{regexp.remark}}</td>
-                                                            <td>
-                                                                <div class="gd-table-operate">
-                                                                    <button type="button" title="删除" class="gd-table-operate-item gd-btn-alone icon-delete" :data-id="regexp.id" @click="delNatureOne(regexp.id)" :disabled="!filescan.content.datalist[0].isregexps || !filescan.enable"></button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
+                                </div>
+                                <div class="policy-row">
+                                    <label class="gd-checkbox gd-margin-right-xxl">
+                                        <input class="j-scan-checkbox" type="checkbox" v-model="filescan.content.datalist[1].isregexps" :disabled="!filescan.enable" :true-value='1' :false-value='0'>
+                                        <i></i>
+                                        自然语义
+                                    </label>
+                                    <div class="nature-wrap">
+                                        <div class="nature-tool-bar">
+                                            <i title="添加" class="gd-btn-icon icon-add" @click="addNature(!filescan.content.datalist[1].isregexps || !filescan.enable)" :disabled="!filescan.content.datalist[1].isregexps || !filescan.enable"></i>
+                                            <i title="删除" class="gd-btn-icon icon-delete" @click="delNatureMore(!filescan.content.datalist[1].isregexps || !filescan.enable)" :disabled="!filescan.content.datalist[1].isregexps || !filescan.enable"></i>
+                                        </div>
+                                        <div class="gd-table-wrapper">
+                                            <div class="gd-table-scroll-h">
+                                                <div class="gd-table-body">
+                                                        <table id="nature_table">
+                                                            <tr>
+                                                                <th width="40"><label class="gd-checkbox"><input class="j-check-all" type="checkbox" :checked="filescan.content.datalist[1].regexps.length === regexpsIds.length && regexpsIds.length!==0" :disabled="!filescan.content.datalist[1].isregexps || !filescan.enable"> <i></i></label></th>
+                                                                <th><span class="gd-table-col-head">语义功能</span></th>
+                                                                <th><span class="gd-table-col-head">匹配方式</span></th>
+                                                                <th><span class="gd-table-col-head">扩展内容</span></th>
+                                                                <th><span class="gd-table-col-head">备注</span></th>
+                                                                <th><span class="gd-table-col-head">操作</span></th>
+                                                            </tr>
+                                                            <tr v-for="regexp in filescan.content.datalist[1].regexps" v-show="filescan.content.datalist[1].regexps !== 0">
+                                                                <td><label class="gd-checkbox" ><input class="j-check-one" :data-id="regexp.id" type="checkbox" @click="checkedOne(regexp.id)" :checked="regexpsIds.indexOf(regexp.id)>=0" :disabled="!filescan.content.datalist[1].isregexps || !filescan.enable"> <i></i></label></td>
+                                                                <td>{{regexp.rulename}}</td>
+                                                                <td>{{regexp.extend_name}}</td>
+                                                                <td>{{regexp.extend_content}}</td>
+                                                                <td>{{regexp.remark}}</td>
+                                                                <td>
+                                                                    <div class="gd-table-operate">
+                                                                        <button type="button" title="删除" class="gd-table-operate-item gd-btn-alone icon-delete" :data-id="regexp.id" @click="delNatureOne(regexp.id)" :disabled="!filescan.content.datalist[1].isregexps || !filescan.enable"></button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr v-show="filescan.content.datalist[1].regexps == 0" >
+                                                                <td colspan="6"><div class="gd-text-center">暂无数据</div></td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -431,7 +483,7 @@
                         <div class="policy-title">启用状态</div>
                         <div class="policy-content">
                             <label class="gd-switch">
-                                <input type="checkbox" v-model="orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                             </label>
                         </div>
@@ -440,42 +492,42 @@
                         <div class="policy-title">水印内容</div>
                         <div class="policy-content j-print-screen">
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="orgprintwatermark.content.computername" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.content.computername" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 计算机名
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="orgprintwatermark.content.ip" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.content.ip" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 IP地址
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="orgprintwatermark.content.mac" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.content.mac" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 MAC地址
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="orgprintwatermark.content.depname" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.content.depname" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 部门名称
                             </label>
                             <label class="gd-checkbox">
-                                <input type="checkbox" v-model="orgprintwatermark.content.pctime" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                <input type="checkbox" v-model="printwatermark.content.pctime" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                 <i></i>
                                 终端时间
                             </label>
                             <div class="gd-margin-top-lg">
                                 <label class="gd-checkbox gd-margin-right-sm">
-                                    <input type="checkbox" v-model="orgprintwatermark.content.manual" :disabled="!orgprintwatermark.enable" :true-value='1' :false-value='0'>
+                                    <input type="checkbox" v-model="printwatermark.content.manual" :disabled="!printwatermark.enable" :true-value='1' :false-value='0'>
                                     <i></i>
                                     自定义
                                 </label>
-                                <input type="text" id="print_screen_manual_text" class="gd-input gd-input-lg" v-model="orgprintwatermark.content.manualtext" :disabled="!orgprintwatermark.content.manual || !orgprintwatermark.enable">
+                                <input type="text" id="print_screen_manual_text" class="gd-input gd-input-lg" v-model="printwatermark.content.manualtext" :disabled="!printwatermark.content.manual || !printwatermark.enable">
                             </div>
                         </div>
                     </div>
                 </gd-tab-item>
-                <div class="save-wrap"><button class="gd-btn" @click="save()">保存</button></div>
+                <div class="save-wrap"><button class="gd-btn" @click.prevent="save()">保存</button></div>
             </gd-tab>
         </div>
     </div>
@@ -486,27 +538,27 @@
             <div class="row">
                 <label class="">语义功能</label>
                 <label class="gd-radio">
-                    <input type="radio" value="邮箱:/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" name="rulename" checked>
+                    <input type="radio" value="邮箱:(\w){1,50}(\.\w{1,50}){0,50}@(\w){1,50}((\.\w{1,50}){1,50})" name="rulename" checked>
                     <i></i>
                     邮箱
                 </label>
                 <label class="gd-radio">
-                    <input type="radio" value="手机:/^[1-9]\d{0,10}$/" name="rulename">
+                    <input type="radio" value="手机:\b(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}\b" name="rulename">
                     <i></i>
                     手机
                 </label>
                 <label class="gd-radio">
-                    <input type="radio" value="固话:3" name="rulename">
+                    <input type="radio" value="固话:((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))" name="rulename">
                     <i></i>
                     固话
                 </label>
                 <label class="gd-radio">
-                    <input type="radio" value="身份证15位:4" name="rulename">
+                    <input type="radio" value="身份证15位:[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}" name="rulename">
                     <i></i>
                     身份证15位
                 </label>
                 <label class="gd-radio">
-                    <input type="radio" value="身份证18位:5" name="rulename">
+                    <input type="radio" value="身份证18位:[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]" name="rulename">
                     <i></i>
                     身份证18位
                 </label>
@@ -547,21 +599,35 @@
 </script>
 <script type="text/javascript" src="${ctxJs}/plugins/element-ui/element-ui.min.js"></script>
 <script>
+    $('.gd-topbar-name').html('策略');
+    $('.icon-strategy').parent().addClass('gd-active');
     var msg = ${resultMsg.data}
+    // // 转换屏幕水印方向的类型
+    // if (msg.sbscrnwatermark.content.direction == 0) {
+    //     var dir = msg.sbscrnwatermark.content.direction;
+    //     msg.sbscrnwatermark.content.direction = dir.toString();
+    // }
+    // if (msg.sbfileoutcfg.content.scwatermark.direction == 0) {
+    //     var dirA = msg.sbfileoutcfg.content.scwatermark.direction;
+    //     msg.sbfileoutcfg.content.scwatermark.direction = dirA.toString();
+    // }
+    
+    
     var policyId = ${policyId};
-    var policyName = '${policyName}'+ '策略配置';
+    var policyName = '${policyName}';
 
     var app = new Vue({
         el: '#app',
         data: {
             // 打印管控
-            orgprintwatermark: msg.orgprintwatermark,
+            printwatermark: msg.printwatermark,
             // 屏幕水印
-            scrnwatermark: msg.scrnwatermark,
+            sbscrnwatermark: msg.sbscrnwatermark,
             sbfileopt: msg.sbfileopt,
             sbfileoutcfg: msg.sbfileoutcfg,
             filescan: msg.filescan,
             regexpsIds: [], // 涉密扫描自然语义选中的id
+            popperClass: 'file-color-picker',
             //工具栏配置
             toolbarConfig: [
                 {
@@ -570,7 +636,7 @@
                 },
                 {
                     type: 'button',
-                    icon: 'icon-view',
+                    icon: 'icon-celvezu',
                     title: '策略',
                     action: function (dom) {
                         gd.showLayer({
@@ -596,17 +662,25 @@
                                                 title: '新建策略',//窗口标题
                                                 content: $('#policy_add_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                                                 //url: './layer_content.html',//也可以传入url作为content,
-                                                size: [670, 280],//窗口大小，直接传数字即可，也可以是['600px','400px']
-//                                            autoFocus:true,//自动对输入框获取焦点，默认为ture
+                                                size: [560, 280],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                                                autoFocus:true,//自动对输入框获取焦点，默认为ture
                                                 btn: [
                                                     {
                                                         text: '确定',
                                                         action: function (dom) {
+                                                            validateDep = gd.validate('#add_dept_form', {
+                                                                autoPlaceholer: true,
+                                                            });
+                                                            if (!validateDep.valid()) {
+                                                                return false;
+                                                            }
+                                                            
                                                             var postData = $('#policyAddWind #add_dept_form').serializeJSON();
                                                             gd.post(ctx + '/policy/addPolicy', postData, function (msg) {
                                                                 if (msg.resultCode == '0') {
-                                                                    gd.showSuccess('保存成功');
-                                                                    selectWindow.getPolicyList();
+                                                                    // gd.showSuccess('保存成功');
+                                                                    // selectWindow.getPolicyList();
+                                                                    window.location.href = ctx + msg.data;
                                                                 } else {
                                                                     gd.showError('保存失败 ' + (msg.resultMsg || ''));
                                                                 }
@@ -697,6 +771,7 @@
                     type: 'button',
                     icon: 'icon-delete',
                     title: '删除',
+                    disabled: policyId == 1 ? true : false,
                     action: function (dom) {
                         if (policyId == 1) {
                             gd.showWarning('默认策略不可删除');
@@ -751,26 +826,26 @@
                     title: '新建自然语义',//窗口标题
                     content: $('#add_nature_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                     //url: './layer_content.html',//也可以传入url作为content,
-                    size: [600, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                    size: [580, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
                     autoFocus:false,//自动对输入框获取焦点，默认为ture
                     btn: [
                         {
                             text: '确定',
                             action: function (dom) {
                                 var postData = $('#addWind #add_dept_form').serializeJSON();
-                                app.filescan.content.datalist[0].natureId ++; // id自增
+                                app.filescan.content.datalist[1].natureId ++; // id自增
 
                                 var item = {
-                                    id: app.filescan.content.datalist[0].natureId,
+                                    id: app.filescan.content.datalist[1].natureId,
                                     rulename: postData.rulename.split(':')[0],
                                     regexps: postData.rulename.split(':')[1],
-                                    extend_type: postData.extend_type.split(':')[1],
+                                    extend_type: parseInt(postData.extend_type.split(':')[1]),
                                     extend_name: postData.extend_type.split(':')[0],
                                     extend_content: postData.extend_content == "" ? '--' : postData.extend_content,
                                     remark: postData.remark == "" ? '--' : postData.remark
                                 };
 
-                                app.filescan.content.datalist[0].regexps.push(item);
+                                app.filescan.content.datalist[1].regexps.push(item);
 
                                 dom.close();
                                 return false;//阻止弹窗自动关闭
@@ -801,8 +876,8 @@
                         text: '确定',
                         class: 'gd-btn-danger', //也可以自定义类
                         action: function (dom) {
-                            var regexpsArr = app.filescan.content.datalist[0].regexps;
-                            app.filescan.content.datalist[0].regexps = regexpsArr.filter(function(item) {
+                            var regexpsArr = app.filescan.content.datalist[1].regexps;
+                            app.filescan.content.datalist[1].regexps = regexpsArr.filter(function(item) {
                                 return item.id != id;
                             });
 
@@ -835,8 +910,8 @@
                         class: 'gd-btn-danger', //也可以自定义类
                         action: function (dom) {
                             for (var i = 0; i < _this.regexpsIds.length; i++) {
-                                var regexpsArr = app.filescan.content.datalist[0].regexps;
-                                app.filescan.content.datalist[0].regexps = regexpsArr.filter(function(item) {
+                                var regexpsArr = app.filescan.content.datalist[1].regexps;
+                                app.filescan.content.datalist[1].regexps = regexpsArr.filter(function(item) {
                                     return item.id != _this.regexpsIds[i];
                                 });
                             }
@@ -857,15 +932,16 @@
             },
             // 保存
             save: function() {
+
                 // 屏幕水印
-                if (this.scrnwatermark.enable == 1 && $('.j-screen-water').find('input[type=checkbox]:checked').length == 0) {
+                if (this.sbscrnwatermark.enable == 1 && $('.j-screen-water').find('input[type=checkbox]:checked').length == 0) {
                     $('.gd-tab-li').eq(0).click();
                     gd.showWarning('请至少选择一项屏幕水印');
                     return;
                 }
 
                 // 屏幕水印的自定义
-                if (this.scrnwatermark.enable == 1 && this.scrnwatermark.content.manual == 1 && $('#screen_manual_text').val() == '') {
+                if (this.sbscrnwatermark.enable == 1 && this.sbscrnwatermark.content.manual == 1 && $('#screen_manual_text').val() == '') {
                     $('.gd-tab-li').eq(0).click();
                     gd.showWarning('请填写自定义水印内容');
                     $('#screen_manual_text').focus();
@@ -878,42 +954,83 @@
                     gd.showWarning('请填写有效期限');
                     $('#file_valid_time').focus();
                     return;
+                } else {
+                    var reg = /^[1-9]+[0-9]*/;
+                    var valid = $('#file_valid_time').val();
+                    if (!reg.test(valid)) {
+                        if (this.sbfileoutcfg.enable == 1) {
+                            gd.showWarning('只可输入大于0的整数');
+                            $('#file_valid_time').focus();
+                            $('.gd-tab-li').eq(1).click();
+                            return;
+                        } else {
+                            this.sbfileoutcfg.content.validtime = 7;
+                        }    
+                    }
                 }
+
                 // 密码验证
-                if (this.sbfileoutcfg.enable == 1 && this.sbfileoutcfg.content.ispsw == 1 && $('#file_psw').val() == '') {
+                if (this.sbfileoutcfg.enable == 1 && this.sbfileoutcfg.content.ispwd == 1 && $('#file_psw').val() == '') {
                     $('.gd-tab-li').eq(1).click();
                     gd.showWarning('请填写密码验证');
                     $('#file_psw').focus();
                     return;
+                } else {
+                    var reg = /^[1-9]+[0-9]*/;
+                    var pwd = $('#file_psw').val();
+                    if (!reg.test(pwd)) {
+                        if (this.sbfileoutcfg.enable == 1) {
+                            gd.showWarning('只可输入大于0的整数');
+                            $('#file_psw').focus();
+                            $('.gd-tab-li').eq(1).click();
+                            return;
+                        } else {
+                            this.sbfileoutcfg.content.pwd = 6;
+                        }    
+                    } 
                 }
+
                 // 打开次数
                 if (this.sbfileoutcfg.enable == 1 && this.sbfileoutcfg.content.isopencount == 1 && $('#file_open_count').val() == '') {
                     $('.gd-tab-li').eq(1).click();
                     gd.showWarning('请填写打开次数');
                     $('#file_open_count').focus();
                     return;
+                } else {
+                    var reg = /^[1-9]+[0-9]*/;
+                    var count = $('#file_open_count').val();
+                    if (!reg.test(count)) {
+                        if (this.sbfileoutcfg.enable == 1) {
+                            gd.showWarning('只可输入大于0的整数');
+                            $('#file_open_count').focus();
+                            $('.gd-tab-li').eq(1).click();
+                            return;
+                        } else {
+                            this.sbfileoutcfg.content.opencount = 1;
+                        }  
+                    }  
                 }
-
+                
                 if (this.sbfileoutcfg.enable == 1 && this.sbfileoutcfg.content.scwatermark.enable == 1 && $('.j-file-screen-water').find('input[type=checkbox]:checked').length == 0) {
                     $('.gd-tab-li').eq(1).click();
                     gd.showWarning('请至少选择一项文件外发的水印内容');
                     return;
                 }
                 // 文件导出
-                if (this.sbfileopt.enable == 1 && $('.j-file-out').find('input[type=checkbox]:checked').length == 0) {
-                    $('.gd-tab-li').eq(1).click();
-                    gd.showWarning('请至少选择一项文件导出方式');
-                    return;
-                }
+                // if (this.sbfileopt.enable == 1 && $('.j-file-out').find('input[type=checkbox]:checked').length == 0) {
+                //     $('.gd-tab-li').eq(1).click();
+                //     gd.showWarning('请至少选择一项文件导出方式');
+                //     return;
+                // }
 
                 // 涉密扫描
-                if (this.filescan.enable == 1 && $('.j-scan-checkbox:checked').length == 0) {
+                if (this.filescan.enable == 1 && this.filescan.content.type == 1 && $('.j-scan-checkbox:checked').length == 0) {
                     $('.gd-tab-li').eq(2).click();
                     gd.showWarning('请至少选择一项识别方式');
                     return;
                 }
 
-                if (this.filescan.content.datalist[0].iskeywords == 1 && $('#keywords_value').val() == '') {
+                if (this.filescan.enable == 1 && this.filescan.content.datalist[0].iskeywords == 1 && $('#keywords_value').val() == '') {
                     $('.gd-tab-li').eq(2).click();
                     gd.showWarning('请填写关键字');
                     $('#keywords_value').focus();
@@ -921,32 +1038,42 @@
                 }
 
                 // 打印管控--屏幕水印
-                if (this.orgprintwatermark.enable == 1 && $('.j-print-screen').find('input[type=checkbox]:checked').length == 0) {
+                if (this.printwatermark.enable == 1 && $('.j-print-screen').find('input[type=checkbox]:checked').length == 0) {
                     $('.gd-tab-li').eq(3).click();
                     gd.showWarning('请至少选择一项屏幕水印');
                     return;
                 }
 
                 // 屏幕水印的自定义
-                if (this.orgprintwatermark.enable == 1 && this.orgprintwatermark.content.manual == 1 && $('#print_screen_manual_text').val() == '') {
+                if (this.printwatermark.enable == 1 && this.printwatermark.content.manual == 1 && $('#print_screen_manual_text').val() == '') {
                     $('.gd-tab-li').eq(3).click();
                     gd.showWarning('请填写自定义水印内容');
                     $('#print_screen_manual_text').focus();
                     return;
                 }
+                this.sbfileoutcfg.content.validtime = parseInt(this.sbfileoutcfg.content.validtime);
+                this.sbfileoutcfg.content.pwd = parseInt(this.sbfileoutcfg.content.pwd);
+                this.sbfileoutcfg.content.opencount = parseInt(this.sbfileoutcfg.content.opencount);
+                this.sbfileoutcfg.content.scwatermark.opacity = parseInt(this.sbfileoutcfg.content.scwatermark.opacity);
+                this.sbfileoutcfg.content.scwatermark.direction = parseInt(this.sbfileoutcfg.content.scwatermark.mydirection);
+
+                this.sbscrnwatermark.content.direction = parseInt(this.sbscrnwatermark.content.mydirection);
+                this.sbscrnwatermark.content.opacity = parseInt(this.sbscrnwatermark.content.opacity);
+                this.sbscrnwatermark.content.fontsize = parseInt(this.sbscrnwatermark.content.fontsize);
+
+                this.filescan.content.type = parseInt(this.filescan.content.type);
 
                 var objAll = {
                     policyid: policyId,
                     content: {
-                        scrnwatermark: this.scrnwatermark,
+                        sbscrnwatermark: this.sbscrnwatermark,
                         sbfileoutcfg: this.sbfileoutcfg,
                         sbfileopt: this.sbfileopt,
                         filescan: this.filescan,
-                        orgprintwatermark: this.orgprintwatermark
+                        printwatermark: this.printwatermark
                     }
                 };
-                
-                console.log(objAll)
+
                 $.ajax({
                     type: 'post',
                     url: ctx + '/policy/updatePolicyJsonFile',
@@ -972,15 +1099,15 @@
             this.getAllApprove();
         },
         watch:{
-            scrnwatermark: {
-                handler(newValue, oldValue) {
+            sbscrnwatermark: {
+                handler: function(newValue, oldValue) {
                     var colorVal = newValue.content.mycolor;
                     newValue.content.color = parseInt(colorVal.substring(1, colorVal.length), 16);
                 },
                 deep: true
             },
             sbfileoutcfg: {
-                handler(newValue, oldValue) {
+                handler: function(newValue, oldValue) {
                     var colorVal = newValue.content.scwatermark.mycolor;
                     newValue.content.color = parseInt(colorVal.substring(1, colorVal.length), 16);
                 },
@@ -1007,5 +1134,21 @@
                 $('.j-check-all').parent().click();
             }
         })
+        .on('mouseenter', '[tooltipnew]', function() {
+            var _this = $(this);
+            var msg = $(this)
+                .attr('tooltipnew')
+                .trim();
+
+            gd.showTip(this, msg, {
+                id: 'tips',//如果传一个id，将关闭之前相同id的tip
+                time: 0,//默认在3秒内关闭，可以自定义关闭时间，0为不自动关闭
+                position: 'right'//设置位置，默认自动
+            });
+            $(this).one('mouseleave', function() {
+                gd.closeTip(tips);
+            });
+        });
+
 </script>
 </body>

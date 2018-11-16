@@ -1,3 +1,6 @@
+.gd-tab-horizontal > div.gd-tab-content .gd-tab-item {
+  padding-top: 0px !important;
+}
 .gd-toolbar {
   background-color: #fff;
 }
@@ -11,10 +14,10 @@
   color: #fff;
 }
 .client-state.backlog {
-  background-color: #F5A623;
+  background-color: #58A5E3;
 }
 .client-state.onway {
-  background-color: #58A5E3;
+  background-color: #F5A623;
 }
 .client-state.refuse {
   background-color: red;
@@ -172,11 +175,10 @@ textarea {
 }
 #openWind .top {
   width: 860px;
-  height: 220px;
+  height: 150px;
   margin: 0 auto;
   background-color: #F7F7F9;
   color: #3B3B3B;
-  margin-top: 20px;
   padding: 15px 0px 15px 15px;
 }
 #openWind .top .title {
@@ -213,7 +215,8 @@ textarea {
 #openWind .flow .flowContent > label {
   display: inline-block;
   vertical-align: top;
-  width: 120px;
+  width: 130px;
+  margin-left: -11px;
 }
 #openWind .flow .flowContent > label .begin_bar,
 #openWind .flow .flowContent > label .default_bar,
@@ -242,15 +245,16 @@ textarea {
 #openWind .flow .flowContent > label .end_bar span {
   display: inline-block;
   width: 50px;
+  margin-top: 8px;
 }
 #openWind .flow .flowContent > label .default_bar > label {
-  background-image: url(../../../images/approve/step_show.png);
+  background-image: url(../../../images/approve/step_gray.png);
 }
 #openWind .flow .flowContent > label .end_bar > label {
   background-image: url(../../../images/approve/app_end.png);
 }
 #openWind .flow .flowContent > label .flow_line {
-  width: 65px;
+  width: 76px;
   height: 15px;
   display: inline-block;
   vertical-align: top;
@@ -259,9 +263,10 @@ textarea {
   border-bottom: 1px solid #eeeeee;
   background-color: #f2f2f2;
   margin-top: 17px;
+  margin-left: -5px;
 }
 #openWind .flow .flowContent > label.default-hover .default_bar label {
-  background-image: url(../../../images/approve/step_gray.png);
+  background-image: url(../../../images/approve/step_show.png);
 }
 #openWind .opinion {
   width: 860px;
@@ -280,6 +285,8 @@ textarea {
   height: 100%;
   display: inline-block;
   vertical-align: top;
+  margin-left: -11px;
+  border: 1px solid #F5F5F5;
 }
 #openWind i.icon-download:focus {
   color: #58A5E3;
@@ -290,25 +297,3 @@ textarea {
 #openWind a:focus {
   color: #58A5E3 !important;
 }
-/*
-.refuse{
-  display: inline-block;
-  width: 40px;
-  text-align: center;
-  height: 20px;
-  line-height: 20px;
-  background-color: red;
-  color: #fff;
-}
-.pass{
-  display: inline-block;
-  width: 40px;
-  text-align: center;
-  height: 20px;
-  line-height: 20px;
-  background-color: #38D1BF;
-  color: #fff;
-}
-i:focus{
-  color: #38D1BF;
-}*/

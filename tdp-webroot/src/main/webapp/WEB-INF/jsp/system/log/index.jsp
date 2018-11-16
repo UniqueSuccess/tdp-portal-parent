@@ -21,13 +21,16 @@
         .gd-table-wrapper{
             height: calc(100% - 56px);
         }
+        .gd-tab-horizontal{
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div id="app" class="gd-right-content" v-cloak>
     <div class="main-content" >
         <gd-tab style="height: 100%">
-            <gd-tab-item label="外发日志">
+            <gd-tab-item label="流转日志">
                 <gd-toolbar :config="outToolbarConfig"></gd-toolbar>
                 <gd-table :config="outTableConfig"></gd-table>
             </gd-tab-item>
@@ -35,6 +38,11 @@
                 <gd-toolbar :config="operToolbarConfig"></gd-toolbar>
                 <gd-table :config="operTableConfig"></gd-table>
             </gd-tab-item>
+            <%--写完了控制台登录日志，先不显示--%>
+            <%--<gd-tab-item label="登录日志">
+                <gd-toolbar :config="logoToolbarConfig"></gd-toolbar>
+                <gd-table :config="logoTableConfig"></gd-table>
+            </gd-tab-item>--%>
         </gd-tab>
     </div>
 </div>
@@ -93,7 +101,7 @@
                     {
                         name: 'ip',
                         head: 'IP地址',
-                        width: '100', //列宽
+                        // width: '300', //列宽
                         title: true
                     },
                     {
@@ -128,7 +136,6 @@
                         ],
                         render: function (cell, row, raw) {//自定义表格内容
                             var html = '';
-                            console.log(raw.fftype);
                             switch(raw.fftype) {
                                 case 2:
                                     html = '密文导出';
@@ -175,7 +182,7 @@
                 enableJumpPage: false, //启用跳页，默认false，可选
                 enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
                 enablePaging: true,//启用分页,默认true，可选
-                orderColumn: 'transferTime',//排序列
+                orderColumn: 'time',//排序列
                 orderType: 'desc',//排序规则，desc或asc,默认desc
                 columnResize: true, //启用列宽调，默认true，可选
                 //showFooter: false,//显示footer,默认为true
@@ -232,7 +239,80 @@
                         head: '时间',
                         title: true,
                         width: '20%',
-//                        orderable: true
+                        orderable: true
+                    }
+                ]
+            },
+            // 登录日志工具栏配置
+            logoToolbarConfig: [
+                {
+                    type: 'searchbox',
+                    placeholder: "用户名/IP",
+                    action: function (val) {
+                        gd.table('logoTable').reload(1, {order: val}, false);
+                    }
+                }
+            ],
+            // 登录表格配置
+            logoTableConfig: {
+                id: 'logoTable',//给table一个id,调用gd.tableReload('demoTable');可重新加载表格数据并保持当前页码，gd.tableReload('demoTable'，1)，第二个参数可在加载数据时指定页码
+                length: 50, //每页多少条,默认50，可选
+                curPage: 1, //当前页码，默认1，可选
+                lengthMenu: [10, 30, 50, 100], //可选择每页多少条，默认[10, 30, 50, 100]，可选
+                enableJumpPage: false, //启用跳页，默认false，可选
+                enableLengthMenu: true, //启用可选择每页多少条，默认true，可选
+                enablePaging: true,//启用分页,默认true，可选
+                orderColumn: 'time',//排序列
+                orderType: 'desc',//排序规则，desc或asc,默认desc
+                columnResize: true, //启用列宽调，默认true，可选
+                //showFooter: false,//显示footer,默认为true
+                //lazy: true,//懒加载数据，调用gd.table('id').reload()对表格数据进行加载,默认为false
+                //loading: true,//显示loading,默认为false
+                ajax: {
+                    //其它ajax参数同jquery
+                    url: ctx + '/systemLog/getSystemLogonLogInPage',
+                    //改变从服务器返回的数据给table
+                    dataSrc: function (data) {
+                        data.rows = data.rows.map(function (obj) {
+                            return [
+                                obj.userName || '--',
+                                obj.logOperateParam || '--',
+                                obj.ip || '--',
+                                obj.time || '--'
+                            ]
+                        });
+                        return data;
+                    },
+                    //请求参数
+                    data: {
+                        order: ''
+                    }
+                },
+                columns: [
+                    {
+                        name: 'userName',
+                        head: '操作人',
+                        title: true,
+                        width: '12%'
+                    },
+                    {
+                        name: 'logOperateParam',
+                        head: '操作详情',
+                        title: true,
+                        width: '40%'
+                    },
+                    {
+                        name: 'ip',
+                        head: 'IP地址',
+                        title: true,
+                        width: '10%'
+                    },
+                    {
+                        name: 'time',
+                        head: '时间',
+                        title: true,
+                        width: '20%',
+                        orderable: true
                     }
                 ]
             }

@@ -7,7 +7,6 @@ import cn.goldencis.tdp.core.dao.*;
 import cn.goldencis.tdp.core.entity.*;
 
 import org.apache.ibatis.session.RowBounds;
-import org.aspectj.weaver.ast.HasAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -65,7 +64,61 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
      * @return
      */
     public JSONArray getManagerNodes() {
-        JSONArray zNodes = toTreeJson(cmapper.getDeptarMentList(null, null, null, null, null), false);
+        JSONArray zNodes = new JSONArray();
+
+        //获取账户关联部门的关联对象集合
+        UserDepartmentDOCriteria udexample = new UserDepartmentDOCriteria();
+        List<UserDepartmentDO> userDepartmentList = udmapper.selectByExample(udexample);
+        List<Integer> deptIdList = new ArrayList<>();
+        //将集合转化为部门id的集合
+        for (UserDepartmentDO userDepartment : userDepartmentList) {
+            deptIdList.add(userDepartment.getDepartmentId());
+        }
+
+        //生成返回页面的部门树
+        if (deptIdList.size() > 0) {
+            //查询用户权限关联的部门对象集合
+            DepartmentDOCriteria example = new DepartmentDOCriteria();
+            example.createCriteria().andIdIn(deptIdList);
+            List<DepartmentDO> departmentList = mapper.selectByExample(example);
+
+            //将部门的部门树中包含的父系部门id放入Set中，利用Set去重，获取不重复的部门id集合，等待处理
+            Set<String> parentIdSet = new HashSet();
+            for (DepartmentDO department : departmentList) {
+                String[] parentIdArr = department.getTreePath().split(",");
+                for (String parentId : parentIdArr) {
+                    parentIdSet.add(parentId);
+                }
+            }
+
+            //去除空的字符串
+            if (parentIdSet.contains(ConstantsDto.EMPTY_STR)) {
+                parentIdSet.remove(ConstantsDto.EMPTY_STR);
+            }
+
+            //去除Set中，在部门集合中已经存在的id。
+            for (DepartmentDO department : departmentList) {
+                if (parentIdSet.contains(department.getId().toString())) {
+                    //集合中已经存在，从Set中去除
+                    parentIdSet.remove(department.getId().toString());
+                }
+            }
+
+            //Set中剩余的部门id，是用来补全部门树的，需要再次查询
+            if (parentIdSet.size() > 0 ) {
+                deptIdList.clear();
+                for (String parentId : parentIdSet) {
+                    deptIdList.add(Integer.parseInt(parentId));
+                }
+
+                //查询需补全部门树的部门列表
+                List<DepartmentDO> supplyList = mapper.selectByExample(example);
+                //添加到权限部门集合中
+                departmentList.addAll(supplyList);
+            }
+
+            zNodes = toTreeJson(departmentList, true);
+        }
         return zNodes;
     }
 
@@ -216,7 +269,7 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
      * @return
      */
     @Override
-    public List<DepartmentDO> getDeptarMentListByParent(Integer startNum, Integer pageSize, Integer pId, String treePath, String ordercase) {
+    public List<DepartmentDO> getDeptarMentListByParent(Integer startNum, Integer pageSize, Integer pId, String treePath, String ordercase, String searchstr) {
         RowBounds rowBounds = new RowBounds(startNum, pageSize);
 
         //获取当前登录账户权限对应的部门id集合
@@ -224,11 +277,22 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
 
         //通过父类id和父类treePath、和父类本身 查询子类集合
         DepartmentDOCriteria departmentDOCriteria = new DepartmentDOCriteria();
-        departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList);
-        departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList);
+        
+        if (!StringUtils.isEmpty(searchstr)) {
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList).andNameLike("%" + searchstr + "%");
+            departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList).andNameLike("%" + searchstr + "%");
+        } else {
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList);
+            departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList);
+        }
+        
         //含父类本身，但是不包含顶级部门
         if (pId != 1 && idList.contains(pId)) {
-            departmentDOCriteria.or().andIdEqualTo(pId);
+            if (!StringUtils.isEmpty(searchstr)) {
+                departmentDOCriteria.or().andIdEqualTo(pId).andNameLike("%" + searchstr + "%");
+            } else {
+                departmentDOCriteria.or().andIdEqualTo(pId);
+            }
         }
 
         List<DepartmentDO> departmentList = mapper.selectByExampleWithRowbounds(departmentDOCriteria, rowBounds);
@@ -285,17 +349,29 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
      * @return
      */
     @Override
-    public long getDeptarMentCountByParent(Integer pId, String treePath) {
+    public long getDeptarMentCountByParent(Integer pId, String treePath, String searchstr) {
         //获取当前登录账户权限对应的部门id集合
         List<Integer> idList = this.getLoginUserDepartmentIdList();
 
         //通过父类id和父类treePath、和父类本身 查询子类集合的总数量
         DepartmentDOCriteria departmentDOCriteria = new DepartmentDOCriteria();
-        departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList);
-        departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList);
+        if (!StringUtils.isEmpty(searchstr)) {
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList).andNameLike("%" + searchstr + "%");
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList).andNameLike("%" + searchstr + "%");
+            departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList).andNameLike("%" + searchstr + "%");
+        } else {
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList);
+            departmentDOCriteria.createCriteria().andParentIdEqualTo(pId).andIdIn(idList);
+            departmentDOCriteria.or().andTreePathLike(treePath).andIdIn(idList);
+        }
+
         //含父类本身，但是不包含顶级部门
         if (pId != 1 && idList.contains(pId)) {
-            departmentDOCriteria.or().andIdEqualTo(pId);
+            if (!StringUtils.isEmpty(searchstr)) {
+                departmentDOCriteria.or().andIdEqualTo(pId).andNameLike("%" + searchstr + "%");
+            } else {
+                departmentDOCriteria.or().andIdEqualTo(pId);
+            }
         }
 
         return mapper.countByExample(departmentDOCriteria);
@@ -357,7 +433,7 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
                 unknownGroup.put("id", department.getId());
                 unknownGroup.put("pId", department.getParentId() == -1 ? null : department.getParentId());
                 unknownGroup.put("name", department.getName());
-                unknownGroup.put("iconSkin", "tDepartment");
+                unknownGroup.put("icon", "icon-group");
                 unknownGroup.put("ParentDepartmentId", department.getParentId());
                 unknownGroup.put("treePath", department.getTreePath());
                 unknownGroup.put("open", true);
@@ -370,13 +446,13 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
                 obj.put("id", department.getId());
                 obj.put("pId", department.getParentId() == -1 ? null : department.getParentId());
                 obj.put("name", department.getName());
-                obj.put("iconSkin", "tDepartment");
+                obj.put("icon", "icon-group");
                 obj.put("ParentDepartmentId", department.getParentId());
                 obj.put("treePath",department.getTreePath());
                 obj.put("open", true);
                 obj.put("status", department.getStatus());
                 obj.put("policyId", department.getPolicyId());
-                obj.put("level", department.getId() == 1?0: StringUtils.levelNum(department.getTreePath()));
+                obj.put("level", department.getId() == 1 ? 0: StringUtils.levelNum(department.getTreePath()));
                 array.add(obj);
             }
         }
@@ -524,6 +600,7 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
             deptJson.put("open", true);
             deptJson.put("iconSkin", "tDepartment");
             deptJson.put("remark", department.getDepartmentRemark());
+            deptJson.put("level", department.getId() == 1 ? 0: StringUtils.levelNum(department.getTreePath()));
 
             if (departmentIdList != null && departmentIdList.contains(department.getId())) {
                 deptJson.put("checked",true);
@@ -626,7 +703,7 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
             if (ListUtils.isEmpty(list)) {
                 return;
             }
-            List<Map<String, String>> policyList = mapper.queryPolicyNameById(Arrays.asList(id));
+            List<Map<String, String>> policyList = mapper.queryPolicyNameById(Arrays.asList(newPolicyId));
             if (ListUtils.isEmpty(policyList)) {
                 return;
             }
@@ -637,11 +714,11 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
                 
                 @Override
                 public void run() {
-                    try {
+                    /*try {
                         Thread.sleep(15000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     //设置消息为策略消息
                     String message = "bdppolicy";
 
@@ -653,12 +730,17 @@ public class DepartmentServiceImpl extends AbstractBaseServiceImpl<DepartmentDO,
                     contentJson.put("url", policyList.get(0).get("path"));
                     contentJson.put("time", policyList.get(0).get("modify_time"));
                     String content = contentJson.toJSONString();
-
+                    String client = ListUtils.covertStringByList(list, null);
+                    System.out.println("####" + client);
+                    if (StringUtils.isEmpty(client)) {
+                        return;
+                    }
                     //使用消息缓存服务
-                    publisher.clientNotify(ListUtils.covertStringByList(list, null) ,message, content, type);
+                    publisher.clientNotify(client ,message, content, type);
                 }
             });
-          
+            //修改需要策略转换的用户
+            mapper.updateClientUserPolicy(list, newPolicyId);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -54,14 +54,22 @@ public class ApproveDetailController {
             //将流程细节集合转化为模型
             detailList = approveDetailService.convertDetailListToModel(detailList);
 
+            ApproveDetail approveDetail = null;
+            if (detailId != null) {
+
+                approveDetail = approveDetailService.getApproveDetailById(detailId);
+            }
+
             JSONObject resJson = new JSONObject();
             resJson.put("detailList", detailList);
             resJson.put("pointId", approveFlow.getPointId());
             resJson.put("detailId", detailId);
+            resJson.put("detailName", approveDetail != null ? approveDetail.getName() : "");
             resultMsg.setData(resJson);
             resultMsg.setResultMsg("获取流程环节模型成功");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         } catch (Exception e) {
+            e.printStackTrace();
             resultMsg.setData(e);
             resultMsg.setResultMsg("获取流程环节模型错误");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
@@ -73,6 +81,7 @@ public class ApproveDetailController {
 
     /**
      * 根据流程id，获取流程的全部细节
+     *
      * @param approveFlowId
      * @return
      */

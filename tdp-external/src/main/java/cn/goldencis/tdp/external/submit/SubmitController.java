@@ -56,7 +56,8 @@ public class SubmitController implements ServletContextAware {
                     "tranunique": "20181018133955",
                     "truename": "xielc",
                     "username": "xielc",
-                    "usrunique": "74b52de3-4dc5-4806-87b2-3897d5fb4c6b"
+                    "usrunique": "74b52de3-4dc5-4806-87b2-3897d5fb4c6b",
+                    "ip":
             }
      */
     @ResponseBody
@@ -109,6 +110,13 @@ public class SubmitController implements ServletContextAware {
             result.put("resultCode", ConstantsDto.RESULT_CODE_ERROR);
             result.put("resultMsg", "外发日志提交接口异常");
         }
+        return result;
+    }
+    @ResponseBody
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    public Map<String, Object> test( HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("resultCode", ConstantsDto.RESULT_CODE_TRUE);
         return result;
     }
 }

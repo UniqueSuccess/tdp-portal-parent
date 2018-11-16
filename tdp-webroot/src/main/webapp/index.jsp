@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ page language="java" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ page language="java" pageEncoding="UTF-8" %>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>金盾TDP</title>
@@ -12,7 +12,7 @@
     <c:set var="ctxImg" value="${pageContext.request.contextPath}/skin/default/images"/>
     <c:set var="version" value="1"/>
     <link rel="icon" href="${ctxImg}/logo.ico" type="image/x-ico"/>
-    <link rel="stylesheet" href="${ctxJs}/plugins/gdui/css/gdui.min.css?v=${version}" />
+    <link rel="stylesheet" href="${ctxJs}/plugins/gdui/css/gdui.min.css?v=${version}"/>
     <script type="text/javascript" src="${ctxJs}/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="${ctxJs}/plugins/vue.min.js?v=${version}"></script>
     <script type="text/javascript" src="${ctxJs}/plugins/gdui/js/gdui.min.js?v=${version}"></script>
@@ -22,13 +22,14 @@
     <style>
         /*------登录页面的背景图-------*/
         .gd-login .gd-login-cover-box img {
-            -webkit-transform: perspective(2000px) rotateX(72deg) translateX(-50%)!important;
-            transform: perspective(2000px) rotateX(72deg) translateX(-50%)!important;
+            -webkit-transform: perspective(2000px) rotateX(72deg) translateX(-50%) !important;
+            transform: perspective(2000px) rotateX(72deg) translateX(-50%) !important;
         }
-        /* .gd-login .gd-login-cover-box .gd-login-cover-item {
-            background:url("${ctxImg}/login/login_bg.png");
+
+        .gd-login .gd-login-cover-box .gd-login-cover-item {
+            background: url("${ctxImg}/login/login_bg.png");
             background-size: cover;
-        } */
+        }
 
     </style>
     <script>
@@ -62,10 +63,10 @@
         data: {
             loginConfig: [{
                 name: 'tdp',
-                api: ctx+'/login',
+                api: ctx + '/login',
                 logo: ctxImg + '/login/login_ra.png',
                 cover: ctxImg + '/login/tdp_cover.jpg',
-                href: ctx+'/homepage/index?navId=1',
+                href: ctx + '/pathDispatch',
                 encrypt: function (data) {
                     data.password = encrypt(data.password).toUpperCase();
                     data[_csrf] = $(".csrf_name").val();
@@ -75,7 +76,7 @@
                     console.log(data);
 
                 },
-                error:function(err){
+                error: function (err) {
                     console.log(err);
 
                 }

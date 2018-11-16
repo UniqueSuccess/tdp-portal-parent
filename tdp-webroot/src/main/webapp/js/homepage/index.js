@@ -8,8 +8,8 @@ var potentRiskChart = ''//潜在风险图表
 var potentRiskOpt = ''//潜在风险图表配置
 
 
-var videoMoveChart = '';//视频流转
-var videoMoveOpt = '';//视频流转配置
+var videoMoveChart = '';//文件流转
+var videoMoveOpt = '';//文件流转配置
 var submitDate = 'day';//时间
 var startDate = "";
 var endDate = "";
@@ -17,22 +17,22 @@ var reportData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 var dataX = ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"];//图表数组
 
 
-var personMoveChart = '';//人员视频流转
-var personMoveOpt = '';//人员视频流转配置
+var personMoveChart = '';//人员文件流转
+var personMoveOpt = '';//人员文件流转配置
 
-var deptMoveChart = '';//部门视频流转分布
-var deptMoveOpt = '';//部门视频流转分布
+var deptMoveChart = '';//部门文件流转分布
+var deptMoveOpt = '';//部门文件流转分布
 
 
 $(function () {
     //潜在风险
     potentRiskInfo();
-    //视频流转
+    //文件流转
     videoMove();
     getRistInfo("day", "noall");
     //部门流转
     deptMove();
-    //人员视频流转top10
+    //人员文件流转top10
     personMove();
     getAllData();//获取用户数据先不用
     initEvents(); //初始化事件
@@ -45,7 +45,7 @@ $(function () {
 function initEvents() {
     //窗口缩放调整图表
     $('body')
-    //视频流转图表切换
+    //文件流转图表切换
         .on('click', '.data-select .right span', function () {
             $(this).addClass('color-white');
             $(this).siblings("span").removeClass('color-white')
@@ -120,12 +120,12 @@ function initEvents() {
 
         location.href = ctx + '/report/index?deptid=' + escape(params.data.id)+'&deptname='+escape(params.data.name);
     });
-    //视频流转
+    //文件流转
     videoMoveChart.on('click', function (params) {
 
-        if(params.seriesName == "视频导出"){
+        if(params.seriesName == "文件导出"){
             location.href = ctx + '/report/index?video=OPT'
-        }else if(params.seriesName == "视频外发"){
+        }else if(params.seriesName == "文件外发"){
             location.href = ctx + '/report/index?video=OUTCFG'
         }else{
             location.href = ctx + '/report/index'
@@ -145,10 +145,10 @@ function getAllData() {
                 if (msg.resultCode == 0) {
                     var x = 0;
                     var y = 0;
-                    for (var i = 1; i < 3; i++) {
+                    for (var i = 1; i < 4; i++) {
                         x += Number(msg.data[i]);
                     }
-                    y = allConnt * 2;
+                    y = allConnt * 3;
                     var num = ((Number(((1 - (x / y)).toFixed(2)) * 100)) / 100);
                     if (x == 0) {
                         potentRiskOpt.series[0].data = [1];
@@ -223,35 +223,58 @@ function getAllData() {
             gd.showError('审批已审批连接服务器失败');
         }
     });
-    //部门视频流转分布
+    //部门文件流转分布
     getAjax(ctx + '/report/countVideoTransferByDepartment', '', function (msg) {
         if (msg.resultCode == 0) {
             var legend = new Array();
             var tempData = new Array();
-            for (var i = 0; i < msg.data.length; i++) {
+            for (var k = 0; k < msg.data.length - 1; k++) {//外层循环控制排序趟数
+                for (var g = 0; g < msg.data.length - 1 - k; g++) {//内层循环控制每一趟排序多少次
+                    if (msg.data[g].count < msg.data[g + 1].count) {
+                        var temp = msg.data[g];
+                        msg.data[g] = msg.data[g + 1];
+                        msg.data[g + 1] = temp;
+                    }
+                }
+            }
+            for (var i = 0; i < 5; i++) {
+                var name = null;
+                var count = null;
+                name = msg.data[i].name;
+                count = msg.data[i].count;
                 var deptData = new Object();
-                legend.push(msg.data[i].name);
-                deptData.value = msg.data[i].count;
-                deptData.name = msg.data[i].name;
+                if (name.toString().length > 8) {
+                    name = name.substring(0, 7) + "... " + count;
+                } else {
+                    for (var j = 0; j < (8 - (msg.data[i].name.toString().length)); j++) {
+                        name += "　";
+                    }
+                    name += count;
+                }
+
+                legend.push(name);
+                deptData.value = count;
+                deptData.name = name;
                 deptData.id = msg.data[i].id;
                 tempData.push(deptData);
             }
             if (getObjArrayCount(tempData) == 0) {
-                 $('#dept_video').addClass('vedio_export_empty');
-                 return;
+                $('#dept_video').addClass('vedio_export_empty');
+                return;
             }
-            deptMoveOpt.series[1].data[0].label.normal.formatter = "共"+getObjArrayCount(tempData).toString()+"条";
+            deptMoveOpt.series[1].data[0].label.normal.formatter = getObjArrayCount(tempData).toString();
             deptMoveOpt.series[0].data = tempData;
             deptMoveOpt.legend.data = legend;
             deptMoveChart.setOption(deptMoveOpt);
         } else {
-            gd.showError('部门视频流转分布连接服务器失败');
+            gd.showError('部门文件流转分布连接服务器失败');
         }
     });
 
     //文件流转类型
     getAjax(ctx + "/report/getFileTypeCount", '', function (msg) {
         if (msg.resultCode == 0) {
+            var fileType = ['WORD文档', 'PDF文档', '演示文稿', '电子表格']
             var legend = new Array();
             var tempData = new Array();
             var doc = msg.data.doc;
@@ -259,12 +282,17 @@ function getAllData() {
             var ppt = msg.data.ppt;
             var xls = msg.data.xls;
             legend.push(doc, pdf, ppt, xls);
+            var legendMax = Math.max.apply(Math, legend);
             for (var i = 0; i < legend.length; i++) {
-                tempData.push(getArrayCount(legend));
+                tempData.push(legendMax * 2);
             }
-            personMoveOpt.yAxis[1].data = legend;
+            sort(legend, fileType);
+            personMoveOpt.yAxis[0].data = fileType;
             personMoveOpt.series[0].data = legend;
             personMoveOpt.series[1].data = tempData;
+            personMoveOpt.series[1].label.normal.formatter = function (params) {
+                return legend[params.dataIndex] === 0 ? '-' : legend[params.dataIndex];
+            };
             if (getArrayCount(legend) == 0) {
                 $('#file_type').addClass('vedio_export_empty');
                 return;
@@ -275,10 +303,41 @@ function getAllData() {
             gd.showError('文件类型获取连接服务器失败');
         }
     });
-
 }
 
-//视频流转方法
+function sort(arr, arr2) {
+    for (var j = 0; j < arr.length - 1; j++) {
+        //两两比较，如果前一个比后一个大，则交换位置。
+        for (var i = 0; i < arr.length - 1 - j; i++) {
+            if (arr[i] > arr[i + 1]) {
+                var temp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = temp;
+                var temp2 = arr2[i];
+                arr2[i] = arr2[i + 1];
+                arr2[i + 1] = temp2;
+
+            }
+        }
+    }
+}
+
+function strlen(str) {
+    var len = 0;
+    for (var i = 0; i < str.length; i++) {
+        var c = str.charCodeAt(i);
+        //单字节加1
+        if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+            len++;
+        }
+        else {
+            len += 2;
+        }
+    }
+    return len;
+}
+
+//文件流转方法
 function getRistInfo(day, isAll) {
 
     videoMoveChart.clear();
@@ -357,12 +416,12 @@ function getRistInfo(day, isAll) {
                             if (day == 'day') {
                                 //暂时保留
                                 if ((getArrayCount(msg.data) + getArrayCount(msgIn.data)) == 0) {
-                                    // $('.no-data').show();
-                                    // $('.video-move').hide();
-                                    // return;
+                                    $('.no-data').show();
+                                    $('.video-move').hide();
+                                    return;
                                 } else {
-                                    // $('.video-move').show();
-                                    // $('.no-data').hide();
+                                    $('.video-move').show();
+                                    $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data, 1) && judgeNum(msgIn.data, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -382,12 +441,12 @@ function getRistInfo(day, isAll) {
                                 videoMoveOpt.xAxis[0].data = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"];
                             } else if (day == 'week') {
                                 if ((getArrayCount(msg.data.countList) + getArrayCount(msgIn.data.countList)) == 0) {
-                                    // $('.no-data').show();
-                                    // $('.video-move').hide();
-                                    // return;
+                                    $('.no-data').show();
+                                    $('.video-move').hide();
+                                    return;
                                 } else {
-                                    // $('.video-move').show();
-                                    // $('.no-data').hide();
+                                    $('.video-move').show();
+                                    $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data.countList, 1) && judgeNum(msgIn.data.countList, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -405,12 +464,12 @@ function getRistInfo(day, isAll) {
                                 videoMoveOpt.xAxis[0].data = msg.data.dateList;
                             } else if (day == 'month') {
                                 if ((getArrayCount(msg.data.countList) + getArrayCount(msgIn.data.countList)) == 0) {
-                                    // $('.no-data').show();
-                                    // $('.video-move').hide();
-                                    // return;
+                                    $('.no-data').show();
+                                    $('.video-move').hide();
+                                    return;
                                 } else {
-                                    // $('.video-move').show();
-                                    // $('.no-data').hide();
+                                    $('.video-move').show();
+                                    $('.no-data').hide();
                                 }
                                 if (judgeNum(msg.data.countList, 1) && judgeNum(msgIn.data.countList, 1)) {
                                     videoMoveOpt.yAxis[0].splitNumber = 1;
@@ -429,15 +488,15 @@ function getRistInfo(day, isAll) {
                             }
                             videoMoveChart.setOption(videoMoveOpt);
                         } else {
-                            gd.showError('视频流转获取图表数据失败');
+                            gd.showError('文件流转获取图表数据失败');
                         }
                     });
                 } else {
-                    gd.showError('视频流转获取图表数据失败');
+                    gd.showError('文件流转获取图表数据失败');
                 }
             });
         } else {
-            gd.showError('视频流转获取图表数据失败');
+            gd.showError('文件流转获取图表数据失败');
         }
     });
 
@@ -516,7 +575,7 @@ potentRiskOpt = {
 
         itemStyle: {
             opacity: 0.95,
-            shadowBlur: 50,
+            shadowBlur: 0,
             shadowColor: 'rgba(0, 0, 0, 0.4)'
         },
 
@@ -539,25 +598,34 @@ potentRiskOpt = {
     }]
 }
 
-//视频流转
+//文件流转
 function videoMove() {
     videoMoveChart = echarts.init(document.getElementById('video_move'));
 
 }
 
-//视频流转
+//文件流转
 videoMoveOpt = {
     color: ['#FFBF2D'],
     tooltip: {
         trigger: 'axis',
-        // formatter:'{a}: {c}条</br>{a1}: {c1}条</br>{b}'
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        },
+        formatter: function (params) {
+            var html = '';
+            html += "<div style='display: inline-block;margin-right: 10px'>" + params[0].axisValueLabel + "</div>" + "<span style='font-size: 18px'>" + (params[0].data + params[1].data) + "</span>条</br>";
+            html += "<span style=\"display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:#37AAE3;\"></span>" + params[0].seriesName + "&nbsp;&nbsp;&nbsp;" + params[0].data + "</br>";
+            html += "<span style=\"display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:#6DCCF8;\"></span>" + params[1].seriesName + "&nbsp;&nbsp;&nbsp;" + params[1].data + "";
+            return html;
+        }
     },
     legend: {
         orient: "horizontal",
         data: ['外发', '导出'],
         itemWidth: 20,
         itemHeight: 12,
-        right: 260,
+        right: 268,
         top: "-5",
         selectedMode: false,
         icon: 'circle',
@@ -630,18 +698,20 @@ videoMoveOpt = {
         {
             name: '外发',
             type: 'bar',
+            stack: "流转",
             barWidth: "auto",
             barMinHeight: 1,
             barGap: "10%",
             itemStyle: {
                 normal: {
-                    color: new echarts.graphic.LinearGradient(
+                    /*color: new echarts.graphic.LinearGradient(
                         0, 0, 0, 1,
                         [
-                            {offset: 0, color: '#6DCCF8'},
-                            {offset: 1, color: '#6DCCF8'}
+                            {offset: 0, color: '#37AAE3'},
+                            {offset: 1, color: '#37AAE3'}
                         ]
-                    )
+                    )*/
+                    color: "#37AAE3"
                 }
             },
             data: []
@@ -649,18 +719,20 @@ videoMoveOpt = {
         {
             name: '导出',
             type: 'bar',
+            stack: "流转",
             barWidth: "auto",
             barMinHeight: 1,
             barGap: "10%",
             itemStyle: {
                 normal: {
-                    color: new echarts.graphic.LinearGradient(
+                    /*color: new echarts.graphic.LinearGradient(
                         0, 0, 0, 1,
                         [
-                            {offset: 0, color: '#37AAE3'},
-                            {offset: 1, color: '#37AAE3'}
+                            {offset: 0, color: '#6DCCF8'},
+                            {offset: 1, color: '#6DCCF8'}
                         ]
-                    )
+                    )*/
+                    color: "#6DCCF8"
                 }
             },
             data: []
@@ -685,12 +757,19 @@ deptMoveOpt = {
     /*title:{
         text:158,
         subtext:"总数",
-        x: 'center',
+        x: '35%',
         y: 'center',
+        textAlign: 'center',
+        textStyle: {
+            color: "#000",
+            textAlign: 'center',
+            fontSize: 38 * 0.5,
+            fontWeight: 'bold'
+        },
     },*/
     tooltip: {
         trigger: 'item',
-        formatter: "{b}: {c} ({d}%)"
+        formatter: "{b} ({d}%)"
     },
     legend: {
         type: "scroll",
@@ -702,22 +781,17 @@ deptMoveOpt = {
         itemHeight: 12,
         itemGap: 20,
         textStyle: {
-            fontSize: 14,
+            fontSize: 14
         },
-        formatter: function (parse) {
-            if (parse.toString().length > 7) {
-                parse = parse.substring(0, 6) + '...';
-            }
-            return parse;
-        },
+        formatter: '{name}',
         data: ["直接访问", "邮件营销"]
     },
     series: [
         {
             name: '访问来源',
             type: 'pie',
-            center: ['38%', '50%'],
-            radius: ['45%', '60%'],
+            center: ['35%', '50%'],
+            radius: ['38%', '50%'],
             avoidLabelOverlap: false,
             label: {
                 normal: {
@@ -744,8 +818,8 @@ deptMoveOpt = {
         {
             name: '内圈',
             type: 'pie',
-            center: ['38%', '50%'],
-            radius: [0, '45%'],
+            center: ['35%', '50%'],
+            radius: [0, '38%'],
             avoidLabelOverlap: false,
             hoverAnimation: false,
             cursor: "default",
@@ -768,8 +842,8 @@ deptMoveOpt = {
                         formatter: "182",
                         textStyle: {
                             color: '#232D3B',
-                            fontSize: 32,
-                            fontWeight: 'bold'
+                            fontSize: 28,
+                            // fontWeight: 'bold'
                         }
                     }
                 }
@@ -794,21 +868,26 @@ personMoveOpt = {
         textStyle: {
             color: '#F0F0F0',
         },
-        formatter: '{b0}: {c0}条'
+        formatter: '{b0}: {c0}条',
+        axisPointer: {
+            lineStyle: {
+                width: 0,
+            }
+        }
 
     },
     grid: {
         top: '0%',
-        left: '3%',
-        right: '30',
+        left: '5%',
+        right: '8%',
         bottom: '5%',
         containLabel: true
     },
     yAxis: [
         {
             type: 'category',
-            show: false,
-            data: ['Word', 'PDF', 'PPT', 'Excel'],
+            show: true,
+            data: ['WORD文档', 'PDF文档', '演示文稿', '电子表格'],
             axisTick: {
                 show: false
             },
@@ -819,17 +898,17 @@ personMoveOpt = {
                 }
             },
             axisLabel: {
-                show: false,
+                show: true,
                 inside: false,
                 textStyle: {
-                    color: '#bac0c0',
+                    color: '#666666',
                     fontWeight: 'normal',
-                    fontSize: '12',
+                    fontSize: '16',
                 }
             }
 
         },
-        {
+        /*{
             type: 'category',
             axisTick: {
                 show: false
@@ -844,7 +923,7 @@ personMoveOpt = {
                 }
             },
             axisLabel: {
-                show: true,
+                show: false,
                 color: '#666',
                 interval: '0',
                 fontSize: '18',
@@ -853,10 +932,11 @@ personMoveOpt = {
             offset: 0,
             data: [20, 30, 40, 50],
             zLevel: '3'
-        }],
+        }*/
+    ],
     xAxis: [{
         type: 'value',
-        show: false,
+        // show: false,
         axisTick: {
             show: false
         },
@@ -874,12 +954,14 @@ personMoveOpt = {
         },
         axisLabel: {
             show: false,
+            inside: false,
             textStyle: {
-                color: '#bac0c0',
+                color: '#666666',
                 fontWeight: 'normal',
-                fontSize: '12',
-            },
-        }
+                fontSize: '16',
+            }
+        },
+        data: ['WORD文档', 'PDF文档', '演示文稿', '电子表格'],
     }],
     series: [
         {
@@ -890,9 +972,9 @@ personMoveOpt = {
             label: {
                 normal: {
                     color: '#666666',
-                    show: true,
+                    show: false,
                     // position: 'center',
-                    position: [0, '-130%'],
+                    position: ["50%", '-130%'],
                     textStyle: {
                         fontSize: 14,
                         fontWeight: 'bold',
@@ -935,16 +1017,20 @@ personMoveOpt = {
                     color: '#EBF0F2'
                 }
             },
-            markLine: {
-                silent: false,
-                lineStyle: {
-                    emphasis: {
-                        show: false,
-                        width: 0
+            label: {
+                normal: {
+                    show: true,
+                    position: 'right',
+                    color: '#666',
+                    interval: '0',
+                    fontSize: '18',
+                    formatter: function (params) {
+                        return 0;
+                        // return data1[params.dataIndex]===0?'-':data1[params.dataIndex];
                     }
                 }
             },
-            z: 1,
+            z: -12,
             data: [50, 50, 50, 50],
         },
     ]

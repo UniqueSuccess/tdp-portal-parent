@@ -69,10 +69,7 @@ public class ApproveOpenController {
 //                approveFlowService.isNeedApprove(approveFlows);
 
             resultMsg.setRows(approveFlows);
-            resultMsg.setRecordsFiltered(count);
-            resultMsg.setRecordsTotal(count);
-            resultMsg.setExportstart(start);
-            resultMsg.setExportlength(length);
+            resultMsg.setTotal(count);
             resultMsg.setResultMsg("获取审批流程列表成功");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
         } catch (Exception e) {

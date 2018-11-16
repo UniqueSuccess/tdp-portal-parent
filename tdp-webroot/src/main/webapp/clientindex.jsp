@@ -12,7 +12,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <head>
-    <title>金盾VDP</title>
+    <title>申请进度</title>
     <c:set var="ctx" value="${pageContext.request.contextPath}"/>
     <c:set var="ctxJs" value="${pageContext.request.contextPath}/js"/>
     <c:set var="ctxCss" value="${pageContext.request.contextPath}/skin/default/css"/>
@@ -30,6 +30,13 @@
         .wind-row{
             padding: 6px 0;
             position: relative;
+        }
+        .wind-label {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+            font-size: 14px;
+            padding: 0 5px;
         }
     </style>
     <script>
@@ -115,7 +122,7 @@
             </div>
             <div class="wind-row">
                 <label for="">接收方信息：<span class="text-ellipsis w150 inline-block text-top"
-                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.recv}}</span></label>
+                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.receiver}}</span></label>
                 <!--<label for="">禁止截屏：{{if flowInfo.policyParam.forbidScreenShot == 1}} 是 {{else}} 否 {{/if}}</label>-->
             </div>
             <div class="wind-row">
@@ -150,7 +157,7 @@
             </div>
             <div class="wind-row">
                 <label for="">接收方信息：<span class="text-ellipsis w300 inline-block text-top"
-                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.recv}}</span></label>
+                                          title="{{flowInfo.policyParam.recv}}">{{flowInfo.policyParam.receiver}}</span></label>
             </div>
             <div class="wind-row">
                 <label for="">申请人：{{applicantName}}</label>

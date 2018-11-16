@@ -13,7 +13,7 @@
   .cell:nth-child(1) {
     width: calc(~"25% - 20px");
     //min-width: 432px;
-    margin: 0px 20px;
+    margin-right: 20px;
     position: relative;
     .cell-top {
       width: 100%;
@@ -42,8 +42,8 @@
       text-align: center;
       .cell-bottom-cell {
         display: inline-block;
-        width: calc(50% - 3px);
-        height: 100px;
+        width: calc(33% - 3px);
+        height: 70px;
         text-align: center;
         color: #666666;
         & > i {
@@ -59,7 +59,7 @@
           font-size: 12px;
           color: #999999;
           letter-spacing: 0;
-          line-height: 50px;
+          line-height: 28px;
         }
       }
       .cell-bottom-cell:nth-child(1) {
@@ -71,15 +71,15 @@
         //color: #19C0F3;
       }
       .cell-bottom-cell:nth-child(3) {
-        color: #FFBF2D;
+        border-left: 1px solid #EEEEEE;
+        //color: #FFBF2D;
       }
     }
   }
 
   .cell:nth-child(2) {
     position: relative;
-    width: calc(~"75% - 40px");
-    margin-right: 20px;
+    width: calc(~"75%");
     #video_move {
       height: calc(100% - 40px);
     }
@@ -138,22 +138,22 @@
   }
   .cell:nth-child(1) {
     width: calc(~"25% - 20px");
-    margin: 0px 20px;
+    margin-right: 20px;
     .content {
       text-align: center;
       padding-top: 44px;
       height: calc(~"100% - 90px");
       .content-cell {
-        width: calc(~"50% - 20px");
+        width: calc(50% - 20px);
         max-width: 160px;
-        min-height: 110px;
-        height: calc(~"50% - 25px");
+        min-height: 100px;
+        height: calc(50% - 47px);
         text-align: center;
         display: inline-block;
         color: #fff;
-        padding-top: 14px;
+        padding-top: 24px;
         .num {
-          font-size: 48px;
+          font-size: 46px;
           cursor: pointer;
         }
         .title {
@@ -179,7 +179,7 @@
     }
   }
   .cell:nth-child(2) {
-    width: calc(~"75% - 20px");
+    width: calc(~"75%");
 
     height: calc(~"100% - 20px");
     background-color: #F7F7F9;
@@ -191,19 +191,18 @@
       height: calc(~"100%");
       margin-right: 20px;
       #dept_video {
-        height: calc(~"100% - 40px");
+        height: calc(~"100% - 44px");
       }
     }
     .cell-right {
       position: relative;
       background-color: #fff;
       float: left;
-      width: calc(~"50% - 20px");
+      width: calc(~"50%");
       //min-width: 395px;
       height: calc(~"100%");
-      margin-right: 20px;
       #file_type {
-        height: calc(~"100% - 40px");
+        height: calc(~"100% - 44px");
       }
       span {
         position: absolute;

@@ -1,5 +1,7 @@
 package cn.goldencis.tdp.common.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,5 +24,13 @@ public class ListUtils {
             split = space;
         }
         return String.join(split, list);
+    }
+
+    public static boolean contain(String type, String types) {
+        List list = Arrays.asList(types.split(";"));
+        if (list.contains(type)) {
+            return true;
+        }
+        return false;
     }
 }

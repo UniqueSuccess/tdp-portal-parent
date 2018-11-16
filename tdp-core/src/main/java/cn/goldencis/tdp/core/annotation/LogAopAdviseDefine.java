@@ -1,5 +1,6 @@
 package cn.goldencis.tdp.core.annotation;
 
+import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.common.utils.SysContext;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.entity.OperationLogDO;
@@ -8,6 +9,7 @@ import cn.goldencis.tdp.core.entity.UserDO;
 import cn.goldencis.tdp.core.service.IOperationLogService;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -79,6 +82,7 @@ public class LogAopAdviseDefine {
                 UserDO user = GetLoginUser.getLoginUser();
                 userName = user.getUserName();
                 userCname = user.getName();
+                
             }
             HttpServletRequest request = SysContext.getRequest();
             String ip = NetworkUtil.getIpAddress(request);
@@ -103,16 +107,18 @@ public class LogAopAdviseDefine {
                 detail = String.format("%s【%s】中执行【%s】操作失败：【%s】，错误信息为【%s】", userCnameStr, module, operation,
                         logOperateParam, errorMsg);
             }
-            OperationLogDO log = new OperationLogDO();
-            log.setIp(ip);
-            log.setLogOperateParam(detail);
-            log.setLogPage(module);
-            log.setTime(dateTime);
-            log.setUserName(userName);
-            log.setLogType(pageLog.type().value());
-            log.setLogDesc(String.format("%s invoke", joinPoint.getSignature().toShortString()));
-            logService.create(log);
-            logger.info("{}--{}-{}---user is {}", module, operation, logOperateParam, userName);
+            if(!StringUtil.isEmpty(userName)) {
+                OperationLogDO log = new OperationLogDO();
+                log.setIp(ip);
+                log.setLogOperateParam(detail);
+                log.setLogPage(module);
+                log.setTime(dateTime);
+                log.setUserName(userName);
+                log.setLogType(pageLog.type().value());
+                log.setLogDesc(String.format("%s invoke", joinPoint.getSignature().toShortString()));
+                logService.create(log);
+                logger.info("{}--{}-{}---user is {}", module, operation, logOperateParam, userName);
+            }
         } catch (Exception ex) {
             logger.error("create pageLog error,message is {}", ex.getMessage());
         }
@@ -130,8 +136,18 @@ public class LogAopAdviseDefine {
                         .getMethod("get" + field.substring(0, 1).toUpperCase() + field.substring(1));
                 value = getMethod.invoke(value);
             }catch(NoSuchMethodException exception){
-                Method getMethod = value.getClass().getMethod(field);
-                value = getMethod.invoke(value);
+                try {
+                    Method getMethod = value.getClass().getMethod(field);
+                    value = getMethod.invoke(value);
+                } catch (Exception e) {
+                    try {
+                        if (value instanceof net.sf.json.JSONObject) {
+                            value = ((net.sf.json.JSONObject) value).get(field);
+                        }
+                    } catch (Exception e2) {
+                    }
+                    
+                }
             }
         }
         return value;

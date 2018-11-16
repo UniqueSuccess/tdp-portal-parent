@@ -34,6 +34,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
 
     /**
      * 添加水印日志
+     *
      * @param watermark
      */
     @Override
@@ -44,6 +45,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
 
     /**
      * 根据水印日志id，更新水印日志
+     *
      * @param watermark
      */
     @Override
@@ -55,6 +57,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
 
     /**
      * 根据水印日志的id获取水印日志信息
+     *
      * @param logId 水印日志id
      * @return
      */
@@ -73,6 +76,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
 
     /**
      * 扫描图片识别logId
+     *
      * @param cmdStr 需要执行的命令
      * @return
      */
@@ -83,7 +87,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
         BufferedReader brStat = null;
         String str = null;
         try {
-            String[] cmd = new String[] { "sh", "-c", cmdStr};
+            String[] cmd = new String[]{"sh", "-c", cmdStr};
             Process process = Runtime.getRuntime().exec(cmd);
             is = process.getInputStream();
             isr = new InputStreamReader(is);
@@ -117,7 +121,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
         String resStr;
         String[] logIdArr = null;
         try {
-            String[] cmd = new String[] { "python3", "/gdsoft/soft/stp.py", imgPath};
+            String[] cmd = new String[]{"python3", "/gdsoft/soft/stp.py", imgPath};
             Process process = Runtime.getRuntime().exec(cmd);
             is = process.getInputStream();
             isr = new InputStreamReader(is);
@@ -126,7 +130,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
             //处理识别返回信息
             if (resStr != null && resStr.length() > 2) {
                 String arrStr = resStr.substring(1, resStr.length() - 1);
-                arrStr = arrStr.replace("'","");
+                arrStr = arrStr.replace("'", "");
                 logIdArr = arrStr.split(",");
                 for (int i = 0; i < logIdArr.length; i++) {
                     logIdArr[i] = "s" + logIdArr[i].trim();
@@ -156,7 +160,7 @@ public class ScrnwatermarkLogImpl extends AbstractBaseServiceImpl<ScrnwatermarkL
 
     @Override
     public ScrnwatermarkLog getScrnwatermarkLogByLast32LogId(String logId) {
-        if (logId.length() > 32 ) {
+        if (logId.length() > 32) {
             logId = "%" + logId.substring(logId.length() - 32);
             ScrnwatermarkLogCriteria example = new ScrnwatermarkLogCriteria();
             example.createCriteria().andScrnwatermarkIdLike(logId);

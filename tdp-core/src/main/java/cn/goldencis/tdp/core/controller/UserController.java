@@ -86,7 +86,7 @@ public class UserController implements ServletContextAware {
         } catch (Exception e) {
             resultMsg.setResultMsg("用户列表获取错误！");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
-            resultMsg.setData(e);
+            e.printStackTrace();
         }
         return resultMsg;
     }
@@ -117,6 +117,7 @@ public class UserController implements ServletContextAware {
                 user.setPassword(null);
             }
             userService.addOrUpdateUser(user, departmentListStr, navigationListStr);
+            cacheManager.getCache("loginUser").clear();
 
             resultMsg.setResultMsg("账户更新成功！");
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
@@ -148,6 +149,7 @@ public class UserController implements ServletContextAware {
                 userService.deleteUser(user);
                 resultMsg.setResultMsg("账户删除成功！");
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+                cacheManager.getCache("loginUser").clear();
             }
         } catch (Exception e) {
             resultMsg.setResultMsg("账户删除错误！");
@@ -273,11 +275,11 @@ public class UserController implements ServletContextAware {
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
                 return resultMsg;
             }
-            if (!preUser.getPassword().equals(prePassword)) {
+            /*if (!preUser.getPassword().equals(prePassword)) {
                 resultMsg.setResultMsg("原密码不正确");
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
                 return resultMsg;
-            }
+            }*/
 
             //如果修改的密码为空，则认为不对密码进行修改
             if (StringUtil.isEmpty(user.getPassword())) {

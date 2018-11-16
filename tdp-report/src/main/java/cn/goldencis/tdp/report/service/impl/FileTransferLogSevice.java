@@ -1,30 +1,39 @@
 package cn.goldencis.tdp.report.service.impl;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.goldencis.tdp.common.utils.DateUtil;
+import cn.goldencis.tdp.common.utils.ListUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.entity.ChildNodeDO;
 import cn.goldencis.tdp.core.entity.ChildNodeDOCriteria;
 import cn.goldencis.tdp.core.entity.DepartmentDO;
+import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.report.entity.TFileTransferLogCriteria;
 import cn.goldencis.tdp.report.entity.VideoTransferLogDOCriteria;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.goldencis.tdp.report.dao.TFileTransferLogMapper;
 import cn.goldencis.tdp.report.entity.TFileTransferLog;
 import cn.goldencis.tdp.report.service.IFileTransferLogSevice;
+
 import org.springframework.util.StringUtils;
 
 @Service
 public class FileTransferLogSevice implements IFileTransferLogSevice {
     @Autowired
     private TFileTransferLogMapper mapper;
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
 
     @Override
     public List<TFileTransferLog> queryFileTransferLog(Map<String, Object> params) {
@@ -214,6 +223,30 @@ public class FileTransferLogSevice implements IFileTransferLogSevice {
         example.setOrderByClause("transfer_time DESC");
 
         return example;
+    }
+
+    @Transactional
+    @Override
+    public void deleteFileTransferLog(Date clearDate) {
+        TFileTransferLogCriteria example = new TFileTransferLogCriteria();
+        example.createCriteria().andTransferTimeLessThan(clearDate);
+        List<TFileTransferLog> list = mapper.selectByExample(example);
+        mapper.deleteByExample(example);
+        taskExecutor.execute(() -> {
+            if (!ListUtils.isEmpty(list)) {
+                list.stream().filter(log -> !StringUtil.isEmpty(log.getFilePath()) && log.getFilePath().startsWith(PathConfig.VIDEOTRANSFERLOG_ROOTPATH)).forEach(log -> {
+                  //判断日志文件是否存在，存在则删除
+                    File file = new File(log.getFilePath());
+                    if (file.exists()) {
+                        try {
+                            file.delete();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
     }
 
 }

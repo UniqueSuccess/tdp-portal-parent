@@ -16,6 +16,7 @@
     <result column="online_time" jdbcType="TIMESTAMP" property="onlineTime" />
     <result column="offline_time" jdbcType="TIMESTAMP" property="offlineTime" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -277,7 +278,7 @@
     update t_client_user
     set id = #{record.id,jdbcType=INTEGER},
       guid = #{record.guid,jdbcType=CHAR},
-      
+
       truename = #{record.truename,jdbcType=VARCHAR},
       deptguid = #{record.deptguid,jdbcType=INTEGER},
       computerguid = #{record.computerguid,jdbcType=CHAR},
@@ -286,7 +287,7 @@
       mac = #{record.mac,jdbcType=VARCHAR},
       regtime = #{record.regtime,jdbcType=TIMESTAMP},
       policyid = #{record.policyid,jdbcType=INTEGER},
-      
+
       online = #{record.online,jdbcType=CHAR},
       online_time = #{record.onlineTime,jdbcType=TIMESTAMP},
       offline_time = #{record.offlineTime,jdbcType=TIMESTAMP},
@@ -392,7 +393,7 @@
       #{clientUser.regtime}, #{clientUser.policyid}, #{clientUser.online})
     </foreach>
   </insert>
-  
+
   <resultMap id="ResultMap" type="cn.goldencis.tdp.policy.entity.ClientUserDO">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="guid" jdbcType="CHAR" property="guid" />
@@ -404,14 +405,15 @@
     <result column="policyid" jdbcType="INTEGER" property="policyid" />
     <result column="online" jdbcType="CHAR" property="online" />
     <result column="online_time" jdbcType="TIMESTAMP" property="onlineTime" />
-    
+
     <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
     <result column="policy_name" jdbcType="VARCHAR" property="policyName" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
 
   <sql id="Column_List">
     t1.id,t1.guid, t1.deptguid, t1.computerguid, t1.computername, t1.ip,
-    t1.mac, t1.policyid, t1.online, t1.online_time, td.name as department_name, tp.name as policy_name
+    t1.mac, t1.policyid, t1.online, t1.nick_name ,t1.online_time, td.name as department_name, tp.name as policy_name
   </sql>
   <sql id="clientUserPage">
     select
@@ -445,7 +447,7 @@
   <select id="getClientUserListByDepartmentId" resultMap="ResultMap">
     <include refid="clientUserPage" />
     <if test='orderColumn != null and orderColumn == "loginTime" '>
-      order by t1.online_time ${orderType}
+      order by t1.online, t1.online_time ${orderType}
     </if>
     <if test='start != null and length != null'>
       limit ${start} , ${length}
@@ -456,12 +458,15 @@
     <include refid="clientUserPage" />
     ) t
   </select>
-  
+
   <update id="updateClientUser">
     update t_client_user t
     <set>
       <if test="department != null">
-        t.deptguid = #{department},
+      t.deptguid = #{department},
+    </if>
+      <if test="nickName != null">
+        t.nick_name = #{nickName},
       </if>
       <if test="strategy != null">
         t.policyid = #{strategy},
@@ -473,7 +478,7 @@
       </foreach>
   </update>
   <select id="queryClientUserByComputerguid" resultMap="ResultMap">
-  	select id, guid,computerguid, policyid from t_client_user
+  	select id, guid,computerguid, policyid,deptguid,nick_name from t_client_user
   	where computerguid =  #{computerguid}
   </select>
   <select id="queryCurrentCustomerCntExclude" resultType="int">
@@ -497,12 +502,12 @@
 	AND online = 0
   </update>
   <select id="queryDepartmentByUnique" resultType="map">
-  	SELECT tc.deptguid AS deptId, td.name AS deptName FROM t_client_user   tc 
+  	SELECT tc.deptguid AS deptId, td.name AS deptName FROM t_client_user   tc
   		LEFT JOIN t_department td ON tc.deptguid = td.id
 	WHERE tc.guid =  #{usrunique}
   </select>
   <select id="queryClientUserByGuId" resultMap="ResultMap">
-  	select id, guid,computerguid, policyid from t_client_user
+  	select id, guid,computerguid, policyid,deptguid,nick_name from t_client_user
   	where guid = #{guid}
   </select>
   <select id="queryChangeClient" resultType="string">
@@ -512,4 +517,16 @@
       </foreach>
   	  AND policyid &lt;&gt; #{strategy}
   </select>
+  <update id="modifyClientUserStatus">
+  	update t_client_user
+  	<set>
+  		<if test="onlineTime != null">
+        	online_time = #{onlineTime},
+      	</if>
+      	<if test="online != null">
+      		online = #{online},
+      	</if>
+  	</set>
+  	where guid = #{guid}
+  </update>
 </mapper>

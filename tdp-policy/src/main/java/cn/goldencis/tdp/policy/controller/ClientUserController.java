@@ -14,7 +14,6 @@ import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
 import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.policy.entity.ClientUserDO;
-import cn.goldencis.tdp.policy.entity.FingerprintDO;
 import cn.goldencis.tdp.policy.entity.UsbKeyDO;
 import cn.goldencis.tdp.policy.service.IClientUserService;
 import cn.goldencis.tdp.core.utils.GetLoginUser;
@@ -156,7 +155,6 @@ public class ClientUserController implements ServletContextAware {
      * @param clientUser
      * @return
      */
-    @PageLog(module = "创建用户", template = "用户名ip：%s", args = "0.computerguid", type = LogType.INSERT)
     @ResponseBody
     @RequestMapping(value = "/addClientUser", method = RequestMethod.POST)
     public ResultMsg addClientUser(@RequestBody net.sf.json.JSONObject jsonObject, HttpServletRequest request) {
@@ -164,8 +162,8 @@ public class ClientUserController implements ServletContextAware {
         ResultMsg resultMsg = new ResultMsg();
         try {
             ClientUserDO clientUser = (ClientUserDO)net.sf.json.JSONObject.toBean(jsonObject, ClientUserDO.class);
-            if (StringUtil.isEmpty(clientUser.getComputerguid())) {
-                resultMsg.setResultMsg("缺失字段computerguid");
+            if (StringUtil.isEmpty(clientUser.getComputerguid()) && StringUtil.isEmpty(clientUser.getGuid())) {
+                resultMsg.setResultMsg("缺失字段computerguid和guid");
                 resultMsg.setResultCode(ConstantsDto.RESULT_CODE_FALSE);
                 return resultMsg;
             }
@@ -412,24 +410,22 @@ public class ClientUserController implements ServletContextAware {
     @RequestMapping(value = "/clientUserLogout", method = RequestMethod.POST)
     public Map<String, Object> clientUserLogout(@RequestBody JSONObject userguid) {
         Map<String, Object> resultMsg = new HashMap<>();
+        resultMsg.put("resultcode", ConstantsDto.RESULT_CODE_FALSE);
         try {
-            //根据传入的GUID，查询数据库中的用户信息
-            ClientUserDO clientUser = clientUserService.getClientUserByGuid((String) userguid.get("userguid"));
-
-            //用户为空不存在
-            if (clientUser == null) {
-                resultMsg.put("resultcode", ConstantsDto.RESULT_CODE_FALSE);
-                resultMsg.put("resultmsg", "用户名不存在！");
+            if (userguid == null || userguid.get("userguid") == null) {
+                resultMsg.put("resultmsg", "缺少userguid");
                 return resultMsg;
             }
-
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("guid", String.valueOf(userguid.get("userguid")));
+            params.put("online", "1");
+            params.put("onlineTime", DateUtil.getCurrentDate(DateUtil.DateTimeFormat));
+            clientUserService.modifyClientUserStatus(params);
             //登出
-            clientUserService.clientUserLogout((String) userguid.get("userguid"));
-
+            
             //记录登录日志
-            OperationLogDO log = new OperationLogDO();
-
-            //设置ip地址
+            //OperationLogDO log = new OperationLogDO();
+            /*//设置ip地址
             String ip = NetworkUtil.getIpAddress(SysContext.getRequest());
             log.setIp(ip);
             log.setLogPage("客户端登出");
@@ -439,12 +435,11 @@ public class ClientUserController implements ServletContextAware {
             log.setLogDesc(String.format("ClientUserController.clientUserLogout(..) invoke"));
             String detail = String.format("【%s】在【客户端登出】中执行【登出】操作成功：【用户名：%s】", clientUser.getTruename(), clientUser.getUsername());
             log.setLogOperateParam(detail);
-            logService.create(log);
+            logService.create(log);*/
 
             resultMsg.put("resultcode", ConstantsDto.RESULT_CODE_TRUE);
             resultMsg.put("resultmsg", "用户登出成功！");
         } catch (Exception e) {
-            resultMsg.put("error", e);
             resultMsg.put("resultcode", ConstantsDto.RESULT_CODE_ERROR);
             resultMsg.put("resultmsg", "用户登出错误！");
         }
@@ -598,7 +593,7 @@ public class ClientUserController implements ServletContextAware {
                 resultMsg.setResultMsg("缺少必要参数");
                 return resultMsg;
             }
-            clientUserService.updateHeartbeat(json.getString("usrunique"));
+            //clientUserService.updateHeartbeat(json.getString("usrunique"));
             Map<String, Object> into = clientUserService.queryDepartmentByUnique(json.getString("usrunique"));
             resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
             resultMsg.setData(into);

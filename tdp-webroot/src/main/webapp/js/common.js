@@ -262,3 +262,18 @@ function GetCrc32(Instr) {
   Crc ^=0xFFFFFFFF;
   return Crc;
 }
+
+//登陆超时重定向
+$.ajaxSetup({
+    complete: function (xhr, textStatus) {
+        // console.log(xhr,textStatus)
+        if (xhr.getResponseHeader('isRedirect') == 'yes') {
+            location.href = "/tdp/login";
+            return;
+        }
+        if(xhr.status == '403') {
+            location.href = "/tdp/login";
+            return;
+        }
+    }
+});

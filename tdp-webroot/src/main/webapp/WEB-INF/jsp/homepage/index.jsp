@@ -7,15 +7,15 @@
 -->
 
 <head>
-    <title>金盾VDP</title>
+    <title></title>
     <link href="${ctxCss}/homepage/index.css" rel="stylesheet" type="text/css"/>
 
 </head>
 
-<div id="homepage" v-cloak class="gd-right-content gd-padding-md">
+<div id="homepage" v-cloak class="gd-right-content gd-padding-lg">
     <div class="row-top">
         <div class="cell">
-            <p class="section-title">安全测评</p>
+            <p class="section-title">安全指数</p>
             <div class="cell-top">
                 <div id="potent_risk" class="echarts-content"></div>
             </div>
@@ -36,13 +36,13 @@
                     </div>
                     <span>外发无水印</span>
                 </div>
-                <%--<div class="cell-bottom-cell">
+                <div class="cell-bottom-cell">
                     <i class="iconfont icon-btn-export"></i>
                     <div>
                         <span class="export"></span>人
                     </div>
-                    <span>导出无水印</span>
-                </div>--%>
+                    <span>导出有风险</span>
+                </div>
             </div>
         </div>
         <div class="cell">

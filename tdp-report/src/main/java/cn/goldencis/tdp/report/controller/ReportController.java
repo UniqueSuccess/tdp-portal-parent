@@ -554,6 +554,33 @@ public class ReportController {
         return resultMsg;
     }
 
+    /**
+     * 删除文档流转日志接口
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/deleteFileTransferLog", method = RequestMethod.POST)
+    public ResultMsg deleteFileTransferLog(Integer clearDays) {
+        ResultMsg resultMsg = new ResultMsg();
+
+        try {
+            //获取需要清理日志的日期
+            Date clearDate = DateUtil.getCurrentDateAddDay(-clearDays);
+
+            //清理视频流转日志及文件
+            fileTransferLogSevice.deleteFileTransferLog(clearDate);
+
+            resultMsg.setResultMsg("删除文档流转日志成功");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_TRUE);
+        } catch (Exception e) {
+            resultMsg.setData(e);
+            resultMsg.setResultMsg("删除文档流转日志错误");
+            resultMsg.setResultCode(ConstantsDto.RESULT_CODE_ERROR);
+        }
+
+        return resultMsg;
+    }
+
     @ResponseBody
     @RequestMapping(value = "/getFileTypeCount",method = RequestMethod.GET)
     public ResultMsg getFileTypeCount(){
@@ -583,4 +610,5 @@ public class ReportController {
         }
         return resultMsg;
     }
+
 }

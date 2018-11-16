@@ -48,6 +48,7 @@ public class ScrnwatermarkLogController {
 
     /**
      * 客户端获取49位屏幕水印随机id的接口
+     *
      * @return
      */
     @ResponseBody
@@ -95,6 +96,7 @@ public class ScrnwatermarkLogController {
 
     /**
      * 根据水印日志的id获取水印日志信息
+     *
      * @param logId
      * @return
      */
@@ -146,7 +148,7 @@ public class ScrnwatermarkLogController {
             String fileName = UUID.randomUUID().toString();
             ServletContext servletContext = SysContext.getRequest().getServletContext();
             String dirPath = servletContext.getRealPath(PathConfig.PRINTSCREEN_PATH);
-            String filePath =  dirPath + "/" + fileName;
+            String filePath = dirPath + "/" + fileName;
             file = new File(filePath);
 
             FileUpload fileUpload = new FileUpload();
@@ -193,6 +195,7 @@ public class ScrnwatermarkLogController {
 
     /**
      * VDP6.0.0升级到VDP6.1.0版本，用户屏幕水印记录的升级接口
+     *
      * @return
      */
     @ResponseBody
@@ -220,5 +223,4 @@ public class ScrnwatermarkLogController {
 
         return resultMsg;
     }
-
 }

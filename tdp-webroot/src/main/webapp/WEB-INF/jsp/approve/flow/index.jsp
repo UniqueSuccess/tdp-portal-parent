@@ -6,7 +6,7 @@
 <%@ include file="/WEB-INF/jsp/common/meta.jsp" %>
 
 <head>
-    <title>金盾VDP</title>
+    <title></title>
     <link href="${ctxCss}/approve/flow/index.css" rel="stylesheet" type="text/css"/>
 </head>
 <div id="approveFlowIndex" v-cloak class="gd-right-content gd-padding-lg">

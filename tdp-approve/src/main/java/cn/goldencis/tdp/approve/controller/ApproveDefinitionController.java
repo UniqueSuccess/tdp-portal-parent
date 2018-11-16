@@ -47,6 +47,7 @@ public class ApproveDefinitionController {
 
     /**
      * 审批流程定义界面跳转
+     *
      * @return
      */
     @RequestMapping(value = "/index", method = RequestMethod.GET)
@@ -60,6 +61,7 @@ public class ApproveDefinitionController {
 
     /**
      * 审批流程定义界面，跳转审批流程具体的信息页面
+     *
      * @param approveDefinitionId
      * @return
      */
@@ -90,6 +92,7 @@ public class ApproveDefinitionController {
 
     /**
      * 审批流程定义界面，获取审批流程具体的信息接口
+     *
      * @return
      */
     @ResponseBody
@@ -133,6 +136,7 @@ public class ApproveDefinitionController {
 
     /**
      * 审批流程定义界面，获取全部审批流程接口
+     *
      * @return
      */
     @ResponseBody
@@ -158,6 +162,7 @@ public class ApproveDefinitionController {
 
     /**
      * 新定义审批流程，添加接口
+     *
      * @param approveDefinition
      * @param parentApproveId
      * @return
@@ -197,6 +202,7 @@ public class ApproveDefinitionController {
 
     /**
      * 根据id删除流程的定义，同时删除其对应的环节
+     *
      * @param approveDefinitionId
      * @return
      */

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.goldencis.tdp.system.dao.TClientPackageLogMapper">
+  <insert id="insert">
+  	REPLACE INTO `t_client_package_log` (file_type, user, file_name, file_size) VALUES (#{fileType}, #{user}, #{fileName}, #{fileSize})
+  </insert>
+
+  <select id="queryLog" resultType="map">
+    select file_type as fileType,  DATE_FORMAT(update_time ,'%Y-%m-%d') updateTime, file_name as fileName 
+    from t_client_package_log
+  </select>
+</mapper>

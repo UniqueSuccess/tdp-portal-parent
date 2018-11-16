@@ -6,6 +6,7 @@ import cn.goldencis.tdp.common.utils.FileUpload;
 import cn.goldencis.tdp.common.utils.SysContext;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.dao.CClientUserDOMapper;
+import cn.goldencis.tdp.core.dao.DepartmentDOMapper;
 import cn.goldencis.tdp.policy.dao.ClientUserDOMapper;
 import cn.goldencis.tdp.policy.dao.PolicyPotentialRiskDOMapper;
 import cn.goldencis.tdp.policy.entity.*;
@@ -13,6 +14,7 @@ import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.policy.dao.PolicyDOMapper;
 import cn.goldencis.tdp.policy.service.IPolicyService;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.ServletContextAware;
 
 import javax.servlet.ServletContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -41,6 +44,9 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
 
     @Autowired
     private PolicyPotentialRiskDOMapper riskDOMapper;
+
+    @Autowired
+    private DepartmentDOMapper departmentDOMapper;
 
     @Override
     protected BaseDao<PolicyDO, PolicyDOCriteria> getDao() {
@@ -145,19 +151,17 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
      */
     @Override
     public void copyPolicyFileFromParentpolicy(PolicyDO policy, PolicyDO parentPolicy) throws IOException {
-        ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
-
         //复制一份策略
         //获取父类策略的数据库路径
         String parentPolicyPath = parentPolicy.getPath();
         //获取父类策略的绝对路径
-        parentPolicyPath = servletContext.getRealPath(parentPolicyPath);
+        //parentPolicyPath = servletContext.getRealPath(parentPolicyPath);
         //获取父类策略文件
-        File parentPolicyFile = new File(parentPolicyPath);
+        File parentPolicyFile = new File(PathConfig.HOM_PATH + parentPolicyPath);
 
 
         //获取新建策略的绝对路径
-        String policyDirRealPath = servletContext.getRealPath(PathConfig.POLICY_BASECATALOG + "/" + policy.getId());
+        String policyDirRealPath = PathConfig.HOM_PATH + PathConfig.POLICY_BASECATALOG + "/" + policy.getId();//servletContext.getRealPath(PathConfig.POLICY_BASECATALOG + "/" + policy.getId());
 
         //创建存放新建策略的文件夹
         File policyDir = new File(policyDirRealPath);
@@ -165,9 +169,8 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
             policyDir.mkdirs();
         }
 
-        String policyPath = PathConfig.POLICY_BASECATALOG + "/" + policy.getId() + "/" + PathConfig.POLICY_JSONFILENAME;
         //获取并设置新建策略的相对路径
-        policy.setPath(policyPath);
+        policy.setPath(PathConfig.POLICY_BASECATALOG + "/" + policy.getId() + "/" + PathConfig.POLICY_JSONFILENAME);
 
         //将父类策略文件复制到新建策略的文件夹中
         File policyFile = new File(policyDirRealPath + "/" + PathConfig.POLICY_JSONFILENAME);
@@ -181,13 +184,12 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
      */
     @Override
     public JSONObject readPolicyJsonFileById(PolicyDO policy) throws IOException {
-        ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
+        //ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
         JSONObject jsonObject = new JSONObject();
 
         String policyPath = policy.getPath();
         if (policyPath != null && !"".equals(policyPath)) {
-            String realPath = servletContext.getRealPath(policyPath);
-            File jsonFile = new File(realPath);
+            File jsonFile = new File(PathConfig.HOM_PATH + policyPath);
             String fileContentStr = FileUtils.readFileToString(jsonFile, "UTF-8");
             jsonObject = JSONObject.fromObject(fileContentStr);
         }
@@ -214,6 +216,11 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         ClientUserDO clientUser = new ClientUserDO();
         clientUser.setPolicyid(1);
         clientUserDOMapper.updateByExampleSelective(clientUser, example);
+        //将使用该策略的部门切换成默认策略
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("oldPolicy", policyId);
+        params.put("newPolicy", 1);
+        departmentDOMapper.updateDepartmentPolicyByPolicyId(params);
 
         //删除策略关联的策略风险
         PolicyPotentialRiskDOCriteria riskExample = new PolicyPotentialRiskDOCriteria();
@@ -221,8 +228,8 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         riskDOMapper.deleteByExample(riskExample);
 
         //删除对应的策略文件
-        ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
-        String realPath = servletContext.getRealPath(policy.getPath());
+        //ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
+        String realPath = PathConfig.HOM_PATH + policy.getPath();//servletContext.getRealPath(policy.getPath());
         File jsonFile = new File(realPath);
         if (jsonFile.exists()) {
             if (!jsonFile.delete()) {
@@ -247,13 +254,13 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
             PolicyDO policy = mapper.selectByPrimaryKey(policyid);
             //获取策略文件目录和文件，确保存在。
             String path = policy.getPath();
-            ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
-            String realPath = servletContext.getRealPath(path);
-            File jsonFile = new File(realPath);
+            //ServletContext servletContext = SysContext.getRequest().getSession().getServletContext();
+            //String realPath = servletContext.getRealPath(path);
+            File jsonFile = new File(PathConfig.HOM_PATH + path);
             if (!jsonFile.exists()) {
 
-                int index = realPath.lastIndexOf("\\");
-                String catalogPath = realPath.substring(0, index);
+                int index = path.lastIndexOf("\\");
+                String catalogPath = path.substring(0, index);
                 File catalog = new File(catalogPath);
 
                 if (!catalog.exists()) {
@@ -295,7 +302,7 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         //统计该风险类型对应的用户数量，并放入结果集
         this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_SCRNWATERMARK, countMap);
         this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOUTCFG, countMap);
-//        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOPT, countMap);
+        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_FILEOPT, countMap);
 //        this.countPotentialRiskClientUser(ConstantsDto.RISK_OF_APPRO, countMap);
 
         return countMap;
@@ -385,7 +392,7 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
         JSONObject policyJson = JSONObject.fromObject(policyContent);
 
         //校验是否存在屏幕无水印的风险
-        Object sbscrnwatermarkEnable = policyJson.getJSONObject("scrnwatermark").get("enable");
+        Object sbscrnwatermarkEnable = policyJson.getJSONObject("sbscrnwatermark").get("enable");
         //检查屏幕水印开关，关闭则存在风险
         if (ConstantsDto.POLICYOPTIONUNENABLE.equals(sbscrnwatermarkEnable)) {
             //处理策略风险
@@ -407,17 +414,19 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
             this.removePolicyPotentialRisk(ConstantsDto.RISK_OF_FILEOUTCFG, policyId);
         }
 
-        //校验是否存在导出无水印的风险
+        //校验是否存在导出无审批，无加密的风险
         Object sbfileoptEnable = policyJson.getJSONObject("sbfileopt").get("enable");
-        /*Object optScwatermarEnable = policyJson.getJSONObject("sbfileopt").getJSONObject("content").getJSONObject("sbfileoptwatermark").get("enable");
+
+        Object optFileoptEncryEnable = policyJson.getJSONObject("sbfileopt").getJSONObject("content").get("encry");
+        Object optFileoptApproveEnable = policyJson.getJSONObject("sbfileopt").getJSONObject("content").get("approve");
         //如果文件导出开关打开，内部水印开关关闭，则存在风险
-        if (ConstantsDto.POLICYOPTIONENABLE.equals(sbfileoptEnable) && ConstantsDto.POLICYOPTIONUNENABLE.equals(optScwatermarEnable)) {
+        if (ConstantsDto.POLICYOPTIONENABLE.equals(sbfileoptEnable) && ConstantsDto.POLICYOPTIONUNENABLE.equals(optFileoptEncryEnable) && ConstantsDto.POLICYOPTIONUNENABLE.equals(optFileoptApproveEnable)) {
             //处理策略风险
             this.dealWithPolicyPotentialRisk(ConstantsDto.RISK_OF_FILEOPT, policyId);
         } else {
             //移除该策略风险的关联
             this.removePolicyPotentialRisk(ConstantsDto.RISK_OF_FILEOPT, policyId);
-        }*/
+        }
 
         //校验是否存在无审批的风险
         Object outcfgApproEnable = policyJson.getJSONObject("sbfileoutcfg").getJSONObject("content").get("mode");
@@ -502,5 +511,10 @@ public class PolicyServiceImpl extends AbstractBaseServiceImpl<PolicyDO, PolicyD
                 riskDOMapper.insert(risk);
             }
         }
+    }
+
+    @Override
+    public void copyDefaultPolicy() {
+
     }
 }

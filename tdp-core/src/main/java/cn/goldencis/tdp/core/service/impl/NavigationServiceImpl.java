@@ -172,6 +172,7 @@ public class NavigationServiceImpl extends AbstractBaseServiceImpl<NavigationDO,
             naviJson.put("pId", navigation.getParentId());
             naviJson.put("name", navigation.getTitle());
             naviJson.put("ParentNavigationId", navigation.getParentId());
+            naviJson.put("level", navigation.getnLevel() - 1);
             if (navigationIdList.contains(navigation.getId())) {
                 naviJson.put("checked", true);
             }

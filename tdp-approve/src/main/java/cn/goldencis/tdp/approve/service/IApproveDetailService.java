@@ -14,12 +14,14 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 仅批准当前细节步骤
+     *
      * @param detail
      */
     void dealWithCurrentDetail(ApproveDetail detail);
 
     /**
      * 根据流程id和环节id，查询所属所有细节列表
+     *
      * @param flowId
      * @param pointId
      * @return
@@ -28,6 +30,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 根据id获取审批细节步骤
+     *
      * @param approveDetailId
      * @return
      */
@@ -35,6 +38,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 根据流程id，获取该流程全部细节集合
+     *
      * @param approveFlowId
      * @return
      */
@@ -42,6 +46,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 将流程细节集合转化为有序的细节名称，以json数组的形式返回。
+     *
      * @param detailList
      * @return
      */
@@ -49,6 +54,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 将流程细节集合转化为模型
+     *
      * @param detailList
      * @return
      */
@@ -56,6 +62,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 根据流程id，获取该流程已经审批完成的细节集合
+     *
      * @param approveFlowId
      * @return
      */
@@ -63,6 +70,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 将流程细节集合转化为有序列表
+     *
      * @param detailList
      * @return
      */
@@ -70,6 +78,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 获取当前账户待审批细节id
+     *
      * @param detailList
      * @param pointId
      * @return
@@ -78,6 +87,7 @@ public interface IApproveDetailService extends BaseService<ApproveDetail, Approv
 
     /**
      * 为流程细节设置审批人姓名
+     *
      * @param detailList
      */
     void fillWithApproverName(List<ApproveDetail> detailList);

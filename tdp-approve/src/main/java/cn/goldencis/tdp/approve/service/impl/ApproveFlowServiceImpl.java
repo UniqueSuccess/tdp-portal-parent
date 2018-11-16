@@ -26,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.System.out;
-
 /**
  * Created by limingchao on 2018/1/16.
  */
@@ -232,27 +230,21 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
      * @return
      */
     @Override
-    public List<ApproveFlow> getApproveFlowPage(int start, int length, Integer status, Integer needOnly, Map<String, Date> timeMap, String applicantOrType) {
-        //添加审批人或者类型条件
-
-        Date startDate = null;
-        Date endDate = null;
-        if (timeMap != null && timeMap.size() > 1) {
-            //添加时间条件
-            startDate = timeMap.get("startDateTime");
-            endDate = timeMap.get("endDateTime");
-        }
-
+    public List<ApproveFlow> getApproveFlowPage(Map<String, Object> params) {
         //添加审批人条件
         String userGuid = null;
-        if (needOnly != null && needOnly == 1) {
-            userGuid = GetLoginUser.getLoginUser().getGuid();
+        List<String> only = (List<String>) params.get("needOnly");
+        if (only != null && only.size() == 1) {
+            if (only != null && "1".equals(only.get(0))) {
+                userGuid = GetLoginUser.getLoginUser().getGuid();
+            }
         }
-        List<ApproveFlow> approveFlowInPage = cMapper.getApproveFlowPage(start, length, status, userGuid, startDate, endDate, applicantOrType);
+        params.put("userGuid", userGuid);
+        List<ApproveFlow> approveFlowInPage = cMapper.getApproveFlowPage(params);
         for (ApproveFlow approveFlow : approveFlowInPage) {
             if (approveFlow.getSeniorId() == 0) {
                 approveFlow.setModifyTime(null);
-            }else{
+            } else {
                 ApproveDetailCriteria criteria = new ApproveDetailCriteria();
                 criteria.createCriteria().andPointIdEqualTo(approveFlow.getSeniorId()).andFlowIdEqualTo(approveFlow.getId());
                 List<ApproveDetail> details = detailMapper.selectByExample(criteria);
@@ -303,22 +295,19 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
      * @return
      */
     @Override
-    public int countApproveFlowPage(Integer status, Integer needOnly, Map<String, Date> timeMap, String applicantOrType) {
-        Date startDate = null;
-        Date endDate = null;
-        if (timeMap != null && timeMap.size() > 1) {
-            //添加时间条件
-            startDate = timeMap.get("startDateTime");
-            endDate = timeMap.get("endDateTime");
-        }
+    public int countApproveFlowPage(Map<String, Object> params) {
+
 
         //添加审批人条件
         String userGuid = null;
-        if (needOnly != null && needOnly == 1) {
-            userGuid = GetLoginUser.getLoginUser().getGuid();
+        List<String> only = (List<String>) params.get("needOnly");
+        if (only != null && only.size() == 1) {
+            if (only != null && "1".equals(only.get(0))) {
+                userGuid = GetLoginUser.getLoginUser().getGuid();
+            }
         }
-
-        long count = cMapper.countApproveFlowPage(status, userGuid, startDate, endDate, applicantOrType);
+        params.put("userGuid", userGuid);
+        long count = cMapper.countApproveFlowPage(params);
         return (int) count;
     }
 
@@ -372,7 +361,13 @@ public class ApproveFlowServiceImpl extends AbstractBaseServiceImpl<ApproveFlow,
                 String[] approverArr = approveFlow.getApprovers().split(",");
                 for (String approver : approverArr) {
                     if (user.getGuid().equals(approver)) {
-                        approveFlow.setChecked(true);
+                        ApproveDetailCriteria criteria = new ApproveDetailCriteria();
+                        criteria.createCriteria().andApproverEqualTo(approver).andFlowIdEqualTo(approveFlow.getId());
+                        List<ApproveDetail> details = detailMapper.selectByExample(criteria);
+                        if (details.get(0).getResult() != null) {
+                        }else{
+                            approveFlow.setChecked(true);
+                        }
                         break;
                     }
                 }

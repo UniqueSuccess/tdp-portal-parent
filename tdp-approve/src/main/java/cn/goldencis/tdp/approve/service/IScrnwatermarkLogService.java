@@ -14,18 +14,21 @@ public interface IScrnwatermarkLogService extends BaseService<ScrnwatermarkLog, 
 
     /**
      * 添加水印日志
+     *
      * @param watermark
      */
     void addScrnwatermarkLog(ScrnwatermarkLog watermark);
 
     /**
      * 根据水印日志id，更新水印日志
+     *
      * @param watermark
      */
     void updateScrnwatermarkLogById(ScrnwatermarkLog watermark);
 
     /**
      * 根据水印日志的id获取水印日志信息
+     *
      * @param logId 水印日志id
      * @return
      */
@@ -33,6 +36,7 @@ public interface IScrnwatermarkLogService extends BaseService<ScrnwatermarkLog, 
 
     /**
      * 扫描图片识别logId
+     *
      * @param cmdStr 需要执行的命令
      * @return
      */
@@ -40,13 +44,15 @@ public interface IScrnwatermarkLogService extends BaseService<ScrnwatermarkLog, 
 
     /**
      * 使用Python来识别图片的方法
-     * @return
+     *
      * @param imgPath
+     * @return
      */
     String[] scanPictureByPython(String imgPath);
 
     /**
      * 根据水印日志的id获取水印日志信息
+     *
      * @param logId 水印日志id
      * @return
      */
@@ -54,7 +60,8 @@ public interface IScrnwatermarkLogService extends BaseService<ScrnwatermarkLog, 
 
     /**
      * 将用户信息封装到info对象中
-     * @param info info对象
+     *
+     * @param info       info对象
      * @param clientUser 用户信息
      * @param department
      */
@@ -62,6 +69,7 @@ public interface IScrnwatermarkLogService extends BaseService<ScrnwatermarkLog, 
 
     /**
      * 判断数据库中是否存在该用户对应的屏幕隐式水印记录
+     *
      * @param guid 用户的guid
      * @return 该用户对应的屏幕隐式水印记录是否存在
      */

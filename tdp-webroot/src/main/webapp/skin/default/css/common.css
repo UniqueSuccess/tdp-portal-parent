@@ -7,6 +7,13 @@
 .gd-table-wrapper {
   height: calc(100% - 56px);
 }
+.gd-select .gd-select-drop {
+  max-width: 380px;
+  max-height: 210px !important;
+}
+.gd-table-wrapper .gd-table-head .gd-table-order i:nth-child(2) {
+  top: 12px;
+}
 .left-menu {
   position: fixed;
   left: 0;
@@ -43,7 +50,7 @@
   padding: 5px 0;
   overflow: auto;
 }
-.container .row label {
+.container .row > label {
   display: inline-block;
   width: 70px;
   margin-right: 16px;
@@ -1824,4 +1831,10 @@ select::-ms-expand {
   line-height: 22px;
   display: inline-block;
   color: #fff;
+}
+.gd-tab-horizontal {
+  color: #333 !important;
+}
+[class*=gd-btn].gd-btn-danger {
+  background-color: #59aef0 !important;
 }

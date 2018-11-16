@@ -35,6 +35,7 @@ public class ApproveFlowInfoServiceImpl extends AbstractBaseServiceImpl<ApproveF
 
     /**
      * 插入审批流程详细信息
+     *
      * @param flowInfo
      */
     @Override
@@ -44,6 +45,7 @@ public class ApproveFlowInfoServiceImpl extends AbstractBaseServiceImpl<ApproveF
 
     /**
      * 根据流程id获取流程信息
+     *
      * @param approveFlowInfoId
      * @return
      */
@@ -60,6 +62,7 @@ public class ApproveFlowInfoServiceImpl extends AbstractBaseServiceImpl<ApproveF
 
     /**
      * 保存文件，并在流程信息中添加路径
+     *
      * @param flowInfo
      * @param approvfile
      */

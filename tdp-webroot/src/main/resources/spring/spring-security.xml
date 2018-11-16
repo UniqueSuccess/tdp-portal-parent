@@ -26,7 +26,7 @@
 
     <http pattern="/download/*/*.*" security="none"/>
     <!-- 开放客户端登录的HTTP接口 -->
-    <http pattern="/clientUser/clientUserLogin" security="none"/>
+    <!--<http pattern="/clientUser/clientUserLogin" security="none"/>-->
     <http pattern="/clientUser/clientUserLogout" security="none"/>
     <http pattern="/clientUser/changePassword" security="none"/>
     <http pattern="/usbKey/checkUsbkeyAvailableByNum" security="none"/>
@@ -77,8 +77,10 @@
     <http pattern="/submit/submitReport" security="none"/>
     <!-- 文件下载 -->
 	<http pattern="/file/ioReadFile" security="none" ></http>
+	<!-- 文件校验是否存在 -->
+	<http pattern="/file/queryFileExists" security="none" ></http>
+	<http pattern="/file/downloadAgent" security="none" ></http>
 
-	
     <!--开放给客户端查看审批流程-->
     <http pattern="/approveFlow/clientFlowIndex" security="none"/>
     <http pattern="/approveOpen/getApproveFlowPageClient" security="none"/>
@@ -86,6 +88,14 @@
     <http pattern="/approveFlow/getApproveFlowInfoById" security="none"/>
     <http pattern="/approveOpen/getApproveFlowModelClient" security="none"/>
     <http pattern="/clientindex.jsp" security="none"/>
+    <!-- 安装包下载页面 -->
+    <http pattern="/download.jsp" security="none" ></http>
+    <!-- 安装包下载页面 - 部门选择接口 -->
+    <http pattern="/department/getManagerNodes" security="none" ></http>
+    <!-- 控制台校验 -->
+    <http pattern="/submit/test" security="none"/>
+    <!-- 数据统计 -->
+    <http  pattern="/druid/**" security="none" />
 
     <!--<http pattern="/vdpWebSocketServer" security="none" />-->
 

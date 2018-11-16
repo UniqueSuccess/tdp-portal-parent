@@ -9,7 +9,9 @@
             top: 0;
             bottom: 0;
         }
-
+        .gd-table-wrapper{
+            height: calc(100% - 56px);
+        }
         .container {
             height: calc(100% - 35px);
             width: calc(100% - 80px);
@@ -17,8 +19,8 @@
         }
         .container .row {
             padding: 5px 0;
-            overflow: auto;
             line-height: 32px;
+            overflow: visible;
         }
         .container .row label{
             display: inline-block;
@@ -75,6 +77,10 @@
                 <span id="edit_computername"></span>
             </div>
             <div class="row">
+                <label>昵称</label>
+                <input type="text" class="gd-input gd-input-lg" gd-validate="maxLength" gdv-maxLength="32" name="nickName" id="edit_nickName" />
+            </div>
+            <div class="row">
                 <label>IP地址</label>
                 <span id="edit_ip"></span>
             </div>
@@ -125,6 +131,7 @@
                     type: 'button',
                     icon: 'icon-strategy',
                     title: '策略',
+                    disabled: true,
                     action: function (dom) {
                         var ids = app.batchDatas.map(function(item) {
                             return item[0];
@@ -139,7 +146,7 @@
                             title: '策略',//窗口标题
                             content: $('#update_batch_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                             //url: './layer_content.html',//也可以传入url作为content,
-                            size: [600, 220],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                            size: [565, 220],//窗口大小，直接传数字即可，也可以是['600px','400px']
                             //autoFocus:true,//自动对输入框获取焦点，默认为ture
                             btn: [
                                 {
@@ -232,11 +239,12 @@
                                 obj.computerguid,
                                 obj.online,
                                 obj.computername || '--',
+                                obj.nickName || '--',
                                 obj.ip || '--',
                                 obj.mac || '--',
                                 obj.departmentName || '--',
                                 obj.policyName || '--',
-                                obj.onlineTime || '--',
+                                obj.online == 1 ? (obj.onlineTime || '--') : '--',
                                 obj.id
                             ]
                         });
@@ -257,6 +265,7 @@
                         align: 'center',//对齐方式，默认left，与class不同，class只影响内容，align会影响内容和表头
                         change: function (data) {//复选框改变，触发事件，返回所有选中的列的数据
                             app.batchDatas = data;
+                            app.toolbarConfig[0].disabled = app.batchDatas.length == 0 ? true : false; //批量修改是否禁用
                         }
                     },
                     {
@@ -267,15 +276,15 @@
                         filters: [//设置检索条件
                             {
                                 label: '在线',
-                                value: '1',
+                                value: '0',
                             }, {
                                 label: '离线',
-                                value: '0'
+                                value: '1'
                             }
                         ],
                         render: function (cell, row, raw) {//自定义表格内容
                             var html = '';
-                            if (raw.online == '0') {
+                            if (raw.online == '1') {
                                 html = '<span class="client-state offline">离线</span>';
                             } else {
                                 html = '<span class="client-state online">在线</span>';
@@ -286,6 +295,11 @@
                     {
                         name: 'computername',
                         head: '计算机名',
+                        title: true
+                    },
+                    {
+                        name: 'nickName',
+                        head: '昵称',
                         title: true
                     },
                     {
@@ -311,7 +325,7 @@
                     },
                     {
                         name: 'loginTime',
-                        head: '登录时间',
+                        head: '离线时间',
                         title: true,
                         orderable: true,
                     },
@@ -328,21 +342,26 @@
 
                                     var domEdit = gd.showLayer({
                                         id: 'editWind',//可传一个id作为标识
-                                        title: '编辑部门',//窗口标题
+                                        title: '编辑',//窗口标题
                                         content: $('#edit_dept_temp').html(),//可直接传内容，也可以是$('#xxx')，或是domcument.getElementById('xxx');
                                         //url: './layer_content.html',//也可以传入url作为content,
-                                        size: [600, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
+                                        size: [570, 400],//窗口大小，直接传数字即可，也可以是['600px','400px']
                                         //autoFocus:true,//自动对输入框获取焦点，默认为ture
                                         btn: [
                                             {
                                                 text: '确定',
                                                 action: function (dom) {
+                                                    validateDep = gd.validate('#add_dept_form', {
+                                                        autoPlaceholer: true,
+                                                    });
+                                                    
                                                     if (!validateDep.valid()) {
                                                         return false;
                                                     }
 
                                                     var postData = {};
                                                     postData.ids = raw.computerguid;
+                                                    postData.nickName = $('#editWind input[name="nickName"]').val();
                                                     postData.department = app.departmentId;
                                                     postData.strategy = $('#editWind input[name="strategy"]').val();
 
@@ -392,6 +411,7 @@
                                                 mounted: function() {
                                                     $.each(raw, function (index, val) {
                                                         $('#editWind span#edit_'+ index +'').html(val);
+                                                        $('#editWind input#edit_'+ index +'').val(val);
                                                         if (index == 'deptguid') {
                                                             setTimeout(function() {
                                                                 $('#editWind #treeWindowDepartment span[data-id="'+ val +'"]').trigger("click");
@@ -404,9 +424,7 @@
                                                         }
                                                     })
 
-                                                    validateDep = gd.validate('#add_dept_form', {
-                                                        autoPlaceholer: true,
-                                                    });
+                                                    
                                                 }
                                             })
                                         },

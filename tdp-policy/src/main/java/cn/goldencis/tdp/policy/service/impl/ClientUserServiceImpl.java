@@ -6,14 +6,18 @@ import cn.goldencis.tdp.common.utils.DateUtil;
 import cn.goldencis.tdp.common.utils.ListUtils;
 import cn.goldencis.tdp.common.utils.StringUtil;
 import cn.goldencis.tdp.common.utils.SysContext;
+import cn.goldencis.tdp.core.annotation.LogType;
 import cn.goldencis.tdp.core.constants.ConstantsDto;
 import cn.goldencis.tdp.core.dao.CClientUserDOMapper;
 import cn.goldencis.tdp.core.dao.DepartmentDOMapper;
+import cn.goldencis.tdp.core.entity.OperationLogDO;
 import cn.goldencis.tdp.core.entity.ResultMsg;
 import cn.goldencis.tdp.core.scheduledtask.DynamicScheduledTask;
 import cn.goldencis.tdp.core.scheduledtask.ExecutableTask;
+import cn.goldencis.tdp.core.service.IOperationLogService;
 import cn.goldencis.tdp.core.utils.AuthUtils;
 import cn.goldencis.tdp.core.utils.NetworkUtil;
+import cn.goldencis.tdp.core.utils.PathConfig;
 import cn.goldencis.tdp.policy.dao.*;
 import cn.goldencis.tdp.policy.entity.*;
 import cn.goldencis.tdp.core.entity.DepartmentDO;
@@ -66,6 +70,9 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+
+    @Autowired
+    private IOperationLogService logService;
 
     @Value("${golbalcfg.path}")
     public String golbalcfgpath;
@@ -131,13 +138,17 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
                 result.put("resultMsg", "用户不存在");
                 return result;
             }
+            clientUser.setDeptguid(cu.getDeptguid());
             ClientUserDO updateCu = new ClientUserDO();
             updateCu.setIp(clientUser.getIp());
             updateCu.setMac(clientUser.getMac());
             updateCu.setOnlineTime(new Date());
+            updateCu.setComputername(clientUser.getComputername());
             updateCu.setOnline("0");
+            updateCu.setId(cu.getId());
             mapper.updateByPrimaryKeySelective(updateCu);
             result.put("usrunique", clientUser.getGuid());
+            result.put("username", cu.getNickName());
             policyId = cu.getPolicyid();
         } else {
             /**
@@ -152,17 +163,6 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
              *                      如果找不到 使用默认策略
              *                      如果找到则使用查找到的策略
              */
-            if (clientUser.getDeptguid() != null) {
-              //根据部门查找对应策略
-                if(clientUser.getDeptguid() != null) {
-                    Integer departmnetPolicyId = departmentDOMapper.queryPolicyIdByDepartmentId(clientUser.getDeptguid());
-                    if (departmnetPolicyId != null) {
-                        policyId = departmnetPolicyId;
-                    }
-                }
-            } else {
-                clientUser.setDeptguid(ConstantsDto.DEPARTMENT_UNKOWN_GROUP);
-            }
 
             ClientUserDO cu = mapper.queryClientUserByComputerguid(clientUser.getComputerguid());
             if (cu == null) {
@@ -170,6 +170,17 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
                     result.put("resultCode", ConstantsDto.RESULT_CODE_FALSE);
                     result.put("resultMsg", "超过用户最大点数");
                     return result;
+                }
+                //根据部门查找对应策略
+                if(clientUser.getDeptguid() != null) {
+                    Integer departmnetPolicyId = departmentDOMapper.queryPolicyIdByDepartmentId(clientUser.getDeptguid());
+                    if (departmnetPolicyId != null) {
+                        policyId = departmnetPolicyId;
+                    } else {
+                        clientUser.setDeptguid(ConstantsDto.DEPARTMENT_UNKOWN_GROUP);
+                    }
+                } else {
+                    clientUser.setDeptguid(ConstantsDto.DEPARTMENT_UNKOWN_GROUP);
                 }
                 //设置用户guid
                 UUID uuid = UUID.randomUUID();
@@ -181,27 +192,54 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
                 //更新数据
                 policyId = cu.getPolicyid();
                 clientUser.setPolicyid(null);
+                clientUser.setDeptguid(null);
                 clientUser.setId(cu.getId());
                 clientUser.setOnlineTime(new Date());
                 mapper.updateByPrimaryKeySelective(clientUser);
                 result.put("usrunique", cu.getGuid());
+                result.put("username", cu.getNickName());
+                clientUser.setDeptguid(cu.getDeptguid());
+            }
+            try {
+                OperationLogDO log = new OperationLogDO();
+                log.setIp(clientUser.getIp());
+                String detail = String.format("【%s】终端注册成功", clientUser.getIp());
+                log.setLogOperateParam(detail);
+                log.setLogPage("终端注册");
+                log.setTime(new Date());
+                log.setUserName("");
+                log.setLogType(LogType.INSERT.value());
+                log.setLogDesc(String.format("终端注册成功"));
+                logService.create(log);
+            } catch (Exception e) {
             }
         }
-        
+        if (clientUser.getDeptguid() != null) {
+            DepartmentDO department = departmentDOMapper.selectByPrimaryKey(String.valueOf(clientUser.getDeptguid()));
+            if (department != null) {
+                result.put("deptid", department.getId());
+                result.put("deptname", department.getName());
+            }
+        }
         //根据策略id查询策略地址
         PolicyDO policy = policyDOMapper.selectByPrimaryKey(policyId);
-        result.put("policy", policy.getPath());
-        result.put("policytime", (policy.getModifyTime().getTime() + "").substring(0,10));
-      //设置全局配置信息
+        if (policy != null) {
+            result.put("policy", policy.getPath());
+            result.put("policytime", policy.getModifyTime().getTime() + "");
+        }
+        //设置全局配置信息
         result.put("golbalcfgpath", golbalcfgpath);
 
-        String realPath = SysContext.getRequest().getSession().getServletContext().getRealPath(golbalcfgpath);
+        String realPath = PathConfig.HOM_PATH + golbalcfgpath;
         File globalCfgFile = new File(realPath);
 
         if (globalCfgFile.exists()) {
             long globalcfgtime = globalCfgFile.lastModified();
             //为符合Python端的处理，截掉毫秒
             result.put("globalcfgtime", (globalcfgtime + "").substring(0,10));
+        }
+        if (result.get("username") == null) {
+            result.put("username", "");
         }
         return result;
     }
@@ -645,7 +683,7 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
          * 查询哪些用户策略有变化 下发策略
          */
         if (!ListUtils.isEmpty(list)) {
-            while (true) {
+            /*while (true) {
                 boolean flag = policyPublish.getInitPolicyId().compareAndSet(0, Integer.valueOf(String.valueOf(params.get("strategy"))))
                         && policyPublish.getInitClientUserList().compareAndSet(null, ListUtils.covertStringByList(list, null));
                 if (flag) {
@@ -653,7 +691,8 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
                     taskExecutor.execute(policyPublish);
                     break;
                 }
-            }
+            }*/
+            policyPublish.send(Integer.valueOf(String.valueOf(params.get("strategy"))), null, ListUtils.covertStringByList(list, null));
         }
     }
 
@@ -669,14 +708,22 @@ public class ClientUserServiceImpl extends AbstractBaseServiceImpl<ClientUserDO,
     @Transactional
     @Override
     public void updateClientUserState(String taskguid) {
-        String date = DateUtil.getFormatDate(DateUtil.getCurrentDateAddMinute(Integer.valueOf(updateClientUserState)), DateUtil.DateTimeFormat);
-        mapper.updateClientUserOnline(date);
-        mapper.updateClientUserOffline(date);
+        /**
+         * 心跳由python实现
+         */
+        //String date = DateUtil.getFormatDate(DateUtil.getCurrentDateAddMinute(Integer.valueOf(updateClientUserState)), DateUtil.DateTimeFormat);
+        //mapper.updateClientUserOnline(date);
+        //mapper.updateClientUserOffline(date);
     }
 
     @Override
     @Cacheable(value = "heartInfo", key = "#usrunique")
     public Map<String, Object> queryDepartmentByUnique(String usrunique) {
         return mapper.queryDepartmentByUnique(usrunique);
+    }
+
+    @Override
+    public void modifyClientUserStatus(Map<String, Object> params) {
+        mapper.modifyClientUserStatus(params);
     }
 }

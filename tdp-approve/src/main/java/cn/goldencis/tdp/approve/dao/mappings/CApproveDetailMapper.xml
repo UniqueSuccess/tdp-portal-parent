@@ -2,35 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.goldencis.tdp.approve.dao.CApproveMapper">
     <resultMap id="DetailResultMap" type="cn.goldencis.tdp.approve.entity.ApproveDetail">
-        <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="name" jdbcType="VARCHAR" property="name" />
-        <result column="flow_id" jdbcType="INTEGER" property="flowId" />
-        <result column="point_id" jdbcType="INTEGER" property="pointId" />
-        <result column="senior_id" jdbcType="INTEGER" property="seniorId" />
-        <result column="approver" jdbcType="VARCHAR" property="approver" />
-        <result column="result" jdbcType="INTEGER" property="result" />
-        <result column="remark" jdbcType="VARCHAR" property="remark" />
-        <result column="standard" jdbcType="INTEGER" property="standard" />
-        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="flow_id" jdbcType="INTEGER" property="flowId"/>
+        <result column="point_id" jdbcType="INTEGER" property="pointId"/>
+        <result column="senior_id" jdbcType="INTEGER" property="seniorId"/>
+        <result column="approver" jdbcType="VARCHAR" property="approver"/>
+        <result column="result" jdbcType="INTEGER" property="result"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="standard" jdbcType="INTEGER" property="standard"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
     </resultMap>
 
     <resultMap id="FlowResultMap" type="cn.goldencis.tdp.approve.entity.ApproveFlow">
-        <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="name" jdbcType="VARCHAR" property="name" />
-        <result column="flow_id" jdbcType="INTEGER" property="flowId" />
-        <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="point_id" jdbcType="INTEGER" property="pointId" />
-        <result column="point_name" jdbcType="INTEGER" property="pointName" />
-        <result column="approvers" jdbcType="INTEGER" property="approvers" />
-        <result column="type" jdbcType="INTEGER" property="type" />
-        <result column="tran_unique" jdbcType="VARCHAR" property="tranUnique" />
-        <result column="applicant_id" jdbcType="VARCHAR" property="applicantId" />
-        <result column="applicant_name" jdbcType="VARCHAR" property="applicantName" />
-        <result column="reason" jdbcType="VARCHAR" property="reason" />
-        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
-        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
-        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
-        <result column="senior_id" jdbcType="INTEGER" property="seniorId" />
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="flow_id" jdbcType="INTEGER" property="flowId"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="point_id" jdbcType="INTEGER" property="pointId"/>
+        <result column="point_name" jdbcType="INTEGER" property="pointName"/>
+        <result column="approvers" jdbcType="INTEGER" property="approvers"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="tran_unique" jdbcType="VARCHAR" property="tranUnique"/>
+        <result column="applicant_id" jdbcType="VARCHAR" property="applicantId"/>
+        <result column="applicant_name" jdbcType="VARCHAR" property="applicantName"/>
+        <result column="reason" jdbcType="VARCHAR" property="reason"/>
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="senior_id" jdbcType="INTEGER" property="seniorId"/>
     </resultMap>
 
     <sql id="ApproveDetail_Column_List">
@@ -47,67 +47,58 @@
     </insert>
 
     <select id="getApproveFlowPage" resultMap="FlowResultMap">
-    SELECT DISTINCT
-    f.id,
-    f.name,
-    f.flow_id,
-    f.status,
-    f.point_id,
-    d.name point_Name,
-    group_concat(d.approver) approvers,
-    type,
-    tran_unique,
-    applicant_id,
-    applicant_name,
-    reason,
-    apply_time,
-    finish_time,
-    d.modify_time,
-    d.senior_id
-    FROM t_approve_flow f
-    LEFT JOIN t_approve_detail d
-    ON f.id = d.flow_id AND f.point_id = d.point_id
-    WHERE 1 = 1
-    <if test="userGuid != null">
-        AND d.approver = #{userGuid,jdbcType=VARCHAR}
-    </if>
-    <if test="startDate != null">
-        AND apply_time BETWEEN #{startDate} AND #{endDate}
-    </if>
-    <if test="applicantOrType != null">
-        AND INSTR(applicant_name, #{applicantOrType})
-    </if>
-    <if test="status == 0">
-        AND f.status = 0 AND d.result IS NULL
-    </if>
-    <if test="status == -1">
-        AND f.status = -1
-    </if>
-    <if test="status == 1">
-        AND f.status = 1
-    </if>
-    <if test="status == 2">
-        AND f.status != 0
-    </if>
+        SELECT DISTINCT
+        f.id,
+        f.name,
+        f.flow_id,
+        f.status,
+        f.point_id,
+        d.name point_Name,
+        group_concat(d.approver) approvers,
+        type,
+        tran_unique,
+        applicant_id,
+        applicant_name,
+        reason,
+        apply_time,
+        finish_time,
+        d.modify_time,
+        d.senior_id
+        FROM t_approve_flow f
+        LEFT JOIN t_approve_detail d
+        ON f.id = d.flow_id AND f.point_id = d.point_id
+        WHERE 1 = 1
+        <if test="userGuid != null">
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+            AND f.id in (select td.flow_id from t_approve_detail td where td.result IS NULL and td.approver = #{userGuid,jdbcType=VARCHAR})
+        </if>
 
-    GROUP BY f.id
+        <if test="type != null and type.size> 0">
+            AND f.type in
+            <foreach close=")" collection="type" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
 
-    <if test="status == 0">
-        ORDER BY f.apply_time DESC
-    </if>
-    <if test="status == -1">
-        ORDER BY f.apply_time DESC
-    </if>
-    <if test="status == 1">
-        ORDER BY f.apply_time DESC
-    </if>
-    <if test="status == 2">
-        ORDER BY f.finish_time DESC
-    </if>
-    <if test="start != null">
-        limit #{start} , #{length}
-    </if>
-</select>
+        <if test="status != null and status.size> 0">
+            AND f.status in
+            <foreach close=")" collection="status" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="applicantOrType != null">
+            AND INSTR(applicant_name, #{applicantOrType})
+        </if>
+
+        GROUP BY f.id
+        <if test='orderType != null'>
+            order by f.apply_time ${orderType}
+        </if>
+        <if test="start != null and length != null">
+            limit ${start} , ${length}
+        </if>
+    </select>
 
     <select id="getApproveFlowPageClient" resultMap="FlowResultMap">
         SELECT DISTINCT
@@ -171,7 +162,6 @@
     </select>
 
 
-
     <select id="countApproveFlowPage" resultType="java.lang.Long">
         SELECT
         count(DISTINCT f.id)
@@ -181,15 +171,13 @@
         WHERE 1 = 1
         <if test="userGuid != null">
             AND d.approver = #{userGuid,jdbcType=VARCHAR}
+            AND f.id in (select td.flow_id from t_approve_detail td where td.result IS NULL and td.approver = #{userGuid,jdbcType=VARCHAR})
         </if>
-        <if test="status == 0">
-            AND f.status = 0 AND d.result IS NULL
-        </if>
-        <if test="status == 1">
-            AND f.status != 0
-        </if>
-        <if test="startDate != null">
-            AND apply_time BETWEEN #{startDate} AND #{endDate}
+        <if test="status != null and status.size> 0">
+            AND f.status in
+            <foreach close=")" collection="status" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
         </if>
         <if test="applicantOrType != null">
             AND INSTR(applicant_name, #{applicantOrType})
@@ -231,6 +219,7 @@
         WHERE
             f.status = 0
             AND d.approver = #{userGuid,jdbcType=VARCHAR}
+            AND d.result IS NULL
     </select>
 
     <select id="countApproveByState" resultType="java.lang.Long">
@@ -241,15 +230,25 @@
         ON f.id = d.flow_id
         AND f.point_id = d.point_id
         WHERE
-            1 = 1
-            <if test="userGuid != null">
-                AND d.approver = #{userGuid,jdbcType=VARCHAR}
-            </if>
-            <if test="status != null and status != 2">
-                AND f.status = #{status,jdbcType=INTEGER}
-            </if>
-            <if test="status != null and status == 2">
-                AND f.status != 0
-            </if>
+        1 = 1
+        <if test="userGuid != null">
+            AND d.approver = #{userGuid,jdbcType=VARCHAR}
+            AND d.result IS null
+        </if>
+        <if test="status != null and status == 0">
+            AND f.status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="status != null and status == -1">
+            AND f.status = #{status,jdbcType=INTEGER}
+            AND d.result IS NOT null
+        </if>
+        <if test="status != null and status == 1">
+            AND f.status = #{status,jdbcType=INTEGER}
+            AND d.result IS NOT null
+        </if>
+        <if test="status != null and status == 2">
+            AND f.status != 0
+            AND d.result IS NOT null
+        </if>
     </select>
 </mapper>

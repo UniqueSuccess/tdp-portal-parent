@@ -4,7 +4,7 @@
 <%@ include file="/WEB-INF/jsp/common/meta.jsp"%>
 
 <head>
-    <title>金盾VDP</title>
+    <title></title>
     <link href="${ctxCss}/ztree/ztree.css" rel="stylesheet" type="text/css"/>
     <link href="${ctxCss}/approve/flow/index.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="wind-row cf">
-                    <button class="gd-btn" onclick="saveApprove(this)">保存</button>
+                    <button class="gd-btn" onclick="saveApprove(this)">确定</button>
                     <button class="gd-btn-cancel" onclick="cancelApprove(this)">取消</button>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                     </div>
                 </div>
                 <div class="wind-row cf">
-                    <button class="gd-btn" onclick="saveApprove(this)">保存</button>
+                    <button class="gd-btn" onclick="saveApprove(this)">确定</button>
                     <button class="gd-btn-cancel" onclick="cancelApprove(this)">取消</button>
                 </div>
             </div>

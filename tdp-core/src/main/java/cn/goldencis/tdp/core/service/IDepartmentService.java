@@ -24,7 +24,7 @@ public interface IDepartmentService extends BaseService<DepartmentDO, Department
      * @param ordercase
      * @return
      */
-    List<DepartmentDO> getDeptarMentListByParent(Integer startNum, Integer pageSize, Integer pId, String treePath, String ordercase);
+    List<DepartmentDO> getDeptarMentListByParent(Integer startNum, Integer pageSize, Integer pId, String treePath, String ordercase, String searchstr);
 
     /**
      * 根据查询条件获取全部列表
@@ -39,7 +39,7 @@ public interface IDepartmentService extends BaseService<DepartmentDO, Department
      * @param treePath
      * @return
      */
-    long getDeptarMentCountByParent(Integer pId, String treePath);
+    long getDeptarMentCountByParent(Integer pId, String treePath, String searchstr);
 
     /**
      * 管理员无权限限制，获取全部部门树json

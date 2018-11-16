@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by limingchao on 2018/1/17.
@@ -33,9 +34,7 @@ public interface CApproveMapper {
      * @param applicantOrType
      * @return
      */
-    List<ApproveFlow> getApproveFlowPage(@Param("start") int start, @Param("length") int length, @Param("status") Integer status,
-                                         @Param("userGuid") String userGuid, @Param("startDate") Date startDate,
-                                         @Param("endDate") Date endDate, @Param("applicantOrType") String applicantOrType);
+    List<ApproveFlow> getApproveFlowPage(Map<String, Object> params);
 
     /**
      * 根据查询条件，获取审批流程。分页查询
@@ -61,8 +60,7 @@ public interface CApproveMapper {
      * @param endDate
      * @param applicantOrType
      */
-    long countApproveFlowPage(@Param("status") Integer status, @Param("userGuid") String userGuid, @Param("startDate") Date startDate,
-                              @Param("endDate") Date endDate, @Param("applicantOrType") String applicantOrType);
+    long countApproveFlowPage(Map<String, Object> params);
 
     /**
      * 根据查询条件，获取审批流程的数量

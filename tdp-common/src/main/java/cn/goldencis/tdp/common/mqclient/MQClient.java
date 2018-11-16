@@ -1,9 +1,13 @@
 package cn.goldencis.tdp.common.mqclient;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import cn.goldencis.tdp.common.utils.Toolkit;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -11,6 +15,7 @@ import javax.annotation.PostConstruct;
 
 @Component
 public class MQClient {
+    private static final Log LOGGER = LogFactory.getLog(MQClient.class);
     public static final int MSG_REALTIME = 1;
     public static final int MSG_CACHED = 2;
     public static final int MSG_SERIALIZABLE = 3;
@@ -87,10 +92,11 @@ public class MQClient {
     }
 
     public boolean clientNotify(String clients, String message, String content, int type) {
+        LOGGER.info("###发送MQ数据..., clients:" + clients + ",message:" + message + ",content:" + content + ",type:" + type);
         if (type == MSG_REALTIME) {
             return publish(clients, message, content);
         }
-
+        
         boolean ret = false;
         Jedis jedis = null;
 

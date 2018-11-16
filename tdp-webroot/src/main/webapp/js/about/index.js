@@ -1,22 +1,103 @@
-changeq("incCopyFileLinux_oms", "incTrueFileLinux_oms");
+var aboutVUE = new Vue({
+    el: "#about",
+    data: {
+        version:"6.0.0",
+        updateDate:"2018年10月26日 12:31:53"
+        /*authDeviceNum:authInfo.authDeviceNum,//授权台数
+        authmsg:authInfo.authmsg,//
+        beginEndDate:authInfo.beginEndDate,//授权有效期
+        company:authInfo.company,//公司名称
+        deviceUnique:authInfo.deviceUnique,//授权码
+        supportDate:authInfo.supportDate*/
 
-function changeq(a, b) {
-    var copyFile = document.getElementById(a);
-    var trueFile = document.getElementById(b);
-    trueFile.onchange = function () {
-        // 判断是不是火狐
-        if (navigator.userAgent.indexOf('Firefox') >= 0) {
-            copyFile.value = getFile(this);
-        } else {
-            copyFile.value = getFile(this).substring(12);
+    },
+    methods: {
+        // 点击选取文件
+        getFile:function() {
+            $('#importFile').click();
+        },
+        // 显示准备上传的文件名
+        fillFileName:function(src, target) {
+            $('.' + target).html($('#' + src)[0].files[0].name);
+            // 当有文件准备上传时【导入】可用
+            $('#authenticate').removeAttr('disabled');
         }
     }
-    function getFile(obj) {
-        if (obj) {
-            return obj.value;
-        }
-    }
-}
+})
+
+$(function(){
+    $(document)
+        .on('click', '#authenticate', function(){
+            var incCopyFileLinux = $(".fileNameShow").html();
+            if (incCopyFileLinux == "") {
+                gd.showWarning('请选择授权文件');
+                return false;
+            }
+            $('#uploadTemplate').ajaxSubmit({
+                type: "post",
+                url: ctx + '/about/uploadfile',
+                // data: flagSymbal,
+                // beforeSubmit:function () {},
+                success: function (msg) {
+                    if (msg.resultCode == 1) {
+                        gd.showSuccess('授权成功');
+                        setTimeout(function(){
+                            window.location.href = window.location.href;
+                        },1000);
+                    } else {
+                        gd.showError('授权失败');
+                    }
+                },
+            });
+
+            /*var formData = new FormData($("#uploadTemplate")[0]);
+            $.ajax({
+                url: ctx + '/about/uploadfile',
+                type: "post",
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                data: formData,
+                success: function (msg) {
+                    if (msg.resultCode == 0) {
+                        gd.showSuccess('授权成功');
+                        setTimeout(function(){
+                            window.location.href = window.location.href;
+                        },1000);
+                    } else {
+                        gd.showError('授权失败')
+                    }
+                },
+                error: function (res) {
+                    gd.showError('授权失败');
+                }
+            });*/
+        })
+        .on('click','#save_authentication',function(){
+            $.ajax({
+                url: ctx + "/about/isFileExist",
+                type: "post",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg == 'success') {
+                        window.location = ctx + '/about/fileload'
+                    } else {
+                        gd.showWarning("授权文件不存在");
+                    }
+                },
+                error: function (e) {
+                    gd.showError("下载失败");
+                }
+            });
+        })
+})
+
+
+
+
+/*
 //drs选择文件
 $('#btn_select_oms').click(function () {
     $(this).closest('li').find('.tip').hide();
@@ -73,4 +154,4 @@ function isFileExistOMS() {
             layer.msg("下载失败", { icon: 2 });
         }
     });
-}
+}*/
